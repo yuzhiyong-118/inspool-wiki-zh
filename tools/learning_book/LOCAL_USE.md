@@ -1,13 +1,13 @@
 # 本地学习系统使用手册
 
-当前本机配置为 `.learning-book-runtime/local/runtime.json`；学习底座为固定补丁版 DeepTutor 1.7.2，Windows／Python 3.12／Node 22／SQLite 单 worker。本机 loopback 使用 API 8136、网页 3836。课程、作答和教学会话仍由 DeepTutor 保存，项目回执和交接包独立保存。
+当前本机配置为 `.learning-book-runtime/local/runtime.json`；学习底座为固定补丁版 DeepTutor 1.7.2，Windows／Python 3.12／Node 22／SQLite 单 worker。本机 loopback 使用默认 API 与网页端口（见安装参数）。课程、作答和教学会话仍由 DeepTutor 保存，项目回执和交接包独立保存。
 
 ## 启动与停止
 
 在仓库根目录运行：
 
 ```powershell
-$learnPython = '.learning-validation/deeptutor-60fb3bd/closeout/venv/Scripts/python.exe'
+$learnPython = '<学习运行时 Python 解释器路径>'
 $learnConfig = '.learning-book-runtime/local/runtime.json'
 & $learnPython -X utf8 -B -m tools.learning_book.runtime start --config $learnConfig
 & $learnPython -X utf8 -B -m tools.learning_book.runtime status --config $learnConfig
@@ -18,13 +18,13 @@ $learnConfig = '.learning-book-runtime/local/runtime.json'
 
 ## 用量及中断
 
-`status` 返回累计实报／估算 tokens、总额、暂停线、受管进程、调用身份及停止原因。现有累计授权为 **100 万，80 万暂停**；迁移时完整继承 I6 的 67 个 call_id／217,743 tokens，没有把旧调用放入免计基线。本地 embedding 的 token 计量不可用。
+`status` 返回累计实报／估算 tokens、总额、暂停线、受管进程、调用身份及停止原因。现有累计授权为 **100 万，80 万暂停**；迁移时完整继承 I6 的 67 个 call_id／用量见本机账本，没有把旧调用放入免计基线。本地 embedding 的 token 计量不可用。
 
-获授权的收尾预审题验证新增 3 次／10,672，累计至 228,415；后续以实际 status 为准。该题运行成功但内容审查失败，原输出和审查已留存，失败题已移除。用户已选择系统架构作为真实课程，材料见 课程讲义（未随公开仓库附带）。
+获授权的收尾预审题验证新增用量（见本机账本），累计用量（见本机账本）；后续以实际 status 为准。该题运行成功但内容审查未通过，失败题已移除。课程材料见课程讲义（未随公开仓库附带）。
 
-架构课程现已发布，准备新增 7 次／34,102，其中正文直写 0、首题 1 次／3,653；累计至 262,517。学习前基线通过，用户亲自试学尚待完成。因无模型的依赖索引故障更换过恢复控制身份，当时为 architecture-cumulative-recovery-1m-01；仍是同一账本、全部历史、原总额与暂停线，旧锁和停止回执保留。
+架构课程现已发布，准备新增用量（见本机账本），其中正文直写 0、首题 1 次调用；累计用量（见本机账本）。学习前基线通过，实际试学尚待完成。因无模型的依赖索引故障更换过恢复控制身份（实例标识属本机运行记录，不随本仓库发布）；仍是同一账本、全部历史、原总额与暂停线，旧锁和停止回执保留。
 
-2026-11-13 已按 call_id 归并 Q3 的五条隔离调用／9,095 tokens，并升级到 Q3 `release-04`。当前控制身份为 architecture-cumulative-q3-fix-02，累计 153 条／567,049 tokens，其中实报 564,305、估算 2,744；免计基线、80 万暂停线和 100 万上限不变。原课程、作答、聊天和项目证据已核对，独立恢复通过。首次基线后的第八页使当前检查为 `binding=unknown`，不将首次基线改写为一致。部署与恢复证据见 后续交付第一批（未随公开仓库附带）。
+2026-11-13 已按 call_id 归并 Q3 的五条隔离调用（用量见本机账本），并升级到 Q3 `release-04`。当前控制身份为 Q3 修复实例（标识属本机运行记录，不随本仓库发布），累计用量（见本机账本），其中实报与估算见本机账本；免计基线、80 万暂停线和 100 万上限不变。原课程、作答、聊天和项目证据已核对，独立恢复通过。首次基线后的第八页使当前检查为 `binding=unknown`，不将首次基线改写为一致。部署与恢复证据见 后续交付第一批（未随公开仓库附带）。
 
 监督器持续检查账本；模型公共计量入口在每次实际调用前检查同一门禁。预算到线只阻止新的模型调用，阅读、个人笔记和已有作答继续，不再把整项学习服务停止。API 另有失联检查线程，监督器丢失时停止自身及身份匹配的网页进程。没有 armed 开关。纯阅读不因账本长期不变而超时；单次实际模型调用当前有 600 秒上限。并发在途调用和供应商晚到计量仍可能越过本地暂停线，不能承诺供应商硬封顶。
 
@@ -48,6 +48,10 @@ $learnConfig = '.learning-book-runtime/local/runtime.json'
 ```
 
 丢失响应时使用原 `requestId` 执行 `reconcile`，不得换 ID 重发。首次 I4 后纠错使用 `create --replacement-of <旧activityId>` 创建替代 activity/book，保留旧题、作答、基线和 I5，不原地重绑。补丁与隔离证据见 [E1 说明](../../patches/deeptutor/e1-authored-delivery/README.md)。
+
+### 受控学习扩展（release-21 机制）
+
+未审 AI 文本／提示／深入学习建议块可删除和重生成，删除建议块时保留已生成子页；个人笔记可删除。原正文、原题和扩展 quiz 不开放该入口，整书重建与整页重生成继续保护。操作使用原请求重放、关联重试和目标摘要保护。冻结完整组合回归在 release-21 定版时实际通过（226 次执行／223 项不同检查），真实 HTTP 只读核对通过；该计数对应当时环境，不表示当前部署状态。生命周期修复与部署报告属本机验收证据，不随本仓库发布。新增内容仍为 `unreviewed`，I5 历史 `history=partial` 限制不变，不声称新的独立复审、正式内容审查或用户掌握。
 
 `release-19` 的真实推荐、自定义深入学习和 I4／I5 历史结果见真实验收报告（未随公开仓库附带），不覆盖本版修改。
 

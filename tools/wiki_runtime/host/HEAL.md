@@ -5,9 +5,11 @@
 ## 只读扫描与导出
 
 ```powershell
-python -B tools/heal.py --root E:/临时库 --json
-python -B tools/heal.py --root E:/临时库 --operation-id heal-001 --plan .wiki-runtime/candidates/heal-001.json
+python -B tools/heal.py --root <知识库根目录> --json
+python -B tools/heal.py --root <知识库根目录> --operation-id heal-001 --plan .wiki-runtime/candidates/heal-001.json
 ```
+
+`<知识库根目录>` 是本机知识库工作区路径，属于本机配置，不随仓库发布；执行时替换为实际路径。
 
 默认扫描不创建目录、不写日志或正文。`--plan` 是显式的候选区写入，限定在所选库的 `.wiki-runtime/candidates/`，拒绝覆盖已有文件、正式正文路径与重解析路径。导出的计划是数据，不是批准记录。`--apply` 在未连接可信宿主 dispatcher 的旧 CLI 中直接拒绝，不配置独立 API 作为替代。
 

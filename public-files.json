@@ -36,6 +36,8 @@
     "docs/design/learning-gated-ingest-plan.md",
     "docs/design/learning-question-constraint-plan.md",
     "docs/design/maintenance-plan.md",
+    "docs/design/public-repo-content-backfill-plan.md",
+    "docs/design/wiki-layer-conventions.md",
     "patches/deeptutor/.gitattributes",
     "patches/deeptutor/README.md",
     "patches/deeptutor/build_i4.py",
@@ -254,6 +256,8 @@
     "tools/tests/test_p1_pilot.py",
     "tools/tests/test_pdf_adapter.py",
     "tools/tests/test_permission_isolation.py",
+    "tools/tests/test_public_release_gate.py",
+    "tools/tests/test_public_release_syntax_matrix.py",
     "tools/tests/test_public_workspace.py",
     "tools/tests/test_readonly_host.py",
     "tools/tests/test_rule_audit.py",
@@ -324,6 +328,7 @@
     "tools/wiki_runtime/gates/__init__.py",
     "tools/wiki_runtime/gates/__main__.py",
     "tools/wiki_runtime/gates/core.py",
+    "tools/wiki_runtime/host/ACCEPTANCE.md",
     "tools/wiki_runtime/host/APPROVAL.md",
     "tools/wiki_runtime/host/BACKEND.md",
     "tools/wiki_runtime/host/CODEX.md",
@@ -380,5 +385,6 @@
     "tools/wiki_runtime/runtime/registry.py",
     "tools/wiki_runtime/runtime/service.py",
     "tools/wiki_runtime/runtime/storage.py"
-  ]
+  ],
+  "exceptions": []
 }

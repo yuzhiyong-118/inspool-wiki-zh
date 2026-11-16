@@ -36,7 +36,7 @@ python -B tools/wiki_runtime/cli.py host health --root <库根> --state-dir <私
 - `host health`：受控生成候选报告和日志，省略 `--apply` 时不写正式库。
 - `host health --write-graph --apply`：同批重验并保存图谱、报告与日志。
 - 兼容 `tools/health.py --write-graph / --graph-only / --save` 已要求显式 `--state-dir` 并转交 Executor；缺参数拒绝写入。`--graph-only` 现在也会经过检查并追加日志。
-- 图谱 v2 的节点 ID 为相对路径，保留关系类型；lint 阈值统计只使用内容图，见 [[meta/graph-schema]]。
+- 图谱 v2 的节点 ID 为相对路径，保留关系类型；lint 阈值统计只使用内容图，见本地图谱模式说明 `wiki/meta/graph-schema.md`（属于本地知识库层，不随本仓库发布）。
 
 ## Raw 队列快照
 
