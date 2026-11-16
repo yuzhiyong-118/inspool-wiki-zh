@@ -1,6 +1,7 @@
 # I6 固定上游补丁
 
 固定提交 60fb3bdfddb30b7740c7ce3bd9b28d908f2af6db，版本 1.7.2。安装核对见 [最终清单](manifest.json)，实际运行见 I6 验收（未随公开仓库附带）。这些是本机补丁发行物。
+固定提交 60fb3bdfddb30b7740c7ce3bd9b28d908f2af6db，版本 1.7.2。安装核对见 [最终清单](manifest.json)，实际运行见 I6 验收（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i6/README.md）。这些是本机补丁发行物。
 
 ## 补丁顺序
 
@@ -22,6 +23,8 @@
 通过原生 regenerate-block 的 params_override 提供 num_questions、question_type 和 prepared_templates。当前预审路径支持 choice，列表数量须与实际 num_questions 一致，question_id 唯一。每行明确包含 question_id、topic、question_type、difficulty、reference_question、reference_answer，值为非空字符串，单字段最高 32,768 字符。
 
 topic 放本次准备者已核对的有限来源正文。reference_question 和 reference_answer 是参考题与答案，上游 mimic 模式会据其生成同类新题。生成后仍须核对题干、选项与解释，实际输出不保证逐字复制模板。元数据 prepared_templates=true 标识使用该路径。
+
+该路径不重复执行 Explore 和 Plan，不附 KB 做全库探索，通过既有 builtin_whitelist 收紧自动工具并保留工作区基础工具，每题最多两轮。实际单题及过渡文为 2 次调用（用量见本机账本），详见 token 审计（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i6/token-audit.md）。
 
 ## 回归入口
 

@@ -49,6 +49,10 @@ with TemporaryDirectory() as temporary:
 
 ## 只读部署预检
 
+```powershell
+& '<用户家目录>/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' -B -m tools.wiki_runtime.isolation --root '<知识库根目录>' --profile tools/wiki_runtime/isolation/deployment-profile.template.json --tool-catalog tools/wiki_runtime/isolation/tool-catalog.template.json
+```
+
 退出码固定为 `2`，输出 `status:not_verified`、`enforced:false`、`may_apply:false`。模板仅表示部署意图；不能用于签发隔离完成。profile 中加入 `verified`、`probe_result` 等额外字段会记录拒绝；即便给出合法模板及完美工具目录也不会通过。实际工具目录必须由可信 host 从 transport 注册表获取，静态 JSON 文件不证明真实宿主只暴露这些工具。`os.access` 只是当前进程可写风险线索，在 Windows 上不能作为 ACL 验收证据。
 
 本版不提供“上传探针报告即签发通过”的 API，也没有自动启用生产部署的开关。未来 backend 接入需提交真实实现、认证证据来源和独立验收测试；不得只改 profile 或模型报告使状态变为 verified。
@@ -68,5 +72,9 @@ with TemporaryDirectory() as temporary:
 探针必须真的在受限 backend 中运行；模型自报“拒绝”、测试替身抛 PermissionError 或静态清单都不能认证实际隔离。当前代码仅作路径逐次检查，不能对抗恶意本地进程并发切换路径；生产还须保证候选树及授权目录的祖先路径不受模型/非可信进程修改，或使用经过验证的 handle-based backend。缺少这些能力继续保持 not_verified。
 
 ## 可复现测试
+
+```powershell
+& '<用户家目录>/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' -B -m unittest discover -s tools/tests -p test_permission_isolation.py -v
+```
 
 测试仅使用临时夹具。硬链接和 Windows junction 使用真实文件系统验证；symlink 如无系统权限则明确 skip。另有“当前进程仍可直接写临时正式库”的反证用例，确保不会以网关拒绝替代宿主验收。测试不安装 sandbox，不配置用户/ACL/服务，不读写真实 raw 或业务状态。

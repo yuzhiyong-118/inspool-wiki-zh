@@ -20,10 +20,9 @@ RPC 使用无 shell 子进程，校验消息身份、JSON 字段、单行/总量
 
 在已有 Codex 会话的终端执行；父线程默认取 `CODEX_THREAD_ID`，也可显式传 `--parent-thread-id`。可执行文件默认从 PATH 查找，也可指定绝对路径。
 
-`<CODEX_RUNTIME_PYTHON>` 表示本机 Codex 运行时自带的 Python 解释器路径；该路径属于本机配置，不随仓库发布，使用时替换为实际路径。
-
 ```powershell
 & '<CODEX_RUNTIME_PYTHON>' -B -m tools.wiki_runtime.host.codex_cli inspect --timeout 30
+& '<用户家目录>/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' -B -m tools.wiki_runtime.host.codex_cli inspect --timeout 30
 ```
 
 显式草稿需 `--role` 与 UTF-8 JSON `--payload` 文件，固定系统提示由角色映射取得，载荷不能设置 model/tools/system。最小合成 Worker 载荷是：
@@ -36,6 +35,7 @@ RPC 使用无 shell 子进程，校验消息身份、JSON 字段、单行/总量
 
 ```powershell
 & '<CODEX_RUNTIME_PYTHON>' -B -m tools.wiki_runtime.host.codex_cli draft --role worker --payload .wiki-runtime/codex-smoke-payload.json --timeout 60
+& '<用户家目录>/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' -B -m tools.wiki_runtime.host.codex_cli draft --role worker --payload .wiki-runtime/codex-smoke-payload.json --timeout 60
 ```
 
 此命令会使用当前账号额度调用继承的模型；只打印草稿，无 apply 选项，不写正式知识库。退出码 0 表示诊断或草稿调用成功，不表示权限隔离或维护门禁已通过。失败只输出固定诊断，不回显可能包含私有数据的服务端错误。
@@ -46,6 +46,7 @@ RPC 使用无 shell 子进程，校验消息身份、JSON 字段、单行/总量
 - Windows sandbox readiness 为 ready。App Server 的真实 `command/exec` 临时目录探针先读取原件成功，随后写入触发系统 PermissionError，原字节不变。探针只覆盖这一只读后端路径，不能外推为所有角色/工具已验收。
 - 一次真实独立 Worker 合成草稿返回 `{"changes":[]}`，没有发送真实知识库内容，没有执行 ingest/approve 或应用变更。
 - 17 项 Codex 定向用例通过，覆盖父模型缺失、角色/会话篡改、严格 JSON、批准/动态工具拒绝、工具事件、超时、进程清理及流量边界；独立审查复跑通过。脱敏现场证据位于 `.wiki-runtime/codex-live-probe.json`，属于本机运行目录，不随仓库发布，也不作为知识页提交。
+- 17 项 Codex 定向用例通过，覆盖父模型缺失、角色/会话篡改、严格 JSON、批准/动态工具拒绝、工具事件、超时、进程清理及流量边界；独立审查复跑通过。脱敏现场证据位于 `.wiki-runtime/codex-live-probe.json`，不提交为知识页。
 
 ## 未完成的强制隔离
 

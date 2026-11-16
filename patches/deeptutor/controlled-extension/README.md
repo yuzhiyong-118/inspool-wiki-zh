@@ -1,15 +1,21 @@
 # 受控学习扩展补丁
 
+状态：`release-21` 已部署并启动，控制身份为 <本机控制实例>，补丁 SHA-256 为 `8afa9d11d24aa930b716b0b5048f8fba00a9f0ac6a908c64c7ae97f73bdfe610`。本版修复未审扩展块删除、重生成和个人笔记删除仍被原生保护拦截的问题，并收敛受管课程中必然失败的整书重建、整页重生成、移动、类型转换和原正文编辑入口。候选绑定目标摘要，关联重试不得覆盖另一请求的新内容。定向 X37–X43 和发行复核通过；冻结完整组合回归 226 次执行／223 项不同检查通过，失败／错误／跳过均为 0，575.907 秒。真实 HTTP 只读核对通过，详见 `docs/design/evidence/learning-controlled-extension/run-49-release-21-block-lifecycle/`、`run-50-release-21-regression/` 和 `run-51-release-21-deploy/`。未删除现有课程或账本。
+
 历史真实验收：`release-19` 完成真实推荐、自定义深入学习、浏览器、I4／I5 与重启验收。父发行固定为 `e1-release-06`，不修改父发行、历史发行物和历史证据。
+
+本版修复用户真实试学发现的内容跑偏：提示与深入学习原只读取章节标题和摘要，把 目标课程项目 的“骨架、血液、薄大脑”误解为人体主题。现在提示、文本和深入学习建议统一使用书名、学习目标及当前页有界正文，深入学习候选子页也携带父页上下文；无有效正文时在模型调用前拒绝。推荐卡片支持自定义方向，只有显式 `custom_topic=true` 才允许推荐列表外主题，旧推荐请求继续省略该字段，保留原摘要、待恢复键、候选重放与提交链。深入学习候选固定为一个 section、最多 6 个小节，最多 7 次调用，8 次硬上限不变。最终自定义请求生成 `FlowRun 的失败恢复与幂等设计` 子页，5 次调用（用量见本机账本），Book revision 19、扩展序号 5，I4 为 `extension_consistent`。
+
+真实验收证据见 `docs/design/evidence/learning-controlled-extension/run-44-release-19-bounded-deep/`、`run-45-release-19-regression/` 和 `run-46-release-19-real-custom/`。I5 `selectedConversations=complete`，但 `history=partial`，5 条作答记录历史关联为 unknown；最终子页仍为 `unreviewed`。以上是实现者验证，不声称新的独立复审、正式内容审查或用户掌握。`release-16` 的历史真实补充练习为 3 次调用（用量见本机账本），不覆盖本版修改。
 
 构建命令（Windows Git Bash 使用 `ROOT=$(pwd -W)`）：
 
 ```bash
 ROOT=$(pwd -W)
-PYTHONPATH="$ROOT" .learning-validation/deeptutor-60fb3bd/closeout/venv/Scripts/python.exe \
+PYTHONPATH="$ROOT" <本机验证目录> \
   -X utf8 -B patches/deeptutor/controlled-extension/prepare_release.py \
-  --base-release .learning-validation/learning-system-next-delivery/e1-release-06 \
-  --output .learning-validation/learning-controlled-extension/<新独立目录>
+  --base-release <本机验证目录> \
+  --output <本机验证目录>
 ```
 
 新增与组合回归使用 `tools.tests.run_learning_controlled_extension`，必须显式传入候选 `--release` 和新证据 `--output`。实际检查以最新证据目录为准，不能把本文状态当作独立验收结论。

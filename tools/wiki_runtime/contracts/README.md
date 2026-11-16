@@ -59,4 +59,9 @@ ADR-0001 将 processed_into 限于 processed，与 AGENTS ingest 要求 pending_
 
 ## 验证命令
 
+```powershell
+& '<用户家目录>/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' -B -m tools.wiki_runtime.contracts --examples
+& '<用户家目录>/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' -B -m unittest discover -s tools/tests -p test_runtime_contracts.py -v
+```
+
 单份校验：`-B -m tools.wiki_runtime.contracts candidate tools/wiki_runtime/contracts/examples/candidate.valid.json`；拒绝退出 2，通过退出 0。本目录的契约是协作门禁接口，未宣称正式库写入已被强制隔离。

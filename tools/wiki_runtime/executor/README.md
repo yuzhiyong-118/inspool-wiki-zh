@@ -42,3 +42,7 @@ journal_root 必须在正式库外且不包含正式库，或位于 `.wiki-runti
 这仍是**协作门禁**：没有部署 ACL、独立用户或受限写入工具，同权限 shell 可以绕过或修改脚本/回调/journal。不是目录原子事务，也没有整个文件系统的 compare-and-swap：窄窗口中的编辑可能先被替换，但实际字节被保留并明确报告，不能宣称用户文件在所有时刻都不被替换。非 Windows 的保守替换是先重命名备份再独占安装，存在目标短暂缺失窗口，未作为生产支持承诺。恶意并发重解析路径切换、磁盘断电持久性与同步软件干预尚无 OS 隔离保障。无法认证或备份不完整时必须停止，不能自动降级放行。
 
 故障测试接口 `fault(event, index)` 只供可信测试注入；index 是执行原语编号，初始化/提交为 -1。事件包括 before_prepare/after_prepare/before_active/after_active/after_applying/after_commit、每步 before_intent/after_intent/before_replace/after_replace/after_write/after_done，以及恢复 recover_before_intent/recover_after_intent/recover_after_write/recover_after_done。回调不得由模型控制生产写入过程。测试额外用真实子进程 `os._exit` 验证新文件 hardlink 安装后、临时链接清除前退出：恢复只对 journal 记载且 inode/完整哈希一致的两个链接清理自己的临时链接；陌生或更多硬链接拒绝。部分写入或被修改的临时文件保留为 conflict，需人工对账。
+
+```powershell
+& '<用户家目录>/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' -B -m unittest discover -s tools/tests -p test_executor_recovery.py -v
+```

@@ -12,8 +12,8 @@
 ## 从固定输入构建
 
 ```powershell
-$fixPython = '.learning-validation/deeptutor-60fb3bd/closeout/venv/Scripts/python.exe'
-& $fixPython -X utf8 -B patches/deeptutor/q3-fix/prepare_release.py --base-release .learning-validation/learning-question-q2/release-06 --output <尚不存在的独立输出目录>
+$fixPython = '<本机验证目录>'
+& $fixPython -X utf8 -B patches/deeptutor/q3-fix/prepare_release.py --base-release <本机验证目录> --output <尚不存在的独立输出目录>
 ```
 
 脚本核对 Q2 的完整发行回执、1,111 个业务文件及八个输入 wheel，应用本目录固定补丁，核对结果字节，重新生成 wheel RECORD，再物化独立 site。只在新的输出目录写入，不安装到已有解释器／日常实例，不调用网络或模型。Windows git 的换行转换在新输出中规范化并按清单重验。
@@ -29,3 +29,4 @@ local_install 仅接受显式 Q2／本修复两条固定清单链，父补丁身
 接入、停服备份、独立恢复继续使用已有 local_install／runtime／local_backup，不直接替换已有控制目录中的文件或运行旧备份配置。本轮只构建和隔离验收，**没有升级日常实例**。Q3 隔离新增用量（见本机账本）仍须在下一次模型调用前按call_id接续，不能重置或遗漏。
 
 实际发行物、测试和复核结论见本轮修复验收（未随公开仓库附带）。
+实际发行物、测试和复核结论见本轮修复验收（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-question-q3-fix/README.md）。

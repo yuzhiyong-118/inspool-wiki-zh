@@ -46,11 +46,14 @@ host = StandaloneHost(vault_root, private_state_dir,
 这个 Python 回调与原生桥接不是所有 Agent 产品的现成连接器。具体宿主还需实现真实子会话创建、权限限制和批准接收；不能直接把任意 shell 会话包装成已受限的 transport。原生 SubAgent 如果只会返回文本，桥接层须严格解析 JSON，不能执行返回的代码。
 
 首个具体产品已选 Codex；现有账号登录、父模型继承、独立只读草稿已连通，见 CODEX.md（未随公开仓库附带）。其默认 Native 通道因缺少完整 tools=() 证明仍拒绝运行；草稿成功不表示维护自动落盘可用。
+首个具体产品已选 Codex；现有账号登录、父模型继承、独立只读草稿已连通，见 [CODEX.md](CODEX.md)。其默认 Native 通道因缺少完整 tools=() 证明仍拒绝运行；草稿成功不表示维护自动落盘可用。
 
 现有 `host run --model-config ...` 是可选 API 宿主的命令，并不自动调用当前应用的 SubAgent。`host doctor` 未传模型配置时按默认继承模型方向检查网关，返回 `gateway_verified_host_binding_required`；只表示网关探针通过，真实 dispatcher 尚需绑定，`may_run_model` 与 `may_apply` 仍为 false。显式指定模型配置才检查 API 适配。离线 health、候选检查及确定性派生也不需要模型密钥。
 
 ## 权限验收与失败循环
 
 依次验证 Worker 无法改正式库，Reviewer 无法改候选，Auditor 无法改规则，所有角色无法伪造批准、重置预算或通过旧 CLI 绕过。检查通过的报告必须绑定当前候选、依赖和规则版本；不能接受模型自报 pass。
+
+失败反馈回到 Worker，受脚本规定的次数和时间预算约束；符合申诉条件时再调用独立 Auditor。规则建议需用户确认后才可生效，当前失败不会因提出申诉而变成通过。
 
 当前 JSONL 后端可限制自身注册工具；开发桌面仍有写权限。只有目标宿主实际通过绕过测试，才可声称该入口强制隔离。不支持受限 SubAgent 时，继续标为协作门禁；需要独立审查但无法提供时暂停，不能用同一上下文自审替代。

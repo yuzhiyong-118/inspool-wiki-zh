@@ -1,6 +1,7 @@
 # 入口迁移清单
 
 脚本与 11 个规则入口已按协作门禁范围交付。下表说明已接管路径与保留的可信兼容接口；完整宿主强制隔离不在当前交付范围。当前设计与限制以 [设计入口](../../docs/design/README.md) 为准，历史任务记录（`docs/design/archive/2026-10/development-tasks.md`，随设计迁移批次发布）供追溯。可信运行器、规则、授权、报告及 journal 不应由模型角色写入。
+脚本与 11 个规则入口已按协作门禁范围交付。下表说明已接管路径与保留的可信兼容接口；完整宿主强制隔离不在当前交付范围。当前设计与限制以 [设计入口](../../docs/design/README.md) 为准，[历史任务记录](../../docs/design/archive/2026-10/development-tasks.md) 供追溯。可信运行器、规则、授权、报告及 journal 不应由模型角色写入。
 
 | 入口 | 当前行为 | 接入目标 |
 |---|---|---|
@@ -21,7 +22,8 @@
 | approve | skill/命令已要求可信批准绑定，用户继续开发不构成批准 | 可信确认绑定完整批次/候选/依赖/规则，执行器迁移及全文回链自检 |
 | query / lint 检查 | 已有只读 answer_query 与 AgentSession.query/lint，独立审查，无自动写入 | 日志、缓存、回填另走受控候选，不创建假事务 |
 | Codex inspect / 显式 draft | 现有登录及父模型继承已实测；独立只读草稿成功；没有 apply 入口 | host/CODEX.md；Native 默认因无完整工具关闭证明而停止，不接 Executor |
-| 父仓库 source-command skills（历史迁移记录） | 迁移前由旧父仓库通过 `tools/wiki_runtime/rollout/skills` 的部署工具下发 5 个 skills 与命令；该部署器、清单与恢复工具不随本仓库发布 | 当前入口已本地化到本仓库 [`.agents/skills/`](../../.agents/skills) 与 [`.claude/commands/`](../../.claude/commands)，直接按仓库内文件使用，不依赖父仓库部署工具；真实宿主仍需另行绑定 |
+| 父仓库 source-command skills（历史迁移记录） | 迁移前由旧父仓库通过 `tools/wiki_runtime/rollout/skills` 的部署工具下发 5 个 skills 与命令；该部署器、清单与恢复工具不随本仓库发布 | 当前入口已本地化到本仓库 `.agents/skills/`（未随本仓库发布：agents/skills） 与 `.claude/commands/`（未随本仓库发布：claude/commands），直接按仓库内文件使用，不依赖父仓库部署工具；真实宿主仍需另行绑定 |
+| 父仓库 source-command skills | 5 skills、5 父命令及 1 本地 ingest 命令已部署，全部目标等于候选哈希 | rollout/skills 保存清单、显式 owner 部署/恢复工具和部署说明；真实宿主尚需接入 |
 
 ## 接入验收缺口
 

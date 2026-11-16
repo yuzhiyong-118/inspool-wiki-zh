@@ -21,3 +21,4 @@ python -B patches/deeptutor/build_i4.py --source <隔离源码目录> --output <
 可将 wheel 解包到独立目录，再传给同一个测试脚本。脚本只叠加解包模块的 namespace 搜索位置，断言实际加载路径，不修改 site-packages。模型和外部连接禁止，仅放行 Windows asyncio 标准库内部 socketpair。
 
 实际构建、源码及解包 wheel 的结果见 I4 验收（未随公开仓库附带）。补丁未安装进 I2 的既有 venv/runtime，未重启既有 API/Web。I6 在隔离实例核对实际安装字节后再填写 `contentReadBuild`；该配置是操作者的构建绑定，不是服务端签名证明。
+实际构建、源码及解包 wheel 的结果见 I4 验收（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i4/README.md）。补丁未安装进 I2 的既有 venv/runtime，未重启既有 API/Web。I6 在隔离实例核对实际安装字节后再填写 `contentReadBuild`；该配置是操作者的构建绑定，不是服务端签名证明。

@@ -34,3 +34,4 @@
 变式用量归入 `book:prepare_question_variant`，session 为 book ID，turn 为生产 request ID；沿用 RuntimeGuard 和原累计账本。两轮 quiz loop 不是“两次调用”：还有 forced finish、格式修复、推理空输出重试及提供方行为，须按实际底层调用计量。测试中假 SDK 的用量（见本机账本） 是合成计量，不是真实业务用量。
 
 限定验收和命令见Q2 验收（未随公开仓库附带）。
+限定验收和命令见Q2 验收（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-question-q2/README.md）。

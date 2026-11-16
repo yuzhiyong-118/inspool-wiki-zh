@@ -70,4 +70,8 @@ Worker、Reviewer、RuleAuditor 和 Executor G3 均经统一 InvocationPort 原�
 
 ## 验证
 
+```powershell
+& '<用户家目录>/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' -B -m unittest discover -s tools/tests -p test_bounded_loop.py -v
+```
+
 仅在临时库使用真实 CandidateView、G0–G2、T06 和 T07 协议，模型为明确的测试替身。未评测实际模型的内容审查与规则裁决质量。

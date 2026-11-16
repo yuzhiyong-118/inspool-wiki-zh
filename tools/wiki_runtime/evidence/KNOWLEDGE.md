@@ -71,3 +71,4 @@ partition_knowledge(prepared, claim_ids, package_id=..., version=..., reason=...
 K2 不实施学习认可／投影、prepare.json 导出、候选 preview、网站采集、正式接受或学习反馈适配；这些按 K3／K4 及既有维护入口推进。新语义内容由外部 Agent 负责；当前宿主主／子 Agent token 用量不可见记 unknown，应用模型 API／网络调用为 0，不改已有 DeepTutor 账本。已有课程授权不自动覆盖新资料外发。
 
 完整样例、实际 CLI 输出和独立审查见 K2 验收（未随公开仓库附带）。K1 入口仍见 [README](README.md)，其历史绑定文件未改。
+完整样例、实际 CLI 输出和独立审查见 K2 验收（证据未公开，无法由本仓库独立复核：docs/design/evidence/knowledge-preparation-k2/README.md）。K1 入口仍见 [README](README.md)，其历史绑定文件未改。

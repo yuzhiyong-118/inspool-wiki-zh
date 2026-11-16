@@ -1,5 +1,7 @@
 # Wiki 门禁运行时
 
+2026-10-26 用户确认按协作门禁范围交付，接受宿主权限无法全面约束的限制，停止强制隔离开发。现有检查、审查、预算、批准及恢复照常执行；Codex 严格 Native 适配器保持关闭，不把未验证的真实模型闭环记为通过，也不再以此阻塞本轮收尾。
+
 规则正本是工作区 `AGENTS.md`。公共契约见 [契约说明](contracts/README.md)，当前设计与取舍见 [设计文档入口](../../docs/design/README.md)，历史任务记录已归档。本目录的实现按阶段验收，不能因为模块存在就声称正式库已受权限隔离。
 
 ## P1 候选采集与检查
@@ -37,9 +39,12 @@ approve、规则及受信工具维护默认缺可信批准回调就拒绝；capt
 
 目前桌面环境仍为协作门禁。实际宿主角色权限和旧入口的迁移清单见 `ENTRYPOINTS.md`；`.wiki-runtime/` 已被忽略，不应将含原件、模型请求和恢复备份的运行记录提交为知识页。
 
+首个具体宿主选用 Codex，现有登录、真实父模型继承及独立只读草稿已实测，见 [host/CODEX.md](host/CODEX.md)。其 Native 通道因尚无完整工具关闭证明保持拒绝；显式 draft 只返回草稿，不应用正式变更。
+
 旧 `health.py --save/--write-graph/--graph-only` 和 `raw_index.py --write` 已转交确定性候选与 Executor，必须显式添加 `--state-dir <库外同卷私有目录>`。缺少目录参数会拒绝写入，不会自动选择位置。Health 保存与重建成功后仍按本次检查问题返回 0/1；`--graph-only` 以及 `host health --apply` 的退出码仅表示应用结果。
 
 heal 默认只读计划，旧 `--apply` 已拒绝；可信 `AgentSession.heal` 重新绑定计划依赖，经过独立内容审查及 Executor，不自动造桩。详见 [host/HEAL.md](host/HEAL.md)。微信 `--raw` 已转交来源包与 Executor，不完整内容停候选；`--out` 限库外普通新文件。详见 [host/WECHAT.md](host/WECHAT.md)。历史 Python 写函数只为可信调用者保留，不向模型角色开放。操作入口位于本仓库 `.agents/skills/` 与 `.claude/commands/`；宿主绑定与权限隔离需要在实际环境另行验证。
+heal 默认只读计划，旧 `--apply` 已拒绝；可信 `AgentSession.heal` 重新绑定计划依赖，经过独立内容审查及 Executor，不自动造桩。详见 [host/HEAL.md](host/HEAL.md)。微信 `--raw` 已转交来源包与 Executor，不完整内容停候选；`--out` 限库外普通新文件。详见 [host/WECHAT.md](host/WECHAT.md)。历史 Python 写函数只为可信调用者保留，不向模型角色开放。父仓库 skills/命令及本地 ingest 命令共 11 个入口已按 `rollout/skills/` 清单部署，备份与日志完整，尚待真实宿主绑定和权限验收。
 
 `python -B tools/wiki_runtime/cli.py host doctor --root <库根>` 默认检查 JSON 后端并报告宿主绑定缺口，不要求 API 配置、不调用模型、不初始化私有状态。`gateway_verified_host_binding_required` 表示网关探针通过，实际受限 dispatcher 仍需宿主实现；不能把此状态解释为生产隔离或正式写入已获批准。
 

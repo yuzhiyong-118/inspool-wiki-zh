@@ -29,4 +29,12 @@ HTML 使用标准库解析器限制正文边界，复用旧微信脚本的 Markd
 
 运行目录为仓库根，所有测试写入临时目录：
 
+```powershell
+& '<用户家目录>/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' -B -m unittest discover -s tools/tests -p test_capture_adapters.py -v
+```
+
 离线微信样本验证（同样只使用临时目录）：
+
+```powershell
+& '<用户家目录>/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' -B -m unittest discover -s tools/tests -p test_capture_adapters.py -k test_wechat -v
+```

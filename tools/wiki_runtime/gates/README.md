@@ -16,4 +16,8 @@ G0/G1/G2 总是返回。required_gates 中的 G3/G4/G5 输出 unsupported，不�
 
 只读独立 CLI（输出 JSON，全部通过退出 0、门禁拒绝退出 1、输入错误退出 2）：
 
+```powershell
+& '<用户家目录>/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' -B -m tools.wiki_runtime.gates --root <知识库根目录> --payload-root C:/候选目录 --manifest C:/记录/manifest.json --candidate C:/记录/candidate.json --snapshot C:/记录/dependency_snapshot.json
+```
+
 路径解析和快照核验不等于操作系统权限隔离；本模块没有 apply，不申请业务批准，不替代未来的写入前重验与事务恢复。

@@ -6,6 +6,10 @@
 
 在 PowerShell 中先建立库外候选父目录，然后运行：
 
+```powershell
+& '<用户家目录>/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' -B tools/wechat_article.py 'https://mp.weixin.qq.com/s/ARTICLE_ID' --raw --state-dir 'E:/wiki-owner-state' --candidate-dir 'E:/wechat-candidates/article-001'
+```
+
 - `--state-dir` 必须显式指定，为正式库外、同卷的专属私有状态目录。
 - `--candidate-dir` 是可信宿主选择的库外全新目录，父目录必须已存在；不得与正式库或状态目录交叠。
 - 抓取只允许 HTTPS `mp.weixin.qq.com/s/<文章ID>`。每跳重定向及最终响应地址都必须满足同一限制；不接受账号密码、显式端口、片段、路径转义或控制字符。
@@ -22,7 +26,7 @@
 python tools/wechat_article.py 'https://mp.weixin.qq.com/s/ARTICLE_ID'
 python tools/wechat_article.py 'https://mp.weixin.qq.com/s/ARTICLE_ID' --full
 python tools/wechat_article.py 'https://mp.weixin.qq.com/s/ARTICLE_ID' --json
-python tools/wechat_article.py 'https://mp.weixin.qq.com/s/ARTICLE_ID' --out 'E:/exports/new-article.md'
+python tools/wechat_article.py 'https://mp.weixin.qq.com/s/ARTICLE_ID' --out '<库外输出目录>/new-article.md'
 ```
 
 `--out` 是解析文本导出，不是来源包，不代表抓取完整。只允许库外普通新 `.md` 文件，父目录须存在；拒绝已有目标、symlink/junction/hardlink、规则入口、代码库和私有状态路径，文件上限 8 MiB。显式 `--state-dir` 时同时排除该状态树。`--raw` 不能与 `--out/--full/--json` 混用。
@@ -40,5 +44,9 @@ report = capture_url(root, state_dir, candidate_dir, url)
 旧 `write_to_raw_unprocessed` 已永久拒绝直接写入；微信资料统一通过上述受管 capture/import 路径，raw 保持 unprocessed。库外普通 Markdown 导出仍使用 `export_markdown`，不属于正式知识入库。当前桌面仍能直接运行可信 Python 的权限事实不因此改变，OS 隔离验收仍属 T11 剩余工作。
 
 ## 离线验证
+
+```powershell
+& '<用户家目录>/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' -B -m unittest tools.tests.test_wechat_rollout -v
+```
 
 测试仅在临时库运行，网络替换为固定字节；正式 capture、门禁、固定重算、Executor 和 WAL 不替换，不访问真实微信或真实 raw。
