@@ -1,6 +1,73 @@
 # I4 详细任务书：学习前内容基线与核验
 
 > 公开设计摘编：保留通用契约与方案；历史验收、用户反馈、运行记录及本地素材不随仓库发布。设计条目不代表部署或验收完成。
+日期：2026-11-10。状态：**I4-A～E 已实现，本地／HTTP 契约通过，真实部署集成待 I6**，见 I4 验收（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i4/README.md）及 [使用说明](../../tools/learning_book/BASELINE.md)。上游最小补丁已在隔离副本应用、重新构建并测试，未安装到既有 I2 服务；模型／embedding 调用为 0，I2/I3 历史证据未覆盖。上一阶段为 I3 本地／HTTP 契约通过（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i3/README.md），真实适配写入仍待集成。
+
+总体边界沿用 [总任务书](learning-book-implementation-tasks.md)、[D2](research/upstream-learning/design-convergence/D2-data-and-handoff-contract.md) 和 [D3](research/upstream-learning/design-convergence/D3-first-learning-scope.md)。开工依据保留在 设计核对记录（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i4-design/README.md）及源码 hash；下文为阶段验收标准，实际通过范围及资源限制以 I4 报告为准。不重跑 I2，不把旧预算恢复为可用。
+
+## 1. 目标与阶段边界
+
+在上游完成课程生成后，项目保存一份**不可编辑的历史内容证据**：用了哪个活动／语料、实际页面／题目／资源是什么、读取是否稳定、支持哪些题型、质量由谁检查过、未来记录最多能绑定到什么程度。
+
+| I4 实现 | 继续后置 |
+| --- | --- |
+| 无生成副作用的完整内容读取，以及必要的最小上游补丁 | 自动编译、补题、模型重试、第二个 BookEngine |
+| 有版本的内容投影、完整页面枚举、依赖资源清单及字节 hash | 通用网页抓取器、任意 HTML／脚本依赖打包器、离线课件播放器 |
+| 有限复读、一致性边界、不可变候选快照及核验记录 | 严格事务快照、提交时内容 hash、独立掌握证明 |
+| 选择题结构检查、失败占位识别、外部质量审查回执与基线绑定 | 自动判定所有教学结论正确、模型书面批改 |
+| CLI 与普通应用操作，给 I5/I6 明确的输入／门禁 | 学习结果导出、门户、MCP Server、正式知识归档 |
+
+I3 的 lazy 页面壳不能直接成为 I4 基线。I4 不负责把它编译完成；可在离线／HTTP 假服务和既有真实响应上实现与验收，真实编译由后续有效额度下的 I6 编排承担。
+
+## 2. 开工前必须关闭的读取缺口
+
+### 2.1 已确认事实
+
+1. 固定版本 `GET /api/books/{id}` 在返回 book/spine/pages/progress 前调用 `maybe_resume_on_open`。`include_blocks=false` 也不取消该调用。不能将其当无额度读取，不能依赖“上次看到 READY”消除并发状态变化的可能性。
+2. `GET /api/books` 返回 manifest 与生成概况，没有完整页列表；spine/page GET 不恢复生成，但只凭 spine 及已知 pageId，不能证明枚举了全部存储页面。manifest.page_count 只能交叉核对，不能代替实际枚举。
+3. `BookStorage.list_pages` 对无法读取／验证的 JSON **跳过后继续返回**。仅移除 GET Book 的 resume 调用，仍不能据 HTTP 200 宣称全部页面完整。
+4. Book/Page/Block 的 READY 和 `source_quality.status=ready` 不等于题目生成成功或来源忠实。既有 I2 响应中，4 页／17 块均 READY，但 11 道题包含 1 道 `[Generation failed]`、答案 `N/A` 的占位题；另有非 choice 题。不得改旧响应来让 I4 通过。
+
+### 2.2 选定的最小调整
+
+**先补上游只读 `GET /api/books/{book_id}/content`，再接 I4 采集。** 保留现有整书 GET 的打开／恢复行为。新入口沿用同一 owner/workspace/书权限解析，不使用新引擎，不启动／恢复／取消任何生成，不写 progress/chat，也不调用生成服务。
+
+拟返回契约：
+
+```json
+{
+  "schema": "book-content-read/1",
+  "book": {"实际上游 manifest 字段": "不捏造进度或来源"},
+  "spine": {"实际上游 spine 字段": "完整返回"},
+  "pages": ["全部实际页面，包含完整 blocks"],
+  "generation": {"status": "ready", "working": false},
+  "pageEnumeration": {
+    "mode": "strict",
+    "fileCount": 4,
+    "returnedCount": 4,
+    "errors": []
+  }
+}
+```
+
+该示意中的对象说明不是接口夹具；实际字段按固定模型返回。实现要求：
+
+- 在存储层增加专用于此入口的严格枚举能力，保留旧 `list_pages` 行为。实际目录中应识别的每个 page JSON 都要成功解析、核对文件身份与 page.id/book_id，或报告不完整；不得继续静默丢页。异常仅返回安全标识／错误码，不泄露 runtime 绝对路径。
+- 页面 ID 重复、引用页缺失、跨书混入、坏 JSON、读中删除等不能返回“完整”枚举。前后目录清单变化需明确报变化；具体诊断包装可实现时简化，但完整语义不可省略。
+- `generation` 仅为观测。`working=false` 不证明没有其他客户端编辑或独立生成任务，仍需协作冻结与项目端复读。
+- 不要求返回 progress、会话、答案记录；I5 另行采集。不为 I4 新增学习状态表。
+- 适配器只把这个**确实存在且按契约验收的**新入口列入安全读取；404／旧响应／缺 schema／缺枚举诊断时停止。不能回退到旧 GET Book，也不能向旧接口随便附 `resume=false` 就认为有效——旧版本可能忽略未知 query 参数。
+
+采用此入口是为了同时解决生成副作用、全页枚举和漏页诊断三个问题，不再并行保留“普通 GET＋预算守卫”或“直接读 DT runtime 目录”两条产品路径。
+
+### 2.3 补丁与版本管理
+
+- 原始提交仍固定 `60fb3bdfddb30b7740c7ce3bd9b28d908f2af6db`。最小 diff、补丁 hash、测试和构建说明已保存到项目的 [patches/deeptutor](../../patches/deeptutor/README.md)，实际 wheel hash 见验收证据。
+- 实施在隔离副本应用补丁，重新构建对应发行物。记录 base commit＋patch hash＋实际 wheel hash；不得直接手改已安装 wheel，或把补丁版本写成未修改的官方版本。
+- Web 继续使用原固定提交；只读新增入口不得改变旧 Web 的行为。若原实现必须改 auth/存储模型或多个生成流程，先缩小补丁并回审，不扩成上游重构。
+- 兼容的只读能力升级不重建活动、不改变部署数据身份；补丁／读取契约版本作为采集 provenance 保存，不能为了加版本字段让已有 I3 activity 映射失效。runtime 重建或身份变更仍按 I3 另行绑定。
+
+**I4-A 的路由／存储测试未通过前，不推进完整基线采集，也不借临时通路把它标成完成。** 可以先做纯投影规则和夹具分析。
 
 ## 3. 应用操作与工程组织
 
@@ -12,11 +79,11 @@
 | `check_baseline` | `check-baseline --activity … --snapshot-id … --check-id …` | 核对本地完整性及当前远端内容，生成独立检查记录，不改旧快照 |
 | `record_baseline_review` | `review-baseline --activity … --snapshot-id … --review-id … --review-file …` | 记录外部审查；通过全部门禁且当前复核一致时绑定首次正式基线 |
 
+各命令沿用 `--state-dir/--deployment` 和 UTF-8 JSON 输出／退出码。没有 HTTP 写／生成操作，不要求模型额度。没有自动生成、修复或额外用户确认弹窗；`review-file` 是准备者完成实际审查后提交的具体结果，可由用户或外部 Agent 提供。
 
 建议最小文件边界：`baseline.py` 放采集／复核／审查应用操作，`content.py` 放投影／题目与资源描述；必要时在文件内合并小函数。HTTP 只读入口和 CLI 接入现有文件，不建设新的后端抽象或注册框架。
 
 采集记录放独立 `captures/` 命名空间，快照放 `snapshots/`，审查／检查放对应证据目录，首次基线绑定为独立不可变记录。**不要把读操作塞进 I3 生产请求状态机**：读取失败没有“远端写入结果不明”的语义，也不能让一次失败采集永久占用活动、阻止生产方处理课程。
-
 
 ## 4. 内容投影与身份
 
@@ -37,7 +104,6 @@
 
 章节／页／块的可见顺序保留。题目身份使用 `(pageId, blockId, questionId)`，同一 q_1 在不同块出现合法；同一块重复题 ID、无 ID 或无法唯一定位的题目不得进入 supported 复核。不要按题干或答案 hash 折叠题目。
 
-
 ## 5. 资源范围与包完整性
 
 内容快照是证据包，不承诺脱离 DT Web 独立运行。记录实际 renderer/Web 版本，不复制整个 node_modules。
@@ -51,7 +117,6 @@
 
 `resourceManifestDigest` 单列。快照身份同时固定投影版本、contentDigest、来源映射和资源 manifest；`check-baseline` 必须比较资源，不能因题干文字没变忽略图片／图表变化。I5 使用的绑定证据也必须引用这些摘要。
 
-
 ## 6. 采集与稳定性协议
 
 1. 校验 I3 activity 映射、成功 production/corpus 回执、当前 backend scope、资料留存与来源版本；不确定生产结果、错 scope、原文缺失或语料漂移不得进入可交付基线。
@@ -64,7 +129,6 @@
 一个 captureId 固定其语义输入（活动、scope、snapshotId、purpose、声明、规则版本等），不绑定可移动绝对路径。相同 ID 完成后返回原结果；不同输入冲突。中途进程崩溃的未完成目录不能被发现为成功；因为没有远端写副作用，可以保留旧尝试，用新尝试目录重新完整读取，不能把跨重启的两次单读拼成一对。
 
 snapshotId 成功发布后不可换字节。首次基线绑定前允许生成多个候选，以便准备阶段修复上游内容后重新审查；首次正式绑定后，不能通过再采集当前版来遮盖漂移，修订按 D2 使用新 activity/book。
-
 
 ## 7. 结构检查、质量审查和交付门禁
 
@@ -93,7 +157,6 @@ quality review 文件至少引用：reviewId、actorId／角色（用户或外�
 
 不满足时，保存审查的原判断／发现与门禁失败原因，不改正文、不补题、不生成模型答案。通过后保存不可变基线绑定；质量审查和绑定不是正式 wiki 的 approve，也不表示学习完成。I6 仍须做交付及真实闭环验收。
 
-
 ## 8. 后续绑定与失败恢复
 
 `check-baseline` 产生新的不可变检查记录，保留 content/resources/current revision、读取边界和错误；不覆盖旧 snapshot 或原质量判断。
@@ -112,7 +175,6 @@ quality review 文件至少引用：reviewId、actorId／角色（用户或外�
 
 重复 review/check 不写上游。读中丢失资源不删旧证据；坏 manifest／内容 hash／资源 hash 拒绝使用。新目录不得覆盖旧 snapshot；派生索引可重建。断电、跨文件原子性、ABA 改后改回、另一客户端所见版本均不在本阶段保证内。
 
-
 ## 9. 子任务与依赖
 
 | 子任务 | 交付和关闭标准 |
@@ -124,7 +186,6 @@ quality review 文件至少引用：reviewId、actorId／角色（用户或外�
 | I4-E CLI 与交接 | JSON CLI、输入／包样例、测试命令及证据，更新任务／设计入口的准确状态 |
 
 A → B/C → D → E；B 的纯函数可以先做，但 A 未通过不能把只读完整采集标为已实现。复用 I3 基础，不改其生产语义，不覆盖 I3 历史报告；新增兼容改动须运行 I3 的 36 项回归，最新证据另存 I4 目录。
-
 
 ## 10. 必测场景
 
@@ -148,3 +209,12 @@ A → B/C → D → E；B 的纯函数可以先做，但 A 未通过不能把只
 | B16 | 未配置模型／零额度：采集／复核测试仍可执行，供应商请求为 0；I3 36 项回归通过，产品不 import 私有探针／测试夹具 |
 
 测试使用真实 loopback HTTP 假服务和实际临时目录／子进程，断言请求路径及次数。上游路由用实际框架测试并观测生成／存储入口，不能只测项目自己期待的 JSON。去敏真实响应明确标 replay，必要时对隔离的补丁服务做无模型只读集成；禁止打开旧 GET Book 验证读取安全。
+## 11. 交付、停止条件和预算
+
+实施后才创建 `docs/design/evidence/learning-book-i4/README.md`，提交代码／补丁、版本与构建 hash、CLI 示例、候选／正式基线／review／check 样例、B01–B16 对照、故障文件与请求计数、I3 回归结果及未覆盖项。不提前放“已通过”占位报告。
+
+本轮 I4 实现、隔离补丁构建／ASGI 路由与 HTTP 假服务验证，真实模型／embedding 调用均为 0；未改既有服务安装，不沿用 I2 额度，也未重新生成课程。需要编译／补题时，另走 I6 的新授权额度与受控生成路径。
+
+向 I5 交接时注意：新 content 入口不返回 progress，I5 须另核对无生成副作用的学习记录／会话读取入口，不能因为已有内容快照就回退旧 GET Book 来拿进度。
+
+如果新入口无法保证无生成副作用、完整页枚举无法证明、需改业务权限模型或必须引入第二个引擎／状态库，停止相应实现并记录最小差距。来源忠实性问题不靠提高 hash 校验强度解决；证据完整性问题也不靠一句人工“看过了”放行。

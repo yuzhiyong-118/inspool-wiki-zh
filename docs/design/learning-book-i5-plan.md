@@ -1,6 +1,22 @@
 # I5 详细任务书：只读学习记录与外部交接
 
 > 公开设计摘编：保留通用契约与方案；历史验收、用户反馈、运行记录及本地素材不随仓库发布。设计条目不代表部署或验收完成。
+更新：2026-11-11。状态：**I5-A～E 已实现并通过本地／HTTP 契约验收**，见 完整验收与 C01–C20（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i5/validated/README.md）、[使用说明](../../tools/learning_book/HANDOFF.md)。项目 174 项测试通过；上游 learning-state 25 项源码／wheel 复测、content 19 项及实际 session/SQLite 9 项通过。真实安装／生产学习集成留 I6，累计补丁未安装到既有服务，项目真实模型／embedding 调用为 0。原任务书编写日期 2026-11-10，设计核对（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i5-design/README.md）、A 验收（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i5/README.md）、B 验收（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i5/i5-b/README.md）与 I4（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i4/README.md）保留历史依据。
+
+边界沿用 [总任务书](learning-book-implementation-tasks.md)、[D2](research/upstream-learning/design-convergence/D2-data-and-handoff-contract.md)、[D3](research/upstream-learning/design-convergence/D3-first-learning-scope.md)。I3/I4 是本地／HTTP 契约通过，真实部署和完整生产闭环仍留 I6；不能将此任务书当作已实现的 exporter。
+
+## 1. 目标和不扩大的职责
+
+让外部 Agent 拿到**真实可见的作答／阅读位置／公开教学会话、固定内容证据、来源映射与明确的未知项**，用于学习回顾与知识候选整理。上游仍是唯一可写学习状态；项目只保存不可变证据与保守派生结果。
+
+| I5 交付 | 继续后置 |
+| --- | --- |
+| 无生成副作用的进度／页边映射读取，区分缺失、损坏与有效空记录 | 回放答案、补写 progress、修复上游题目或同步 question bank |
+| 所选公开会话和规范 turn events 的有限分页读取 | 搜索全账户／跨 workspace 聊天、恢复已删历史、导出私有模型 replay |
+| 原始记录、作用域 key、来源／内容绑定、选择题条件性复核 | 模型书面批改、受控测验、独立掌握证明、自动知识归档 |
+| 可搬运 `learning-handoff/1` 包和 JSON CLI／应用方法 | 新门户、MCP Server、第二个可写学习库或通用后端框架 |
+
+用户可以在尚未结束、没有基线、存在失败记录时导出事实；这些情况不靠伪造“完成／全部正确”放行，也不应一律阻止其取回仍存在的数据。
 
 ## 2. 开工前读取门禁：I5-A
 
@@ -21,6 +37,7 @@
 沿用 `_resolve_book_or_404`、请求 user/workspace 与 `resolved.learning`，不更改权限模型，不调用 resume/compile/生成、迁移／会话 adoption、save／score 重算。只输出当前读者的学习状态和诊断，不重复传全书内容。
 
 核心契约如下；I5-A 实施版额外返回逐项 `valueAcquired/coverage/diagnostics`、文件摘要／字节数及 `consistency=per_item_observation`，实际字节和构建身份见 验收（未随公开仓库附带）。下例只解释字段，不是实际用户记录：
+核心契约如下；I5-A 实施版额外返回逐项 `valueAcquired/coverage/diagnostics`、文件摘要／字节数及 `consistency=per_item_observation`，实际字节和构建身份见 验收（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i5/README.md）。下例只解释字段，不是实际用户记录：
 
 ```json
 {
@@ -52,7 +69,6 @@ I4 的发行物和验收证据冻结。新补丁记录 base commit、I4 基础 p
 
 **I5-A 未通过，不推进“完整进度采集已实现”的结论。** 可先写纯记录投影／历史反例分析。若必须修改生成、评估或权限核心流程，停止扩补丁并回报最小缺口。
 
-
 ## 3. 会话的选择、校验和覆盖
 
 ### 3.1 首期选择范围
@@ -81,7 +97,6 @@ I4 的发行物和验收证据冻结。新补丁记录 base commit、I4 基础 p
 
 只导出公开用户／导师消息和公共事件，不读 provider replay、model_turn、provider_response_state 等内部状态。现有详情会去掉两个私有 metadata 键，但 events 分页路由没有同样显式调用；实施必须用注入反例验证边界。若 HTTP 响应出现私有字段／凭据回显，拒绝将其原字节落入交接包，保存安全错误及 wire hash，标该项未捕获／partial；不得先保存“原始证据”再声称已经去敏。若必须补上游公共过滤，限定为既有公开序列化边界的小补丁并单独验收，不开放内部历史读取。
 
-
 ## 4. 作答记录与派生判断
 
 ### 4.1 原始事实和稳定 key
@@ -109,7 +124,6 @@ attempt 本身不保存题型，任何题型分类须注明所依据的 snapshot
 
 `choice-key/1` 只针对 I4 已支持、唯一 `(pageId,blockId,questionId)` 的单答案 choice；检查 user_answer 是否**精确**等于某选项键，再比较 correct_answer。未知／多答案／文本答案／UI 大小写转换不做模糊归一化：不支持或不唯一时 derivedCheck=unknown，不把解析失败判为答错。原客户端判分与复核不同，保留两者并标 disagreement。
 
-
 ## 5. 内容绑定和时间门禁
 
 复用 I4 的完整快照验证和**本次新检查**，不读取某个旧 checkId 的历史成功就当当前结论。包中引用 rule、contentDigest、resourceManifestDigest、sourceMappingDigest、实际 accepted binding、reviewDigest 和本次检查；只比 revision／当前题干不足。
@@ -124,7 +138,6 @@ attempt 本身不保存题型，任何题型分类须注明所依据的 snapshot
 retrospective、早于绑定、无时间、缺基线、未获正式绑定、内容／资源变更、身份错配的记录为 unknown。仍可附 `comparisonToBaseline` 条件性复核，必须标 `historicalBinding=unknown`，不称其为用户当时题目的评分。现有 I4 包只给 capture 微秒时间，不证明服务器时钟精度；I5 不补造缺失历史。
 
 ABA、另一客户端显示内容、提示影响和独立作答均未证明，**首期永不输出 verified_at_submission 或 mastery_passed**。有关联公开教学消息可以标 assistance.observed 并附证据及范围，缺记录一律 unknown，不能推出 unassisted。
-
 
 ## 6. 一致性、有限读取和发布
 
@@ -157,7 +170,6 @@ I5-B 已从 I4 提取共享的 **learning_context／read_content_once／evaluate
 
 `collectionStatus`、各维度 coverage、binding、completion 分开：稳定得到一个部分覆盖包可以成功发布，但 CLI 返回 partial。损坏／越界／scope 错误绝不能当可消费学习包；可发布独立诊断，不混入有效 record 集合。rawRef／JSON pointer 必须指向实际保存的公开字节；去敏／拒绝响应另标，不用 hash 冒充已保存原文。
 
-
 ## 7. 应用操作、CLI 和字段
 
 最小新增建议为 `handoff.py`：普通 `export_learning_results(...)` 操作及 `verify_handoff(...)` 本地包验证，按需一个小记录投影文件；复用已有 scope/HTTP/证据模块，不建新的任务运行框架。
@@ -179,7 +191,6 @@ verify-handoff --package <交接包目录>
 
 交接字段沿用 D2 `learning-handoff/1`，已固化 [schema](../../tools/learning_book/schemas/learning-handoff.schema.json)：backendScope/build、activity、sources、content/binding、原始 records 与稳定 key、assessments.raw／comparisonToBaseline、navigation、conversation selection／消息／events／分支、assistance、completion 声明、逐项 coverage、collection boundaries／限额、errors/limitations 和 manifest。正常／partial／diagnostic 结构校验及离线字节校验均已实测。
 
-
 ## 8. 子任务和依赖
 
 | 子任务 | 交付和关闭标准 |
@@ -191,7 +202,6 @@ verify-handoff --package <交接包目录>
 | I5-E CLI 与交接（已通过） | 两 CLI、完整 schema／正常与 partial 包、D/E 合计 24 项实测、C01–C20 对照和 I6 交接 |
 
 A → B/C → D → E 均已按依赖完成，最新统一复验在 validated，保留原 A/B/I3/I4 报告，不将合成 HTTP 替代实际路由证明。下一步 I6 核对实际安装、真实活动映射／生产学习／备份恢复；本次不自动启动。
-
 
 ## 9. C01–C20 必测场景
 
@@ -219,3 +229,10 @@ A → B/C → D → E 均已按依赖完成，最新统一复验在 validated，
 | C20 | 零模型配置／零生成预算可执行；JSON CLI／退出码／离线 verify；I3 36＋I4 29 兼容回归，产品不 import 测试／文档／私有探针 |
 
 测试采用真实 loopback HTTP 假服务、临时文件与独立进程；A 使用实际 FastAPI＋own/shared 存储。会话路由使用实际 SQLite 临时库、规范 turn 和 legacy 消息，验证公共视图／分页真实行为，而非只测 exporter 自造包装。既有 I2 原始安全响应可作为注明 provenance 的反例／回放；不新增假真实用户、不删失败项来通过。
+## 10. 交付、预算和接续
+
+完整交付位于 `docs/design/evidence/learning-book-i5/validated/`：代码／补丁／发行物身份、174 项项目测试与实际路由复验、正常／partial 可搬运样例、schema、C01–C20 对照和 I6 交接。原 A/B 样例和早期 final/acceptance 试跑保留历史，不当作最新字节闭合；B 的进度样例不是完整包。`learning-book-i5-design` 仍仅为原源码核对。
+
+本轮／I5 的无模型实现与测试不使用生成额度。I2 的原 100 万和后来 3 万均已结案；需要真实编译／追问／补题时，另获 I6 的有限额度。不能通过再生成整本书来获取漂亮导出夹具。
+
+接续入口：**I5 已通过，阅读 validated 验收后再决定 I6 的真实部署集成与额度**。公开 API 无法取回的历史保持 partial／unsupported；不引入第二套学习库补真值，不恢复缺失历史，不扩大成新 Agent harness。

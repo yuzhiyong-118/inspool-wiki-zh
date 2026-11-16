@@ -1,8 +1,10 @@
 # 学习资料交付、内容基线与只读学习交接（I3–I5）
 
 题目能力Q1／Q2已按原范围交付，Q3小样本后的三项缺口已修复并通过限定复审（未随公开仓库附带）。147项不同检查通过（17新增），[新补丁](../../patches/deeptutor/q3-fix/README.md)覆盖受管工具禁用、健康只读与流式计量／重启门禁，原三份Q3课件和六份包只读回验通过。操作见[题目生产手册](QUESTION_PRODUCTION.md)。固定八模块尚未升级日常实例，旧课不自动迁移；完整新课仍需E1。下次模型调用前，须接续Q3新增用量（见本机账本），原账本未自动归并。
+题目能力Q1／Q2已按原范围交付，Q3小样本后的三项缺口已修复并通过限定复审（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-question-q3-fix/README.md）。147项不同检查通过（17新增），[新补丁](../../patches/deeptutor/q3-fix/README.md)覆盖受管工具禁用、健康只读与流式计量／重启门禁，原三份Q3课件和六份包只读回验通过。操作见[题目生产手册](QUESTION_PRODUCTION.md)。固定八模块尚未升级日常实例，旧课不自动迁移；完整新课仍需E1。下次模型调用前，须接续Q3新增用量（见本机账本），原账本未自动归并。
 
 日常运行从 [本机使用手册](LOCAL_USE.md)开始；外部 Agent 按 [课程准备工作单](PREPARATION.md)操作。正式启动／状态／停止、预算门禁、安装接入与备份恢复分别位于 runtime.py、runtime_guard.py、local_install.py、local_backup.py，运行底座需要固定 DeepTutor 发行物。收尾证据见 验收记录（未随公开仓库附带）。
+日常运行从 [本机使用手册](LOCAL_USE.md)开始；外部 Agent 按 [课程准备工作单](PREPARATION.md)操作。正式启动／状态／停止、预算门禁、安装接入与备份恢复分别位于 runtime.py、runtime_guard.py、local_install.py、local_backup.py，运行底座需要固定 DeepTutor 发行物。收尾证据见 验收记录（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-closeout/README.md）。
 
 把已准备好的 UTF-8 Markdown／纯文本交给 DeepTutor HTTP 服务，留下可核验的语料、请求和活动映射。只使用 Python 标准库；不 import DeepTutor，不需要其 venv、私有探针或运行目录。建议 Python 3.11–3.14；后端固定为 DeepTutor 1.7.2、提交 `60fb3bdfddb30b7740c7ce3bd9b28d908f2af6db`。
 
@@ -35,6 +37,7 @@ I6 实际集成增加显式 `recover_inputs(request_id)`／`recover-inputs`。�
 I5-A 的 `DeepTutor.read_learning_state(book_id)` 仅访问严格 GET，返回经能力／读者作用域验证的原始 HTTP Response，不补 Progress 默认值。须有独立 `learningStateReadBuild`，见 [部署样例](examples/deployment-i5.json) 与 [补丁说明](../../patches/deeptutor/i5/README.md)；构建标识不改变 I3 scope digest。authenticated 同时核对 profile 与实际 actor，匿名 owner 是配置标签。缺能力／404／身份冲突拒绝关联，零旧 Book GET 回退。
 
 `LearningRecords.observe_records(...)` 仍只作进度观察，详见 [RECORDS](RECORDS.md)。完整交接使用 [HANDOFF](HANDOFF.md) 中的 `Handoff.export_learning_results(...)`／`verify_handoff(...)` 及 export-results／verify-handoff 两 CLI；A～E 已完成，174 项项目测试及实际路由／存储验收（未随公开仓库附带）通过。原记录不覆盖，缺时间／基线／来源依据保持 unknown；真实安装和生产学习集成留 I6。
+`LearningRecords.observe_records(...)` 仍只作进度观察，详见 [RECORDS](RECORDS.md)。完整交接使用 [HANDOFF](HANDOFF.md) 中的 `Handoff.export_learning_results(...)`／`verify_handoff(...)` 及 export-results／verify-handoff 两 CLI；A～E 已完成，174 项项目测试及实际路由／存储验收（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i5/validated/README.md）通过。原记录不覆盖，缺时间／基线／来源依据保持 unknown；真实安装和生产学习集成留 I6。
 
 ## 资料包
 
@@ -165,3 +168,4 @@ python -B -m tools.tests.run_learning_book_i3 --output docs/design/evidence/lear
 ```
 
 测试使用独立临时资料、真实 loopback HTTP 假服务、实际子进程退出／锁竞争、实际指定实例停止，以及去敏 I2 响应回放。产品不 import 测试／文档／私有验证目录。验收范围与未覆盖项见 I3 验收（未随公开仓库附带），阶段要求见 [任务书](../../docs/design/learning-book-i3-plan.md)。
+测试使用独立临时资料、真实 loopback HTTP 假服务、实际子进程退出／锁竞争、实际指定实例停止，以及去敏 I2 响应回放。产品不 import 测试／文档／私有验证目录。验收范围与未覆盖项见 I3 验收（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i3/README.md），阶段要求见 [任务书](../../docs/design/learning-book-i3-plan.md)。

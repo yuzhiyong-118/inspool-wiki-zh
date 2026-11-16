@@ -14,17 +14,19 @@ $learnConfig = '.learning-book-runtime/local/runtime.json'
 & $learnPython -X utf8 -B -m tools.learning_book.runtime stop --config $learnConfig
 ```
 
+启动后打开本机网页端口的 `/learning/books` 路径。现有白榆示例用于工程验收，真实试学从自己的资料开始。
+
 重复启动会返回已有监督器状态；端口被其他实例占用时拒绝启动。启动失败先查 `status` 和控制目录中的私有日志。不要同时启动旧 `run_i6.py` 或另一个原生服务指向同一 runtime。正常入口会核对安装文件和生产网页摘要，升级后应重新核对发行清单。
 
 ## 用量及中断
 
 `status` 返回累计实报／估算 tokens、总额、暂停线、受管进程、调用身份及停止原因。现有累计授权为 **100 万，80 万暂停**；迁移时完整继承 I6 的 67 个 call_id／用量见本机账本，没有把旧调用放入免计基线。本地 embedding 的 token 计量不可用。
 
-获授权的收尾预审题验证新增用量（见本机账本），累计用量（见本机账本）；后续以实际 status 为准。该题运行成功但内容审查未通过，失败题已移除。课程材料见课程讲义（未随公开仓库附带）。
+获授权的收尾预审题验证已执行，实际用量见本机账本；后续以实际 status 为准。该题运行成功但内容审查未通过，失败题已移除。课程材料见课程讲义（未随公开仓库附带）。
 
-架构课程现已发布，准备新增用量（见本机账本），其中正文直写 0、首题 1 次调用；累计用量（见本机账本）。学习前基线通过，实际试学尚待完成。因无模型的依赖索引故障更换过恢复控制身份（实例标识属本机运行记录，不随本仓库发布）；仍是同一账本、全部历史、原总额与暂停线，旧锁和停止回执保留。
+目标课程项目现已发布，新增用量见本机账本。学习前基线通过，实际试学尚待完成。因无模型的依赖索引故障更换过恢复控制身份（实例标识属本机运行记录，不随本仓库发布）；仍是同一账本、全部历史、原总额与暂停线，旧锁和停止回执保留。
 
-2026-11-13 已按 call_id 归并 Q3 的五条隔离调用（用量见本机账本），并升级到 Q3 `release-04`。当前控制身份为 Q3 修复实例（标识属本机运行记录，不随本仓库发布），累计用量（见本机账本），其中实报与估算见本机账本；免计基线、80 万暂停线和 100 万上限不变。原课程、作答、聊天和项目证据已核对，独立恢复通过。首次基线后的第八页使当前检查为 `binding=unknown`，不将首次基线改写为一致。部署与恢复证据见 后续交付第一批（未随公开仓库附带）。
+2026-11-13 已按 call_id 归并 Q3 的五条隔离调用（用量见本机账本），并升级到 Q3 `release-04`。当前控制身份为 Q3 修复实例（标识属本机运行记录，不随本仓库发布）；免计基线、80 万暂停线和 100 万上限不变。原课程、作答、聊天和项目证据已核对，独立恢复通过。首次基线后的第八页使当前检查为 `binding=unknown`，不将首次基线改写为一致。部署与恢复证据见 后续交付第一批（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-system-next-delivery/batch-1/README.md）。
 
 监督器持续检查账本；模型公共计量入口在每次实际调用前检查同一门禁。预算到线只阻止新的模型调用，阅读、个人笔记和已有作答继续，不再把整项学习服务停止。API 另有失联检查线程，监督器丢失时停止自身及身份匹配的网页进程。没有 armed 开关。纯阅读不因账本长期不变而超时；单次实际模型调用当前有 600 秒上限。并发在途调用和供应商晚到计量仍可能越过本地暂停线，不能承诺供应商硬封顶。
 
@@ -40,6 +42,7 @@ $learnConfig = '.learning-book-runtime/local/runtime.json'
 
 已审正文使用 `author-block` 原样写入，再用 `author-plan` 从实际页块生成计划，最后调用 `complete-authored-book`。这些步骤不代替 I4，也不能把普通块 ready 当作整书完成。部署必须显式配置匹配 E1 发行物的 `authoredDeliveryBuild`；接入工具会核对固定补丁和实际作者模块字节。
 
+2026-11-14 已将 `e1-release-06` 受控部署到日常（原课程、账本和恢复边界保留）。目标课程项目已发布并通过 I4，当前等待用户亲自试学；入口及实际用量见 试学报告（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-system-e1-trial/README.md）。
 
 ```powershell
 & $learnPython -X utf8 -B -m tools.learning_book.cli author-block --activity <activityId> --request-id <新的请求ID> --deployment <隔离deployment.json> --state-dir <隔离state> --page-id <pageId> --operation insert --body-file <已审正文.md> --budget-context <隔离预算.json> --knowledge-preparation <已审connection.json> --expected-revision <当前revision>
@@ -51,9 +54,11 @@ $learnConfig = '.learning-book-runtime/local/runtime.json'
 
 ### 受控学习扩展（release-21 机制）
 
-未审 AI 文本／提示／深入学习建议块可删除和重生成，删除建议块时保留已生成子页；个人笔记可删除。原正文、原题和扩展 quiz 不开放该入口，整书重建与整页重生成继续保护。操作使用原请求重放、关联重试和目标摘要保护。冻结完整组合回归在 release-21 定版时实际通过（226 次执行／223 项不同检查），真实 HTTP 只读核对通过；该计数对应当时环境，不表示当前部署状态。生命周期修复与部署报告属本机验收证据，不随本仓库发布。新增内容仍为 `unreviewed`，I5 历史 `history=partial` 限制不变，不声称新的独立复审、正式内容审查或用户掌握。
+未审 AI 文本／提示／深入学习建议块可删除和重生成，删除建议块时保留已生成子页；个人笔记可删除。原正文、原题和扩展 quiz 不开放该入口，整书重建与整页重生成继续保护。操作使用原请求重放、关联重试和目标摘要保护。冻结完整组合回归在 release-21 定版时实际通过（226 次执行／223 项不同检查），真实 HTTP 只读核对通过；该计数对应当时环境，不表示当前部署状态。生命周期修复与部署报告属本机验收证据（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-controlled-extension/run-49-release-21-block-lifecycle/README.md 与 docs/design/evidence/learning-controlled-extension/run-51-release-21-deploy/README.md），不随本仓库发布。新增内容仍为 `unreviewed`，I5 历史 `history=partial` 限制不变，不声称新的独立复审、正式内容审查或用户掌握。
 
 `release-19` 的真实推荐、自定义深入学习和 I4／I5 历史结果见真实验收报告（未随公开仓库附带），不覆盖本版修改。
+
+`release-19` 的真实推荐、自定义深入学习和 I4／I5 历史结果见真实验收报告（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-controlled-extension/run-46-release-19-real-custom/README.md），不覆盖本版修改。
 
 受管课程使用独立扩展路由和权威 journal，不删除 `question_content_protected`；普通原生正文／旧题修改仍拒绝。新增内容使用新块、新 question ID 和显式 `unreviewed` 状态，成功提交即保存，可以阅读和练习，但不冒充正式内容审查通过。
 
@@ -64,6 +69,7 @@ $learnConfig = '.learning-book-runtime/local/runtime.json'
 ```
 
 候选生成在正式 pages 枚举之外完成，随后短提交。生成失败或响应不完整保持 uncertain，按原 requestId 检查，不换 ID 重发。revision 冲突则通过 `/books/retry-extension` 显式关联原候选，以新提交请求复用候选字节，不重新生成。个人笔记走独立窄写入规则；深入学习子页、spine、父链接、主题映射和 Book 计数由同一提交恢复。扩展后的检查与 `/3` 交接见 [I4 基线](BASELINE.md)和[补丁说明](../../patches/deeptutor/controlled-extension/README.md)。当前证据与阻塞见本轮交接（未随公开仓库附带）。
+候选生成在正式 pages 枚举之外完成，随后短提交。生成失败或响应不完整保持 uncertain，按原 requestId 检查，不换 ID 重发。revision 冲突则通过 `/books/retry-extension` 显式关联原候选，以新提交请求复用候选字节，不重新生成。个人笔记走独立窄写入规则；深入学习子页、spine、父链接、主题映射和 Book 计数由同一提交恢复。扩展后的检查与 `/3` 交接见 [I4 基线](BASELINE.md)和[补丁说明](../../patches/deeptutor/controlled-extension/README.md)。当前证据与阻塞见本轮交接（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-controlled-extension/handoff.md）。
 
 学习前完成内容审查和 I4 基线；网页负责阅读、选择题、追问及位置恢复。聊天保留原文，并显示按 Unicode 字符实计、排除空白的原文字符数；这不是 token 数，也不把模型自称的字数当实测值。
 

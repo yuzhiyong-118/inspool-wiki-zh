@@ -1,6 +1,50 @@
 # I3 详细任务书：来源交付与生产回执
 
 > 公开设计摘编：保留通用契约与方案；历史验收、用户反馈、运行记录及本地素材不随仓库发布。设计条目不代表部署或验收完成。
+日期：2026-11-10。状态：**I3-A～E 已实现，本地／HTTP 契约验收通过；真实后端写入待集成**。用户随后授权读取任务书继续实施；实现与使用见 [产品说明](../../tools/learning_book/README.md)，结果与限制见 I3 验收（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i3/README.md）。没有启动 DeepTutor 或调用真实模型。总体边界沿用 [实施任务书](learning-book-implementation-tasks.md)、[D2 契约](research/upstream-learning/design-convergence/D2-data-and-handoff-contract.md) 和 [D3 范围](research/upstream-learning/design-convergence/D3-first-learning-scope.md)。I2 已有限通过（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i2-probe/acceptance-final.md），无需重跑已有探针。
+
+## 1. 交付目标与边界
+
+把外部 Agent 整理好的 Markdown／纯文本资料包，可靠地交给一个已配置的 DeepTutor HTTP 服务，并留下可以恢复、核验和供后续阶段使用的生产回执。
+
+I3 完成时，应能回答：这份书请求用了哪些原文版本和提取物、上传的是哪些字节、对应哪个语料集／部署／书、哪些步骤已确定成功、哪些结果尚不确定，以及后续应从哪里继续。
+
+| I3 实现 | 本阶段不实现 |
+| --- | --- |
+| 资料包校验、稳定身份与 hash、冻结语料集投影 | 爬虫／OCR／自动选材／重新整理正式 wiki |
+| 输入上传、原始字节读回、索引状态核验 | 自建向量库、第二个 BookEngine、通用 Agent／任务调度平台 |
+| 创建书、逐步确认 proposal／spine 的 HTTP 适配与回执 | 自动循环确认、批量编译、课程质量审核器 |
+| 本地请求去重、阶段恢复、不确定结果处理 | 第二套可写 progress、学习完成状态或掌握度数据库 |
+| CLI 与可供未来 Web／MCP 调用的普通 Python 应用操作 | 新门户、MCP Server、多用户产品化、学习结果导出 |
+
+**I3 的结束边界是可追溯的书创建／确认回执，不是“课程已发布可学习”。** `confirm-spine` 明确使用 `auto_compile=false`，得到页面壳及上游 lazy 模式；上游可同时预构建 READY 的概览页，须保留实际状态，不能因此判定内容章节已生成。页面实际生成继续由上游承担。I4 的内容基线与核验、I5 的结果交接、I6 的编译与交付编排分别后置，不把 I3 的成功当作 READY、来源忠实或学习完成。
+
+已有 I2 的首答 500、课程忠实性与窄视窗布局问题进入后续范围；它们不阻断资料／回执模块，但在日常学习交付前必须处理或明确限制。I3 不通过“先创建空 chat”掩盖首答缺陷，不改旧课程快照来消除质量问题。
+
+## 2. 固定基线与工程组织
+
+- DeepTutor：`60fb3bdfddb30b7740c7ce3bd9b28d908f2af6db`，1.7.2；不更新参考仓库 HEAD，不改已安装 wheel 或上游 Web。
+- 一个已运行、loopback、单 worker 的 HTTP 服务；生产适配不自行启动第二个引擎或修改 DT 的文件／业务 SQLite。用量账本可只读观察。
+- 建议实现目录如下，允许在保持四个职责边界的前提下合并小文件；不为每个名词建一层框架，也不预建其他后端接口桩。
+
+```text
+tools/learning_book/
+  __init__.py
+  cli.py                 # 参数与 JSON 输出，不承载业务分支
+  contracts.py           # 数据对象、规范化、验证与摘要
+  evidence_store.py      # 请求／响应／回执与活动映射，本地单写者
+  deeptutor.py            # 一个真实 HTTP 后端，响应解包与错误映射
+  production.py          # 校验、发布输入、创建、确认、核对的应用操作
+tools/tests/
+  test_learning_book_i3_*.py
+  fixtures/learning_book_i3/
+docs/design/evidence/learning-book-i3/
+  README.md              # 实施后才创建，记录验证层次与限制
+```
+
+优先使用标准库和项目已具备的依赖，不把私有 `<本机验证目录>` 或其 venv 当产品 import 路径。不依赖旧 S0/S1 的学习编排来承接本模块，不修改其通过状态；正式知识接受仍由现有维护入口承担。
+
+配置分别指定：生产者资料根目录、项目回执状态目录、后端部署配置。DT runtime-home 与这两个目录保持职责独立。配置路径可变化，稳定身份不随绝对路径变化。输出目录排除正式 `raw/`、`wiki/` 和参考源码；允许只读引用原始来源，不移动或改写它们。
 
 ## 3. 输入、身份与持久对象
 
@@ -49,7 +93,6 @@
 
 JSON 摘要沿用 D2：UTF-8、键排序、紧凑分隔、不转义中文、拒绝 NaN。请求摘要包括操作、作用域、资料身份／内容、会影响生成的目标与参数；不包括凭据、时间戳和可移动的本地定位。源列表顺序若影响提交则保留，不能为凑相同 hash 擅自排序。确认 proposal／spine 的 payload 与 expected_revision 属于对应阶段请求摘要。
 
-
 ## 4. 应用操作、CLI 与上游接口
 
 下面是本期接口名称与语义；实现采用普通函数／数据对象，未来 Web／MCP 直接复用，不新增服务协议。
@@ -85,7 +128,6 @@ CLI 统一输出 JSON：`operation`、`requestId`、`status`、`receiptRef`、`a
 语料发布须满足：所选输入原始字节一致、实际成员与冻结集合一致、匹配本次／可核对的索引运行及文件 source_hash、存在可用索引版本。这里上游 `documents[path].source_hash` 对比的是**上传的 inputArtifact hash**，不是清洗前原文的 hash。KB 名称存在、文件大小相同、HTTP 200 或 parser ready 都不足以满足。上游失败可返回诊断性 partial 回执，但不能生成可供 `create` 消费的成功 corpusReceipt。
 
 同一冻结 corpus 可由不同 activity 复用，不重复上传／索引；同一 input hash 不抹去其来源身份。新成员或变更创建新的 corpusVersion／KB。已冻结集合出现未知成员／替换字节时标记漂移并停止创建，不能自动清理上游资料。
-
 
 ## 5. 请求去重、崩溃恢复与不确定成功
 
@@ -126,7 +168,6 @@ CLI 统一输出 JSON：`operation`、`requestId`、`status`、`receiptRef`、`a
 
 确认步骤每次有自己的 requestId／digest／回执，并关联同一 productionReceipt 与上一步；修订 proposal／spine 是新阶段请求，不能改已成功历史。用户／外部 Agent 已明确提出创建或确认时，不再额外强制同意一次同样操作；仍不能把“上传好了”自动等同于批准所有后续模型生成。
 
-
 ## 6. 预算、副作用和阶段依赖
 
 创建、confirm-proposal、索引中的实际供应商调用，以及可能恢复生成的读取均按真实副作用分类，不只按 HTTP 动词。confirm-spine 虽设 auto_compile=false，仍作为生产写操作记录，不能让未知上游行为绕开预算检查。
@@ -139,7 +180,6 @@ I2 的守卫算法、错误案例与 Windows 进程身份校验可参考，但�
 
 阶段交接：I3 回执证明输入和远端创建／确认的已知事实；I4 才采集实际生成内容、资源与一致性基线并落实学前核验；I5 才交接真实学习结果；I6 才证明完整交付与恢复。当前网页直接开未完成页面可能触发编译，I3 不自动把其 URL 当“已发布课程”推送给用户。
 
-
 ## 7. 实施拆分与完成标准
 
 | 子任务 | 最小交付 | 完成标准 |
@@ -151,7 +191,6 @@ I2 的守卫算法、错误案例与 Windows 进程身份校验可参考，但�
 | I3-E CLI 与验收交接 | JSON CLI、使用说明、fixtures／故障验证、结果报告 | 外部 Agent 无需读实现即可调用、判断下一步；验证层次如实区分 |
 
 按 A → B → C → D → E 推进，每项用相应测试关闭；不为了模块数量单独扩展框架。任何约定与真实上游字段冲突，先修本文／契约并保存依据，不让测试夹具迁就错误实现。
-
 
 ## 8. 必测场景与验证层次
 
@@ -168,6 +207,7 @@ I2 的守卫算法、错误案例与 Windows 进程身份校验可参考，但�
 | A09 | parser ready=true，但索引 failed／旧 source_hash／无可用版本 | 不发布成功 corpus；仅文件可见不等于索引可用 |
 | A10 | 二进制读回与 preview 归一化文本不同 | 只用原始字节核对上传 hash，不误报 preview hash 等价 |
 | A11 | 三种不同响应包装及缺关键字段 | 正确解包 book/proposal、book/spine、pages；HTTP 200 缺身份不成功 |
+| A12 | 确认 revision 冲突、旧 payload、先推进 revision 后返回 400 | 不自行刷新 token 后重放，不默改用户确认内容，不把全部 4xx 当零副作用 |
 | A13 | 同名书、错误部署／owner／workspace、General 空值、KB 资源作用域 | 不按标题认领；作用域错配拒绝；不把 KB header 当隔离证明 |
 | A14 | 零额度下 inspect／reconcile 与 GET Book 副作用 | 本地 show／安全核对可用；不能意外恢复生成；未授权模型请求为 0 |
 | A15 | 跨确认步骤计量、缺失 usage、在途越线／停止失败 | 不清零；停止新增调用；后台监控确实运行，停止失败可见，不自称硬封顶 |
@@ -178,3 +218,38 @@ I2 的守卫算法、错误案例与 Windows 进程身份校验可参考，但�
 再使用 I2 中去敏的真实请求／响应建立公开小夹具，核对参数、包装和原字节 hash。夹具不得依赖私有绝对路径、运行中的 I2 服务、已安装的 DeepTutor 源码包或真实 Key；重放必须标为 replay，不冒充新适配器已完成真实生成。
 
 必要时可对既有隔离实例做无模型读取或独立临时 KB 的字节上传／读回，但不能修改 I2 的冻结语料、书与证据；需要索引／生成的集成测试须另有有效预算。I3 可按“本地与 HTTP 契约验收通过、真实适配写入待集成”明确交付，I6 的真实闭环不得引用该离线状态冒充通过。
+
+## 9. 验收交付与停止条件
+
+实施完成后提交：变更清单；CLI 帮助与一个完整调用示例；prepare／corpus／production／activity 样例；实际测试命令与结果；故障前后持久文件和 HTTP 调用次数；固定源码映射；未覆盖项及模型／embedding 消耗。报告在 `docs/design/evidence/learning-book-i3/README.md`，不要提前创建“已通过”占位报告。
+
+验收需同时确认：
+
+- I3-A～E 的最小能力存在，A01～A16 有对应证据；可将实现选择简化，但不能删除不确定成功、作用域和原始字节核验。
+- 没有新增通用调度／插件平台，没有从旁写 DT BookStorage／Progress／chat，也没有用正式 raw/wiki 当内部 Agent 可写目录。
+- 无新真实生成仍可完成所声明的离线／契约验收；模型调用、回放、静态推断和实际运行分别列明。
+- I3 成功不能发布可学习标记、宣称内容忠实或自动进入 I4–I6。未知创建／上传结果、scope 错配、缺原文／回执、无法观察预算时停止相应操作并留证据，不能静默降级为成功。
+
+本阶段若发现必须改上游 API、需要新进程／存储系统或无法核对基本输入身份，先记录最小事实并修订设计，不能边实现边扩大任务。普通文件组织、函数拆分、测试夹具等可自行决定，无需为这些可逆细节再次请求用户确认。
+
+## 10. 已核对的本地依据
+
+以下为固定提交下的源码路径，开工按需定位，不要求重新阅读整个参考工程：
+
+| 文件 | 已核对依据 |
+| --- | --- |
+| `deeptutor/api/routers/book.py:70–103` | create／confirm 的真实请求模型；auto_compile 默认 true，适配器必须显式覆盖 |
+| `deeptutor/api/routers/book.py:594–612,742–795,810–902` | 列表、Book GET 的恢复副作用、纯 spine/page 读取、三种响应包装 |
+| `deeptutor/book/engine.py`：`create_book`、`maybe_resume_on_open` | 提案生成与保存时序、COMPILING 的开页恢复、PAUSED／lazy 模式边界 |
+| `deeptutor/api/routers/knowledge.py:3097,3201,3223,3411,4346,4368` | 文件清单、preview、原始 FileResponse、上传、索引运行与环境 readiness 的不同语义 |
+| `deeptutor/knowledge/indexing_run.py`：`visible_run` | 运行者死亡可投影 interrupted／unknown；读取不重启任务 |
+| `deeptutor/api/routers/auth.py:508–547,1327–1348` | workspace 传递、KB 资源库管理作用域、认证关闭时 profile 不可用 |
+| I2 私有 `raw/book-create.json`、`book-confirm-proposal.json`、`book-confirm-spine.json`、`kb-indexing-run-final.json` | 可选的去敏真实夹具来源；不能作为产品运行时依赖 |
+
+私有验证根是 `<本机验证目录>`，不是产品固定安装路径。优先读本任务书与 D2；只有需要核对字段时才打开对应源码或原始响应。
+
+## 11. 本轮实施交接
+
+I3-A～E 已在 `tools/learning_book/` 实现，另拆 `budget.py` 放独立计量／实例控制；不依赖文档探针或私有 runtime import。36 项本地／HTTP 契约测试与 11 份真实请求／响应夹具的去敏回放覆盖 A01–A16，证据、样例、完整命令及源码补充核对见 I3 验收（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i3/README.md）。
+
+CLI 当前支持 validate、publish-inputs、create、confirm-proposal、confirm-spine、show、reconcile，另有只读 process-identity。成功大纲回执仍不表示课程已可学习。真实 DT 写入、真实预算控制集成、Linux 停止分支和网络共享目录未验证；I4–I6 未实施，不用离线结果代替 I6。
