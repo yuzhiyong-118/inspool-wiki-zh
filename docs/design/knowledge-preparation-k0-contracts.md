@@ -1,6 +1,19 @@
 # K0：知识准备接口与可执行协议核对
 
 > 公开设计摘编：保留通用契约与方案；历史验收、用户反馈、运行记录及本地素材不随仓库发布。设计条目不代表部署或验收完成。
+日期：2026-11-11。状态：接口设计、29 项离线核对及独立只读复审通过，见修订关闭记录（证据未公开，无法由本仓库独立复核：docs/design/evidence/knowledge-preparation-k0/review.md）；不表示 K1–K4 业务已实现。本文件细化[任务书](knowledge-preparation-plan.md)的 K0，不接入真实模型、采集服务或正式文件写入。
+
+## 1. 已核对的接口事实
+
+| 位置 | 实际行为 | 本次决定 |
+| --- | --- | --- |
+| evidence/package_protocol.py | 知识包字段封闭；检查来源／证据引用、摘要和范围；不读取原文件，不验证摘录真伪或支持语义 | 保留原协议，K1／K2 补真实字节及语义核验 |
+| learning_book/contracts.py | validate_package 读取原件与投影并固定上传字节；归一化会忽略部分未知顶层字段 | 学习约定、核验与覆盖另存封装，不把未知字段当已校验或已持久保存 |
+| learning_book/production.py | create 的实际 intent 可覆盖包内 learningGoal；confirm-spine 固定 auto_compile=false | 绑定实际 intent 及确认 payload，不能只检查包中建议目标 |
+| persistence/protocol.py | compile_candidate 输出 preview；最终理解覆盖依赖旧 assessment_l2_valid | K3 复用预览；不调用最终理解覆盖为本次签发 L2 |
+| learning_book/HANDOFF.md | 显式导出所选原始学习证据，不自动生成熟悉程度或入库 | 回顾由外部调用者触发，背景观察引用结果，不回写进度 |
+
+摘要约定：原件／投影 digest 是原始 bytes 的 SHA-256。JSON 内容摘要复用 wiki_runtime.contracts.digest，排序对象键、保留数组顺序，不归一化 Unicode 或换行。引用必须说明是哪一种摘要，不将二者混用。
 
 ## 2. 最小文件与数据所有权
 
@@ -15,7 +28,6 @@
 KnowledgePackage、原文、prepare.json、I3 回执、I4 基线和 I5 结果包继续使用各自现有格式。新记录引用这些产物，不复制原始作答、课程正文或 Claim 成为新正本。操作回执由现有宿主／应用能力保存，工作区不添加第二套调度器。
 
 新记录使用 camelCase，引用旧 KnowledgePackageRef 时原样保留 package_id/version/digest。工作区文件路径只是定位信息；稳定 source locator 使用逻辑标识，通过本次 locator 清单解析到文件。不能把可移动文件路径混入来源身份；同逻辑标识的新字节必须新版本。
-
 
 ## 3. 学习约定正文与认可附件
 
@@ -37,7 +49,6 @@ BriefRef 为 briefId/version/digest，digest 仅计算正文。正文不内嵌�
 用户要求与课件传输授权分别核对。mapping.intent 必须等于认可附件的 acceptedIntent；实际 create.intent 或提案变更如改变目标、范围或量级，更新约定。等价措辞由已有认可范围与转换说明导出新的 acceptedIntent 记录，无须重复询问；不能只重算摘要就自行扩大认可范围。发布检查读取实际 I3 请求中的 intent 与确认 payload，不能只检查建议 learningGoal 或本地计划值。原生 API 200 仅证明操作事实。
 
 背景观察最少记录 observationId、subject（当前用户／任务明确的学习者）、topic、basisType、evidenceRefs、observedAt、applicableVersion、planningUse 和 limitation。basisType 限 material_available、user_report、practice_record、learning_record、unknown。planningUse 限 connect_background、propose_brief_review、use_within_evidence_scope、plan_supplement、clarify。material_available 只能用于连接背景；不得依据它签发 mastered 或自动跳过关键前置。主题／主体／时间／版本不匹配时维持 unknown 或补讲。
-
 
 ## 4. 知识与课程的交付映射
 
@@ -67,7 +78,6 @@ sourceBindings 不允许重复或将同一知识来源重复映射冒充独立�
 
 发布前核对当前原文字节、包摘要、约定认可、投影与映射。I3 活动映射随后记录实际 bookId 和请求；I4 绑定实际课件，不预先塞入 preparation-map 造成反向依赖。新增章节和题目若引入新事实或改约定，退回对应准备环节。
 
-
 ## 5. 应用操作与执行入口
 
 以下接口名是 K1–K4 的实现目标，当前没有创建空实现或注册能力。先用普通 Python 应用模块及 CLI，未来 MCP／网页共用，不要求常驻服务。
@@ -84,7 +94,6 @@ sourceBindings 不允许重复或将同一知识来源重复映射冒充独立�
 
 inspect_context 与 draft_learning_brief 可形成约定而不先调用 prepare_knowledge；prepare_knowledge 也可没有约定独立整理知识。只有 build_learning_projection 同时消费两者。候选预览不是创建正式 sources 页，持久原文采集亦是独立副作用。
 
-
 ## 6. 检查结果与恢复语义
 
 K1–K4 操作统一返回 result、findings、artifactRefs、nextAction，具体封闭字段在首个实现时按本文件固定。result 限 ready_for_review、needs_clarification、needs_evidence、stale、rejected、uncertain；ready_for_review 表示机器检查可供审阅，不是内容已正确或拥有写权限。
@@ -100,10 +109,10 @@ K1–K4 操作统一返回 result、findings、artifactRefs、nextAction，具�
 
 解析与确定性重检不消费模型预算。真实调用走既有调用管理，不重复扣费；宿主用量不可见记 unknown。文件发布复用现有原子写工具及不可变版本习惯，但本次接口设计不承诺跨服务原子事务。
 
-
 ## 7. 离线核对与放行边界
 
 使用合成样例（未随公开仓库附带）和可执行核对脚本（未随公开仓库附带）检验：旧包与新映射可对接、真实字节／定位／目标覆盖能对应、现有校验器的拒绝项与未覆盖项被如实记录。脚本不实现生产认可或语义门禁；任何传入的 user／reviewer 字符串都不能授权。
+使用合成样例（证据未公开，无法由本仓库独立复核：docs/design/evidence/knowledge-preparation-k0/fixture.json）和可执行核对脚本（未随本仓库发布：tools/tests/verify_knowledge_preparation_k0.py）检验：旧包与新映射可对接、真实字节／定位／目标覆盖能对应、现有校验器的拒绝项与未覆盖项被如实记录。脚本不实现生产认可或语义门禁；任何传入的 user／reviewer 字符串都不能授权。
 
 运行：
 
