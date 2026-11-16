@@ -1,0 +1,2 @@
+# prepare.json 声明的是原始字节 hash，不能在 checkout 时转换换行。
+lesson.md -text

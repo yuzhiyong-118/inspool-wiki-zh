@@ -1,0 +1,17 @@
+{
+  "deploymentId": "replace-with-stable-local-deployment-id",
+  "ownerId": "local-single-user",
+  "workspaceId": "",
+  "scopeVerification": "configured_single_user",
+  "baseUrl": "http://127.0.0.1:8127",
+  "kbOwnerId": "local-single-user",
+  "ragProvider": "llamaindex",
+  "timeoutSeconds": 120,
+  "indexWaitSeconds": 30,
+  "contentReadBuild": {
+    "baseCommit": "60fb3bdfddb30b7740c7ce3bd9b28d908f2af6db",
+    "rendererCommit": "60fb3bdfddb30b7740c7ce3bd9b28d908f2af6db",
+    "patchSha256": "8eafee08f29dab8b97c721495eedbc97b3b45f4edd3c14ac255a82c5a8bf88eb",
+    "wheelSha256": "348c7784558951dcd7dcc92be34354c734cc3c9b2fb0878a817a19d28e73a922"
+  }
+}

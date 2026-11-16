@@ -1,0 +1,126 @@
+{
+  "write_entrypoints": [
+    {
+      "entry_id": "host_run_apply",
+      "module": "tools/wiki_runtime/host/supervisor.py",
+      "symbol": "StandaloneHost.run_operation",
+      "write_condition": "apply=True",
+      "write_path": "StandaloneHost.apply_pending -> Executor.apply",
+      "preview_condition": "apply=False（仅生成私有候选，仍写私有状态）"
+    },
+    {
+      "entry_id": "host_apply_pending",
+      "module": "tools/wiki_runtime/host/supervisor.py",
+      "symbol": "StandaloneHost.apply_pending",
+      "write_condition": "可信 owner 调用；CLI apply 对非 derived 记录进入此处，derived 记录由 _apply_record 直接调用 derived Executor",
+      "write_path": "Executor.apply",
+      "preview_condition": null
+    },
+    {
+      "entry_id": "host_heal_plan",
+      "module": "tools/wiki_runtime/host/heal.py",
+      "symbol": "run_heal_plan",
+      "write_condition": "limits.apply=True",
+      "write_path": "StandaloneHost.run_operation -> StandaloneHost.apply_pending -> Executor.apply",
+      "preview_condition": "limits.apply=False（仅生成私有候选）"
+    },
+    {
+      "entry_id": "derived_raw_index",
+      "module": "tools/wiki_runtime/host/cli.py",
+      "symbol": "_prepare_derived(raw-index) / _apply_record",
+      "write_condition": "host raw-index --apply；tools/raw_index.py --write 经 health._apply_via_host 委托至此",
+      "write_path": "tools/raw_index.py --write -> health._apply_via_host(raw-index) -> host raw-index --apply -> build_raw_index -> Executor.apply",
+      "preview_condition": "省略 --apply（仅生成私有候选）"
+    },
+    {
+      "entry_id": "derived_health",
+      "module": "tools/wiki_runtime/host/cli.py",
+      "symbol": "_prepare_derived(health) / _apply_record",
+      "write_condition": "health --apply；tools/health.py 的 --save/--write-graph/--graph-only 委托至此",
+      "write_path": "build_health -> Executor.apply",
+      "preview_condition": "省略 --apply（仅生成私有候选）"
+    },
+    {
+      "entry_id": "derived_import_package",
+      "module": "tools/wiki_runtime/host/cli.py",
+      "symbol": "_prepare_derived(import-package) / _apply_record",
+      "write_condition": "import-package --apply",
+      "write_path": "build_capture -> Executor.apply",
+      "preview_condition": "省略 --apply（仅生成私有候选）"
+    },
+    {
+      "entry_id": "wechat_raw_write",
+      "module": "tools/wechat_article.py",
+      "symbol": "write_to_raw_unprocessed",
+      "write_condition": "旧可信 Python 调用方直接调用",
+      "write_path": "RAW_UNPROCESSED.mkdir -> path.write_text",
+      "preview_condition": null,
+      "discovery_note": "T6 独立审查补登记；现行实现永久拒绝并要求受管 capture/import"
+    },
+    {
+      "entry_id": "refresh_index",
+      "module": "tools/raw_index.py",
+      "symbol": "refresh_index",
+      "write_condition": "apply=True",
+      "write_path": "tempfile.mkstemp -> os.replace(raw/index.md)",
+      "preview_condition": "apply=False"
+    },
+    {
+      "entry_id": "run_heal",
+      "module": "tools/heal.py",
+      "symbol": "run_heal",
+      "write_condition": "dry_run=False",
+      "write_path": "依次调用 heal_index_sync、heal_broken_links、heal_missing_pages 的写分支",
+      "preview_condition": "dry_run=True"
+    },
+    {
+      "entry_id": "heal_missing_pages",
+      "module": "tools/heal.py",
+      "symbol": "heal_missing_pages",
+      "write_condition": "dry_run=False",
+      "write_path": "stub_path.parent.mkdir -> stub_path.write_text",
+      "preview_condition": "dry_run=True"
+    },
+    {
+      "entry_id": "heal_broken_links",
+      "module": "tools/heal.py",
+      "symbol": "heal_broken_links",
+      "write_condition": "dry_run=False",
+      "write_path": "page.write_text",
+      "preview_condition": "dry_run=True"
+    },
+    {
+      "entry_id": "heal_index_sync",
+      "module": "tools/heal.py",
+      "symbol": "heal_index_sync",
+      "write_condition": "dry_run=False 且索引文本有变化",
+      "write_path": "index_path.write_text",
+      "preview_condition": "dry_run=True"
+    }
+  ],
+  "read_only_previews": [
+    "tools/health.py 默认/--json",
+    "tools/raw_index.py 默认",
+    "refresh_index(apply=False)",
+    "run_heal(dry_run=True)",
+    "heal_missing_pages(dry_run=True)",
+    "heal_broken_links(dry_run=True)",
+    "heal_index_sync(dry_run=True)",
+    "host doctor/inspect",
+    "tools/heal.py 默认（不指定 --plan）"
+  ],
+  "candidate_only_entrypoints": [
+    "host run_operation(apply=False)",
+    "host raw-index/health/import-package（省略 --apply）",
+    "host run_heal_plan(limits.apply=False)",
+    "tools/heal.py --plan（仅写 .wiki-runtime/candidates）"
+  ],
+  "executor_baseline": {
+    "journal_root": "<state_dir>/private/journals",
+    "active_path": "<project_root>/.wiki-runtime/executor-active.json",
+    "lock_path": "<project_root>/.wiki-runtime/executor.lock",
+    "runtime_db_path": "<project_root>/.wiki-runtime/learning/runtime.db",
+    "active_present": false,
+    "wal_relocation_allowed": false
+  }
+}

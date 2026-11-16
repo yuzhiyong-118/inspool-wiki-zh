@@ -1,0 +1,19 @@
+{
+  "contract_version": "1.0",
+  "operation_id": "example-001",
+  "files": [
+    {
+      "path": "wiki/index.md",
+      "precondition": {
+        "kind": "hash",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    {
+      "path": "wiki/concepts/新页.md",
+      "precondition": {
+        "kind": "absent"
+      }
+    }
+  ]
+}

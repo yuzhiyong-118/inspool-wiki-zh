@@ -1,0 +1,17 @@
+{
+  "localPatchId": "inspool-i4-content-1",
+  "baseCommit": "60fb3bdfddb30b7740c7ce3bd9b28d908f2af6db",
+  "baseVersion": "1.7.2",
+  "capability": "book-content-read/1",
+  "patchSha256": "8eafee08f29dab8b97c721495eedbc97b3b45f4edd3c14ac255a82c5a8bf88eb",
+  "files": {
+    "deeptutor/book/storage.py": {
+      "originalSha256": "cb9d9e79fd6e8ee75bf368a908bd7443b576fc23597de755f86f2c7094a95847",
+      "patchedLfSha256": "1181182819fcd4773d119b821f0353ef3d57f5ce8dab6dad3b24e15dd7239379"
+    },
+    "deeptutor/api/routers/book.py": {
+      "originalSha256": "84bcf22c7eb6eacd8ac40142e0e44908e365a6881f04dd394b0e340a85521ade",
+      "patchedLfSha256": "e2f9c22a6635b545b685326276d7fbc1d69cb39df0221705534ae840e973808d"
+    }
+  }
+}

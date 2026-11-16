@@ -1,0 +1,21 @@
+{
+  "operation_id": "example-001",
+  "candidate_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+  "dependencies_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+  "rules_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mapping_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+  "validator_version": "gates-1.0",
+  "review_prompt_version": "review-1.0",
+  "rule_ids": [
+    "RAW-001"
+  ],
+  "failure_refs": [
+    "reports/g1.json"
+  ],
+  "evidence": "前后正文原始字节相同",
+  "goal_conflict": "检查器误把 BOM 计作正文变更",
+  "minimal_counterexample": "带 BOM 的 Markdown",
+  "proposal": "补充明确字节边界测试",
+  "impact": "重跑原文不变量门禁",
+  "disposition": "submitted"
+}

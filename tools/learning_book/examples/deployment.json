@@ -1,0 +1,11 @@
+{
+  "deploymentId": "replace-with-stable-local-deployment-id",
+  "ownerId": "local-single-user",
+  "workspaceId": "",
+  "scopeVerification": "configured_single_user",
+  "baseUrl": "http://127.0.0.1:8127",
+  "kbOwnerId": "local-single-user",
+  "ragProvider": "llamaindex",
+  "timeoutSeconds": 120,
+  "indexWaitSeconds": 30
+}

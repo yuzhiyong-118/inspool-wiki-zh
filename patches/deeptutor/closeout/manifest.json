@@ -1,0 +1,32 @@
+{
+  "baseCommit": "60fb3bdfddb30b7740c7ce3bd9b28d908f2af6db",
+  "inherits": "../i6/manifest.json",
+  "sourceFiles": {
+    "deeptutor/services/llm/metrics.py": {
+      "before": "e80c0eefb6ad51acda5204e8789c8aaec6f5e4b60d0e7e1415beaec6bea5aa41",
+      "after": "6609a835bf77e1cb9fd57da391609c36c933e7416f975a504d95ce5ba0506574"
+    },
+    "deeptutor/book/engine.py": {
+      "before": "8a493e07b322c096e3f3ff775243a60bf8c6231d58101e46cb12b7235cdf4926",
+      "after": "45755d7462682e167fc070fdb3efc6621078e94c977c7ef0069aad9e563bf385"
+    },
+    "deeptutor/book/storage.py": {
+      "before": "1181182819fcd4773d119b821f0353ef3d57f5ce8dab6dad3b24e15dd7239379",
+      "after": "5a3de3470e29a702c8a2d08fe6d00e71e6e940d227120201b55c2155777f0c1b"
+    },
+    "deeptutor/api/routers/book.py": {
+      "before": "869ba4d7c3e0f52c8abcf4d73ed78ee6d594edb24519b6ae585adb18e4b534e5",
+      "after": "eb92df87e5088b65260837ed6c625b0d0a43367261b69e02903ec50f7c2e3efd"
+    },
+    "deeptutor/book/generation.py": {
+      "before": null,
+      "after": "72b42ef8efb6cafb0268b3815b3f19c103c25a0305e5d3aca44e450a5f924c0d"
+    }
+  },
+  "patches": {
+    "closeout.patch": "3fead1ab6bff46c46e1f2ae0ed64bf266c7745439e389125de0a2bae000cb8fa",
+    "web-closeout.patch": "1a1509ce3cf695de4096a1649fdaf675b7ffa823328d407ebcb73b538673c4c0"
+  },
+  "dependenciesSha256": "fd8e6cf59167e03a276934695de320da8f3f76dd6e235d826eb9252a0ce17616",
+  "i6ManifestSha256": "14d3fe8367b2fc41f87d6e16a8f862e79ae1ead29b2e0ed4387d5de1837f5a5f"
+}

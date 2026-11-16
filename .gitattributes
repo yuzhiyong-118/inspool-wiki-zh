@@ -1,0 +1,10 @@
+* text=auto eol=lf
+*.py text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.patch -text
+.githooks/* text eol=lf
+
+# 补丁及其校验清单保留原始字节
+patches/** -text whitespace=cr-at-eol
+*.patch -whitespace

@@ -1,0 +1,15 @@
+{
+  "operation_id": "example-001",
+  "changes": [
+    {
+      "action": "write",
+      "path": "wiki/index.md",
+      "payload_path": "payload/wiki/index.md",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "precondition": {
+        "kind": "hash",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    }
+  ]
+}

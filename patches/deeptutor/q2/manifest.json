@@ -1,0 +1,41 @@
+{
+  "baseCommit": "60fb3bdfddb30b7740c7ce3bd9b28d908f2af6db",
+  "inherits": "../closeout/manifest.json",
+  "localPatchId": "learning-question-q2/1",
+  "patchSha256": "5e1a11fa3bc17fe5bee6ea72ae103bf4eecb185bd462e4008ac0d44d0a92b871",
+  "files": {
+    "deeptutor/book/storage.py": {
+      "before": "5a3de3470e29a702c8a2d08fe6d00e71e6e940d227120201b55c2155777f0c1b",
+      "after": "1b3f48b4c7128548071afc173c75d7b81d7c96c7c60f3bb7b063843064758cdf"
+    },
+    "deeptutor/api/routers/book.py": {
+      "before": "eb92df87e5088b65260837ed6c625b0d0a43367261b69e02903ec50f7c2e3efd",
+      "after": "8768851eecc73c8ffa4c152ab9dc413cec976d19377b5c87ba2dcda2f03ccd9b"
+    },
+    "deeptutor/book/engine.py": {
+      "before": "45755d7462682e167fc070fdb3efc6621078e94c977c7ef0069aad9e563bf385",
+      "after": "a84ccf15402f0c869db925ee0db2de68ec23ee762629dcdf15191622a6dfbe43"
+    },
+    "deeptutor/book/question_publication.py": {
+      "before": null,
+      "after": "e943963e68b7f0317fa52509c388329887ad5a4e68c3716640b3a5c49807ce50"
+    },
+    "deeptutor/book/generation.py": {
+      "before": "72b42ef8efb6cafb0268b3815b3f19c103c25a0305e5d3aca44e450a5f924c0d",
+      "after": "72b42ef8efb6cafb0268b3815b3f19c103c25a0305e5d3aca44e450a5f924c0d"
+    }
+  },
+  "inheritedFiles": {
+    "deeptutor/services/llm/metrics.py": "6609a835bf77e1cb9fd57da391609c36c933e7416f975a504d95ce5ba0506574",
+    "deeptutor/book/blocks/quiz.py": "bcc347cf4255e22aac7536db0d7e010bb4d89ef3aa2300479124656349bfc7bb",
+    "deeptutor/book/learning_state_read.py": "7af7e5629c7aa31f6eee1d56a4b17bc5d26517d583287b03a4fe7528226d3cf7",
+    "deeptutor/agents/question/pipeline.py": "5d535ea8231c28a6c6af01c6d57790a2915c98632417d17417e932abecb1024d"
+  },
+  "baseBooksWheelSha256": "9891fc9fe48d4989a8341c169172e2901214bd8a4293167e8bd1bb8891a31bd0",
+  "wheelBaseOverrides": {
+    "deeptutor/book/engine.py": "8225321b36ff2221e02e857d83b1fb6bc4fee1ef5edf5e13905c9842c9433b70",
+    "deeptutor/api/routers/book.py": "c9d14eb133b5125a2fbfb77bd7e15b1b694a2d0675f7ed6964f8094afd86ac5b",
+    "deeptutor/book/generation.py": "6d939a5cf99515c7d706f5114381a6fbbd6c79199f1bb8db9c115b27a376641a"
+  },
+  "baseDifference": "closeout wheel lacks installed generation overview and previousOperationId/retryOf distinction; router has CRCRLF and pause_book names. Q2 retains verified installed lifecycle fixes and supports both pause action spellings."
+}

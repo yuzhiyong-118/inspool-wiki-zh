@@ -1,0 +1,40 @@
+{
+  "baseCommit": "60fb3bdfddb30b7740c7ce3bd9b28d908f2af6db",
+  "localPatchId": "learning-question-q3-fix/1",
+  "inherits": "../q2/manifest.json",
+  "parentPatchSha256": "5e1a11fa3bc17fe5bee6ea72ae103bf4eecb185bd462e4008ac0d44d0a92b871",
+  "parentReleaseSha256": "0dca25afa44080d3e7bab8dc7393982cf6d5f8e02e7de89161318e441dc4e704",
+  "patchSha256": "2ac81d10f4ec20b1f8d264898983a7bb2aa8447b53edd5e82408aae4af627a6e",
+  "files": {
+    "deeptutor/agents/question/pipeline.py": {
+      "before": "5d535ea8231c28a6c6af01c6d57790a2915c98632417d17417e932abecb1024d",
+      "after": "491cf8eb1bcb6ee5f02041047bc95d423b998a3536fbcf1e00759d94f3ff81ca"
+    },
+    "deeptutor/book/question_publication.py": {
+      "before": "e943963e68b7f0317fa52509c388329887ad5a4e68c3716640b3a5c49807ce50",
+      "after": "578b39da27dad926da870134841cf54080b36ffbb63527285a6894ac2f1e559b"
+    },
+    "deeptutor/book/blocks/quiz.py": {
+      "before": "bcc347cf4255e22aac7536db0d7e010bb4d89ef3aa2300479124656349bfc7bb",
+      "after": "7cbfcac2f9476509777201f6e86b3fcaa4a20cfe9a59f4cbdb6d300351ea8d10"
+    },
+    "deeptutor/book/engine.py": {
+      "before": "a84ccf15402f0c869db925ee0db2de68ec23ee762629dcdf15191622a6dfbe43",
+      "after": "4b6c98bb9e5d5c61e014f42aff3cc660a53fdb515e6a5daabbb9de14607f2c07"
+    },
+    "deeptutor/services/llm/metrics.py": {
+      "before": "6609a835bf77e1cb9fd57da391609c36c933e7416f975a504d95ce5ba0506574",
+      "after": "87e246efc2d075d95874a0d2d9e1be6f6c3b21d363cafeff050f9945e352c6b3"
+    }
+  },
+  "inputWheels": {
+    "deeptutor-1.7.2-py3-none-any.whl": "b40313ff96a938f65b9265a4f12d5c0841361f383cf0de6a0f32047ecb3ab29f",
+    "deeptutor_books-1.7.2-py3-none-any.whl": "6380e6fedcdd2fba51406b35385c59ed34c6fc354d1a33160e081f676d4a97b6",
+    "deeptutor_server-1.7.2-py3-none-any.whl": "ad9e36b82ba731521f68890c448b984ac67b2da72f121697b75cca065bf8933f",
+    "deeptutor_questions-1.7.2-py3-none-any.whl": "656b8199041f8b833cd44546833e30211d8041925f4e44477e54c3e7c2e27973",
+    "deeptutor_knowledge-1.7.2-py3-none-any.whl": "de9cb30f42e4caa9392798c21d461720a60a2436ce7a4d2e3b30a32ba0ea10ab",
+    "deeptutor_mastery-1.7.2-py3-none-any.whl": "d189f634f02d9eb364d186df2d1f2339b01969fcc4c27c7486865796299eb05e",
+    "deeptutor_parsing-1.7.2-py3-none-any.whl": "9b0a37355accfb651c79c1ba71d88d827d4fad8583fc79dd776539140559b7fb",
+    "deeptutor_visualize-1.7.2-py3-none-any.whl": "26dbfc8480265c0c7da7abd8323073cc850fca5d31be79cf477ddb452b170544"
+  }
+}

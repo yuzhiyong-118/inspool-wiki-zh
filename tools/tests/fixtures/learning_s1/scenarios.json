@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "groups": {
+    "X": {
+      "title": "执行、授权、身份与恢复组合故障",
+      "scenarios": [
+        {
+          "id": "X1",
+          "test": "test_x01_g3_interference_never_accepts",
+          "faults": ["revoke", "pause", "readiness_invalidation", "ownership_generation", "actual_g3_overage"],
+          "expected": "每种锁外 G3 干扰都真实完成；首个 WAL 不存在，正式文件不变。"
+        },
+        {
+          "id": "X2",
+          "test": "test_x02_acceptance_crash_has_one_outcome",
+          "faults": ["after_acceptance_before_prepare", "after_prepare", "after_commit"],
+          "expected": "无完整 WAL 可重试；有 WAL 独立恢复；归并前崩溃按原 Admission 归并。"
+        },
+        {
+          "id": "X3",
+          "test": "test_x03_invocation_reentry_crash_and_replay",
+          "faults": ["same_process_active_reentry", "not_started_send_race", "cross_process_active_reentry", "executor_kill", "draining_takeover", "same_id_replay"],
+          "expected": "双线程与跨进程同 ID 均不重复执行；崩溃接管先 draining 后释放，Task／Run 不重复扣减。"
+        },
+        {
+          "id": "X4",
+          "test": "test_x04_nonterminal_states_recover_without_success",
+          "faults": ["prepared", "applying", "recovery_required", "recovered"],
+          "expected": "中间态均不投影 applied；原 operation 可独立恢复并永久封闭。"
+        },
+        {
+          "id": "X5",
+          "test": "test_x05_terminal_replay_ignores_dynamic_state",
+          "faults": ["applied", "recovered", "host_applied", "host_recovered", "expired", "pause", "budget_blocked", "payload_missing", "library_change", "admission_rebinding"],
+          "expected": "Executor 与真实 Host 终态重放均无动态审查、预算或新写入；过期与合法暂停不阻断，异绑 Admission 拒绝。"
+        },
+        {
+          "id": "X6",
+          "test": "test_x06_host_revoke_and_pause_stay_responsive",
+          "faults": ["same_host_revoke", "cross_process_revoke", "same_host_pause", "cross_process_pause"],
+          "expected": "长 G3 不阻挡撤销或暂停；干扰与接受有唯一顺序且无 WAL。"
+        },
+        {
+          "id": "X7",
+          "test": "test_x07_identity_and_scope_negative_matrix",
+          "faults": ["trusted_transport_positive", "self_signed_transport", "missing_request_identity", "wrong_role", "cross_scope", "valid_candidate", "wrong_candidate", "unattested_review", "unattested_host_executor_g3"],
+          "expected": "可信 transport 有正例；自签与异绑拒绝；无 Attestation 的 Driver／Executor G3 不生成可复用凭据，真实 L3 不自动通过。"
+        },
+        {
+          "id": "X8",
+          "test": "test_x08_budget_slots_and_draining_are_atomic",
+          "faults": ["last_thread_budget", "last_process_budget", "last_process_slot", "not_started_slot", "timeout", "late_completion", "repeated_timeout"],
+          "expected": "最后额度或槽位只有一个赢家；unknown 不退款、不重发，迟到完成只释放资源。"
+        },
+        {
+          "id": "X9",
+          "test": "test_x09_recovery_conflict_preserves_user_edits",
+          "faults": ["crash_after_write", "user_edit", "recovery_conflict", "forged_applied_reconcile"],
+          "expected": "conflict 保留用户字节并进入人工对账；不投影 applied，不接受伪造成功。"
+        },
+        {
+          "id": "X10",
+          "test": "test_x10_ingest_and_approve_authorization_boundaries",
+          "faults": ["ingest_as_g4", "learning_approve", "executor_approve_revocation_barrier"],
+          "expected": "ingest 授权不替代 G4；学习 approve 不自动签发；Executor 撤销屏障先序于 WAL，Host 端到端证据由 X6 提供。"
+        },
+        {
+          "id": "X11",
+          "test": "test_x11_history_requires_compensating_operation",
+          "faults": ["revoke_consumed", "reauthorize_accepted_operation", "semantic_compensation_applied", "archive_correction", "old_approval_rejected", "new_approval_applied"],
+          "expected": "真实语义补偿以新 Task／operation／Admission／Authorization 应用并归并；归档修正拒绝旧批准，原 WAL 与执行投影不变。"
+        },
+        {
+          "id": "X12",
+          "test": "test_x12_host_driver_cannot_self_grant",
+          "faults": ["legacy_counter_reset", "self_reported_approval", "self_reported_review_state", "host_credential_injection"],
+          "expected": "旧投影不重置权威预算；Driver 不能自签；产品 Host 不暴露合成 Readiness／Credential 写入入口，权威表不变。"
+        }
+      ]
+    },
+    "L": {
+      "title": "持久循环、版本与存储组合故障",
+      "scenarios": [
+        {
+          "id": "L1",
+          "test": "test_l01_event_commit_replay_and_conflict",
+          "faults": ["accept_response_lost", "same_key_replay", "same_key_different_envelope", "post_plan_replay"],
+          "expected": "事件只有一条权威事实；丢失响应后恢复原确认；异内容拒绝且不派生重复工作。"
+        },
+        {
+          "id": "L2",
+          "test": "test_l02_crash_windows_resume_durable_work",
+          "faults": ["accepted_before_plan", "planner_before_commit", "plan_after_commit_response_lost", "result_after_commit_response_lost", "stale_frozen_snapshot", "restart"],
+          "expected": "接收、规划、结果及后续工作各崩溃窗口均可续办；旧冻结快照不能覆盖新 LearningState，重规划后可完成。"
+        },
+        {
+          "id": "L3",
+          "test": "test_l03_claim_takeover_and_original_invocation",
+          "faults": ["two_process_claim", "executor_lost", "stale_generation_result", "original_invocation_replay", "unknown_invocation"],
+          "expected": "双进程单赢家；换代拒绝旧结果并归并原成功 Invocation；unknown 不归并成功也不重发。"
+        },
+        {
+          "id": "L4",
+          "test": "test_l04_answer_race_revision_and_readiness",
+          "faults": ["duplicate_answer_threads", "answer_invalidation_race", "stale_knowledge_version", "answer_revision", "readiness_replay"],
+          "expected": "重复回答只派一次判分；失效后的旧版本不推动 Readiness；修订答案只产生对应后续工作。"
+        },
+        {
+          "id": "L5",
+          "test": "test_l05_result_domain_and_followups_are_atomic",
+          "faults": ["published_artifact", "domain_change", "result_after_commit_response_lost", "same_result_replay", "different_result_replay"],
+          "expected": "产物、领域状态和后续工作同一事务归并；响应丢失后原结果重放，异结果冲突。"
+        },
+        {
+          "id": "L6",
+          "test": "test_l06_capability_and_knowledge_version_invalidation",
+          "faults": ["dependency_change", "capability_missing", "required_check_removed", "capability_revoked", "implementation_digest_change", "cross_version_credential", "stale_admission", "new_version_credential"],
+          "expected": "失效依赖、缺必需检查和能力变化均阻断；旧凭据不能跨知识版本签发授权或 Admission，新凭据完整重绑后才可授权。"
+        },
+        {
+          "id": "L7",
+          "test": "test_l07_restart_retry_and_wait_preserve_bounds",
+          "faults": ["completed_step_restart", "nonzero_finance_restart", "no_progress_repair", "format_repair_failure", "retry_restart", "waiting_user", "bounded_stop"],
+          "expected": "重启不重做完成业务、不刷新真实非零预算或 attempt；无进展修复有界停止，等待用户不派工作。"
+        },
+        {
+          "id": "L8",
+          "test": "test_l08_storage_failures_preserve_authoritative_state",
+          "faults": ["db_busy", "late_write_rollback", "orphan_artifact", "backup_restore_replay", "unknown_schema"],
+          "expected": "数据库故障有界且晚期写入整体回滚；孤儿产物不进入备份；备份恢复可重放原绑定，未知 schema 不重置账本。"
+        },
+        {
+          "id": "L9",
+          "test": "test_l09_controlled_invocation_cannot_self_grant",
+          "faults": ["capability_self_approval", "revoked_capability_invoke", "self_signed_attestation", "self_applied_without_wal", "host_credential_injection", "unknown_usage_visibility", "authority_tables_unchanged"],
+          "expected": "能力与 Driver 只能经统一调用留痕；自报批准、自签身份和无 WAL applied 均拒绝，Host 无合成注入入口，未知 token 不按零计费。"
+        }
+      ]
+    },
+    "C": {
+      "title": "旧 WAL、pending 与全局切变组合故障",
+      "scenarios": [
+        {
+          "id": "C1",
+          "test": "test_c01_legacy_wal_original_root_and_terminal_closure",
+          "faults": ["prepared", "applying", "applied", "recovered", "payload_missing", "terminal_replay"],
+          "expected": "四类旧 WAL 均在原 journal_root 查询或恢复；recovered 永久封闭，终态重放不动态审查或写新 WAL。"
+        },
+        {
+          "id": "C2",
+          "test": "test_c02_pending_dispositions_without_history_or_budget_fabrication",
+          "faults": ["terminal", "accepted_pending_recovery", "pre_wal_pending", "supersede", "recover", "cutover_ready"],
+          "expected": "三类旧 pending 均有确定去向；pending 历史不变，不伪造 Invocation、不刷新预算或授权。"
+        },
+        {
+          "id": "C3",
+          "test": "test_c03_pause_resume_requires_new_operation_and_admission",
+          "faults": ["pause_during_g3", "old_epoch", "same_operation_new_admission", "new_operation_acceptance"],
+          "expected": "G3 中暂停使旧操作与 Admission 失效；同操作换 Admission 拒绝，新 operation 当前授权后可接受并归并。"
+        },
+        {
+          "id": "C4",
+          "test": "test_c04_derived_and_python_apis_have_no_direct_write_bypass",
+          "faults": ["derived_apply", "refresh_index_write", "run_heal_write", "three_heal_write_branches", "read_only_previews"],
+          "expected": "derived 经维护 Runtime 应用；五个 Python 写分支拒绝直写，只读预览不变，无学习 Admission 旁路。"
+        },
+        {
+          "id": "C5",
+          "test": "test_c05_cutover_crashes_and_writer_races_resume_idempotently",
+          "faults": ["six_drain_crash_points", "supersede_crash", "intent_only_tamper", "intent_only_late_pending", "locator_only", "locator_writer_rejected", "checked_writer", "late_writer", "runtime_enable"],
+          "expected": "分类、supersede、drain、intent／locator 与启用前中断均幂等续办；摘要篡改和迟到 pending 拒绝入列，旧 guard 与写者封闭，除获准 drain 外无新 WAL。"
+        }
+      ]
+    }
+  }
+}

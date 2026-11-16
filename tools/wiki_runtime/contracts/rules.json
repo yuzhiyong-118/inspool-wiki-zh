@@ -1,0 +1,195 @@
+{
+  "mapping_version": "1.0",
+  "authority": "AGENTS.md",
+  "rules": [
+    {
+      "rule_id": "RAW-001",
+      "authority": "AGENTS.md",
+      "heading": "三层结构 / 1. `raw/`",
+      "clause": "正文默认只读；流程元数据与移动例外",
+      "level": "mandatory",
+      "gate": "G1",
+      "checker": "raw_body_invariant",
+      "implementation_status": "planned"
+    },
+    {
+      "rule_id": "RAW-002",
+      "authority": "AGENTS.md",
+      "heading": "Raw 流程元数据",
+      "clause": "少量流程字段；不允许借此篡改正文",
+      "level": "mandatory",
+      "gate": "G1",
+      "checker": "raw_metadata_allowlist",
+      "implementation_status": "planned"
+    },
+    {
+      "rule_id": "STATE-001",
+      "authority": "AGENTS.md",
+      "heading": "2. Ingest",
+      "clause": "仅配套更新成功后推进 pending_review；禁止直接移入 processed",
+      "level": "mandatory",
+      "gate": "G2",
+      "checker": "ingest_group_state",
+      "implementation_status": "planned"
+    },
+    {
+      "rule_id": "APPROVE-001",
+      "authority": "AGENTS.md",
+      "heading": "3. Approve",
+      "clause": "用户明确确认批次后才允许迁移",
+      "level": "mandatory",
+      "gate": "G4",
+      "checker": "trusted_approval_binding",
+      "implementation_status": "planned"
+    },
+    {
+      "rule_id": "APPROVE-002",
+      "authority": "AGENTS.md",
+      "heading": "3. Approve",
+      "clause": "整组迁移；修复所有旧 raw 路径；局部自检失败不得完成",
+      "level": "mandatory",
+      "gate": "G2",
+      "checker": "approve_path_residue",
+      "implementation_status": "planned"
+    },
+    {
+      "rule_id": "REL-001",
+      "authority": "AGENTS.md",
+      "heading": "3.1 反向边回填（ingest 的必查项）",
+      "clause": "关联旧页 frontmatter 与正文双通道反向边及 updated",
+      "level": "mandatory",
+      "gate": "G2",
+      "checker": "reverse_edges",
+      "implementation_status": "planned"
+    },
+    {
+      "rule_id": "INDEX-001",
+      "authority": "AGENTS.md",
+      "heading": "禁止事项",
+      "clause": "不得只更新正文而忘记 index/log；不得只更新 wiki 忘记 raw/index 与状态",
+      "level": "mandatory",
+      "gate": "G2",
+      "checker": "companion_files",
+      "implementation_status": "planned"
+    },
+    {
+      "rule_id": "PATH-001",
+      "authority": "AGENTS.md",
+      "heading": "用户维护分类目录",
+      "clause": "递归扫描分类子目录；未经明确要求不重组分类",
+      "level": "mandatory",
+      "gate": "G0",
+      "checker": "recursive_scope",
+      "implementation_status": "planned"
+    },
+    {
+      "rule_id": "PATH-002",
+      "authority": "AGENTS.md",
+      "heading": "路径稳定性规则",
+      "clause": "分类迁移合法；修复旧路径而非要求回退目录",
+      "level": "mandatory",
+      "gate": "G2",
+      "checker": "health.check_path_residue",
+      "implementation_status": "existing_partial"
+    },
+    {
+      "rule_id": "FACT-001",
+      "authority": "AGENTS.md",
+      "heading": "禁止事项",
+      "clause": "不得把未经确认的猜测写成事实；不得删除冲突信息",
+      "level": "mandatory",
+      "gate": "G3",
+      "checker": "independent_content_review",
+      "implementation_status": "planned"
+    },
+    {
+      "rule_id": "EVIDENCE-001",
+      "authority": "AGENTS.md",
+      "heading": "引用与落链规则",
+      "clause": "关键结论尽量带证据链接，优先本地 sources 锚点",
+      "level": "recommended",
+      "gate": "G3",
+      "checker": "independent_content_review",
+      "implementation_status": "planned"
+    },
+    {
+      "rule_id": "FM-001",
+      "authority": "AGENTS.md",
+      "heading": "关系字段约定",
+      "clause": "推荐 frontmatter 字段，不将全体推荐字段设为必填",
+      "level": "recommended",
+      "gate": "G2",
+      "checker": "frontmatter_policy",
+      "implementation_status": "planned"
+    },
+    {
+      "rule_id": "FORMAT-001",
+      "authority": "AGENTS.md",
+      "heading": "页面推荐结构",
+      "clause": "建议页面小节，非统一硬模板",
+      "level": "recommended",
+      "gate": "G2",
+      "checker": "page_shape_advice",
+      "implementation_status": "planned"
+    },
+    {
+      "rule_id": "LINK-001",
+      "authority": "AGENTS.md",
+      "heading": "页面写作原则",
+      "clause": "尽量使用 Obsidian 双链",
+      "level": "recommended",
+      "gate": "G2",
+      "checker": "health.check_broken_links",
+      "implementation_status": "existing_partial"
+    },
+    {
+      "rule_id": "HEALTH-001",
+      "authority": "AGENTS.md",
+      "heading": "四类核心操作 / 1. Health",
+      "clause": "纯确定性结构检查并追加 health 日志",
+      "level": "mandatory",
+      "gate": "G2",
+      "checker": "health.run_health",
+      "implementation_status": "existing_partial"
+    },
+    {
+      "rule_id": "SOURCE-001",
+      "authority": "AGENTS.md",
+      "heading": "证据节点与图谱原则",
+      "clause": "关键结论优先 sources，本地证据节点接入图谱",
+      "level": "recommended",
+      "gate": "G3",
+      "checker": "independent_content_review",
+      "implementation_status": "planned"
+    }
+  ],
+  "design_constraints": [
+    {
+      "id": "CONTRACT-001",
+      "source": "wiki/meta/agent-maintenance-plan.md#二、基本约束",
+      "checker": "contracts.validate",
+      "note": "未知结构拒绝，可信授权与模型意见分离；这是实现约束，不冒充 AGENTS 原句"
+    },
+    {
+      "id": "BINDING-001",
+      "source": "wiki/meta/agent-maintenance-plan.md#七、操作记录与验证结果",
+      "checker": "contracts.bindings_match + trusted_runner",
+      "note": "绑定变化旧通过失效；认证由可信运行器负责"
+    },
+    {
+      "id": "PATH-SAFETY-001",
+      "source": "wiki/meta/agent-maintenance-plan.md#八、写入、恢复与实际隔离",
+      "checker": "contracts.validate_path + executor",
+      "note": "词法与解析检查不替代权限隔离"
+    }
+  ],
+  "disputes": [
+    {
+      "id": "ADR0001-processed-into-timing",
+      "authority": "AGENTS.md",
+      "other": "wiki/meta/adr/0001-state-storage.md#配套约束",
+      "decision": "保留分歧；以 AGENTS ingest 元数据流程为当前正本，不强制 processed_into 只在 processed 才存在",
+      "status": "recorded_not_amended"
+    }
+  ]
+}

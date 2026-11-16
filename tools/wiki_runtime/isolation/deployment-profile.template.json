@@ -1,0 +1,6 @@
+{
+  "profile_version": "1.0",
+  "backend": "restricted-tool-gateway",
+  "model_tools_only": true,
+  "executor_out_of_band": true
+}

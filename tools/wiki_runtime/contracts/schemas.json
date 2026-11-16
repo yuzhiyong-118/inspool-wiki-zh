@@ -1,0 +1,1120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:inspool:runtime:contracts:1.0",
+  "$defs": {
+    "precondition": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "absent"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "hash"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "[0-9a-f]{64}"
+            }
+          },
+          "required": [
+            "kind",
+            "sha256"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "artifact": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "format": "vault-path"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}"
+        },
+        "media_type": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "path",
+        "sha256",
+        "media_type"
+      ],
+      "additionalProperties": false
+    },
+    "binding": {
+      "type": "object",
+      "properties": {
+        "operation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "candidate_digest": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}"
+        },
+        "dependencies_digest": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}"
+        },
+        "rules_digest": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}"
+        },
+        "mapping_digest": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}"
+        },
+        "validator_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "review_prompt_version": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "operation_id",
+        "candidate_digest",
+        "dependencies_digest",
+        "rules_digest",
+        "mapping_digest",
+        "validator_version",
+        "review_prompt_version"
+      ],
+      "additionalProperties": false
+    },
+    "source_package": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0"
+        },
+        "package_version": {
+          "const": "1.0"
+        },
+        "source_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_revision": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}"
+        },
+        "input_type": {
+          "type": "string",
+          "enum": [
+            "markdown",
+            "text",
+            "wechat",
+            "html",
+            "pdf",
+            "audio",
+            "video",
+            "chat"
+          ]
+        },
+        "source": {
+          "type": "object",
+          "properties": {
+            "origin": {
+              "type": "string",
+              "minLength": 1
+            },
+            "title": {
+              "type": "string"
+            },
+            "author": {
+              "type": "string"
+            },
+            "published_at": {
+              "type": "string"
+            },
+            "acquired_at": {
+              "type": "string",
+              "minLength": 1
+            },
+            "unavailable_fields": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            }
+          },
+          "required": [
+            "origin",
+            "title",
+            "author",
+            "published_at",
+            "acquired_at",
+            "unavailable_fields"
+          ],
+          "additionalProperties": false
+        },
+        "originals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifact"
+          },
+          "minItems": 1
+        },
+        "extracted": {
+          "$ref": "#/$defs/artifact"
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifact"
+          },
+          "minItems": 0
+        },
+        "locators": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "block_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "artifact_path": {
+                "type": "string",
+                "format": "vault-path"
+              },
+              "location": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "block_id",
+              "artifact_path",
+              "location"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
+        },
+        "parser": {
+          "type": "object",
+          "properties": {
+            "adapter_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "adapter_version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "parser_version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "config_digest": {
+              "type": "string",
+              "pattern": "[0-9a-f]{64}"
+            },
+            "used_ocr": {
+              "type": "boolean"
+            },
+            "used_model": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "adapter_id",
+            "adapter_version",
+            "parser_version",
+            "config_digest",
+            "used_ocr",
+            "used_model"
+          ],
+          "additionalProperties": false
+        },
+        "quality": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "complete",
+                "partial",
+                "failed"
+              ]
+            },
+            "errors": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            },
+            "missing": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 0
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1
+            },
+            "statistics": {
+              "type": "object",
+              "properties": {
+                "blocks": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "characters": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "pages_total": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "pages_extracted": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "blocks",
+                "characters",
+                "pages_total",
+                "pages_extracted"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "status",
+            "errors",
+            "missing",
+            "evidence",
+            "statistics"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "contract_version",
+        "package_version",
+        "source_id",
+        "source_revision",
+        "input_type",
+        "source",
+        "originals",
+        "extracted",
+        "attachments",
+        "locators",
+        "parser",
+        "quality"
+      ],
+      "additionalProperties": false
+    },
+    "manifest": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0"
+        },
+        "operation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operation_type": {
+          "type": "string",
+          "enum": [
+            "capture",
+            "import",
+            "ingest",
+            "approve",
+            "index_rebuild",
+            "query",
+            "inspool",
+            "health",
+            "lint",
+            "rename",
+            "move",
+            "merge",
+            "rule_maintenance",
+            "tool_maintenance"
+          ]
+        },
+        "task": {
+          "type": "string",
+          "minLength": 1
+        },
+        "input_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "allowed_paths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "vault-path"
+          },
+          "minItems": 0
+        },
+        "rules_path": {
+          "const": "AGENTS.md"
+        },
+        "rules_digest": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}"
+        },
+        "mapping_digest": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}"
+        },
+        "validator_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "review_prompt_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dependencies_digest": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}"
+        },
+        "candidate_digest": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}"
+        },
+        "round": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "required_gates": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "G0",
+              "G1",
+              "G2",
+              "G3",
+              "G4",
+              "G5"
+            ]
+          },
+          "minItems": 0
+        },
+        "authorization_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "contract_version",
+        "operation_id",
+        "operation_type",
+        "task",
+        "input_refs",
+        "allowed_paths",
+        "rules_path",
+        "rules_digest",
+        "mapping_digest",
+        "validator_version",
+        "review_prompt_version",
+        "dependencies_digest",
+        "candidate_digest",
+        "round",
+        "required_gates",
+        "authorization_refs"
+      ],
+      "additionalProperties": false
+    },
+    "candidate": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0"
+        },
+        "operation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "changes": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "action": {
+                    "const": "write"
+                  },
+                  "path": {
+                    "type": "string",
+                    "format": "vault-path"
+                  },
+                  "payload_path": {
+                    "type": "string",
+                    "format": "vault-path"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "[0-9a-f]{64}"
+                  },
+                  "precondition": {
+                    "$ref": "#/$defs/precondition"
+                  }
+                },
+                "required": [
+                  "action",
+                  "path",
+                  "payload_path",
+                  "sha256",
+                  "precondition"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "action": {
+                    "const": "move"
+                  },
+                  "source": {
+                    "type": "string",
+                    "format": "vault-path"
+                  },
+                  "source_sha256": {
+                    "type": "string",
+                    "pattern": "[0-9a-f]{64}"
+                  },
+                  "path": {
+                    "type": "string",
+                    "format": "vault-path"
+                  },
+                  "precondition": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "const": "absent"
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "action",
+                  "source",
+                  "source_sha256",
+                  "path",
+                  "precondition"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "action": {
+                    "const": "delete"
+                  },
+                  "path": {
+                    "type": "string",
+                    "format": "vault-path"
+                  },
+                  "precondition": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "const": "hash"
+                      },
+                      "sha256": {
+                        "type": "string",
+                        "pattern": "[0-9a-f]{64}"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "sha256"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "action",
+                  "path",
+                  "precondition"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "action": {
+                    "const": "move"
+                  },
+                  "source": {
+                    "type": "string",
+                    "format": "vault-path"
+                  },
+                  "source_sha256": {
+                    "type": "string",
+                    "pattern": "[0-9a-f]{64}"
+                  },
+                  "path": {
+                    "type": "string",
+                    "format": "vault-path"
+                  },
+                  "precondition": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "const": "absent"
+                      }
+                    },
+                    "required": [
+                      "kind"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "payload_path": {
+                    "type": "string",
+                    "format": "vault-path"
+                  },
+                  "sha256": {
+                    "type": "string",
+                    "pattern": "[0-9a-f]{64}"
+                  }
+                },
+                "required": [
+                  "action",
+                  "source",
+                  "source_sha256",
+                  "path",
+                  "precondition",
+                  "payload_path",
+                  "sha256"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "contract_version",
+        "operation_id",
+        "changes"
+      ],
+      "additionalProperties": false
+    },
+    "dependency_snapshot": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0"
+        },
+        "operation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "format": "vault-path"
+              },
+              "precondition": {
+                "$ref": "#/$defs/precondition"
+              }
+            },
+            "required": [
+              "path",
+              "precondition"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "contract_version",
+        "operation_id",
+        "files"
+      ],
+      "additionalProperties": false
+    },
+    "finding": {
+      "type": "object",
+      "properties": {
+        "rule_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "blocking",
+            "warning",
+            "info"
+          ]
+        },
+        "category": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected": {
+          "type": "string",
+          "minLength": 1
+        },
+        "repairable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "rule_id",
+        "severity",
+        "category",
+        "target",
+        "evidence",
+        "expected",
+        "repairable"
+      ],
+      "additionalProperties": false
+    },
+    "gate_report": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0"
+        },
+        "operation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "candidate_digest": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}"
+        },
+        "dependencies_digest": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}"
+        },
+        "rules_digest": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}"
+        },
+        "mapping_digest": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}"
+        },
+        "validator_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "review_prompt_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "gate": {
+          "type": "string",
+          "enum": [
+            "G0",
+            "G1",
+            "G2",
+            "G3",
+            "G4",
+            "G5"
+          ]
+        },
+        "result": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail",
+            "error",
+            "unsupported"
+          ]
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/finding"
+          },
+          "minItems": 0
+        },
+        "producer": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "contract_version",
+        "operation_id",
+        "candidate_digest",
+        "dependencies_digest",
+        "rules_digest",
+        "mapping_digest",
+        "validator_version",
+        "review_prompt_version",
+        "gate",
+        "result",
+        "findings",
+        "producer"
+      ],
+      "additionalProperties": false
+    },
+    "review_report": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0"
+        },
+        "operation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "candidate_digest": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}"
+        },
+        "dependencies_digest": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}"
+        },
+        "rules_digest": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}"
+        },
+        "mapping_digest": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}"
+        },
+        "validator_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "review_prompt_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewer_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "result": {
+          "type": "string",
+          "enum": [
+            "recommend_pass",
+            "request_changes",
+            "insufficient_evidence",
+            "error"
+          ]
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/finding"
+          },
+          "minItems": 0
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "contract_version",
+        "operation_id",
+        "candidate_digest",
+        "dependencies_digest",
+        "rules_digest",
+        "mapping_digest",
+        "validator_version",
+        "review_prompt_version",
+        "reviewer_id",
+        "result",
+        "findings",
+        "evidence_refs"
+      ],
+      "additionalProperties": false
+    },
+    "appeal_report": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0"
+        },
+        "operation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "candidate_digest": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}"
+        },
+        "dependencies_digest": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}"
+        },
+        "rules_digest": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}"
+        },
+        "mapping_digest": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}"
+        },
+        "validator_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "review_prompt_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rule_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "failure_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
+        },
+        "goal_conflict": {
+          "type": "string",
+          "minLength": 1
+        },
+        "minimal_counterexample": {
+          "type": "string",
+          "minLength": 1
+        },
+        "proposal": {
+          "type": "string",
+          "minLength": 1
+        },
+        "impact": {
+          "type": "string",
+          "minLength": 1
+        },
+        "disposition": {
+          "type": "string",
+          "enum": [
+            "submitted",
+            "rule_valid",
+            "validator_bug",
+            "rule_change_needed",
+            "insufficient_evidence"
+          ]
+        }
+      },
+      "required": [
+        "contract_version",
+        "operation_id",
+        "candidate_digest",
+        "dependencies_digest",
+        "rules_digest",
+        "mapping_digest",
+        "validator_version",
+        "review_prompt_version",
+        "rule_ids",
+        "failure_refs",
+        "evidence",
+        "goal_conflict",
+        "minimal_counterexample",
+        "proposal",
+        "impact",
+        "disposition"
+      ],
+      "additionalProperties": false
+    },
+    "execution_result": {
+      "type": "object",
+      "properties": {
+        "contract_version": {
+          "const": "1.0"
+        },
+        "operation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "candidate_digest": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}"
+        },
+        "dependencies_digest": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}"
+        },
+        "rules_digest": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}"
+        },
+        "mapping_digest": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}"
+        },
+        "validator_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "review_prompt_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "prepared",
+            "checking",
+            "repairing",
+            "rule_review",
+            "awaiting_human",
+            "ready_to_apply",
+            "applying",
+            "applied",
+            "failed",
+            "recovery_required",
+            "recovered"
+          ]
+        },
+        "applied": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "format": "vault-path"
+              },
+              "sha256": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "pattern": "[0-9a-f]{64}"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "path",
+              "sha256"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
+        },
+        "journal_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "vault-path"
+          },
+          "minItems": 0
+        },
+        "recovery_status": {
+          "type": "string",
+          "enum": [
+            "not_needed",
+            "required",
+            "in_progress",
+            "recovered",
+            "conflict"
+          ]
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "contract_version",
+        "operation_id",
+        "candidate_digest",
+        "dependencies_digest",
+        "rules_digest",
+        "mapping_digest",
+        "validator_version",
+        "review_prompt_version",
+        "state",
+        "applied",
+        "journal_refs",
+        "recovery_status",
+        "errors"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

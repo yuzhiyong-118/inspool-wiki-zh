@@ -1,0 +1,72 @@
+{
+  "baseCommit": "60fb3bdfddb30b7740c7ce3bd9b28d908f2af6db",
+  "inheritedI4PatchSha256": "8eafee08f29dab8b97c721495eedbc97b3b45f4edd3c14ac255a82c5a8bf88eb",
+  "inheritedI5PatchSha256": "09992fc36bd05f6d2599bb06f274e1688496b090424558771d5297457908e917",
+  "patches": [
+    {
+      "file": "quiz-legacy-session.patch",
+      "sha256": "8124d68f6fadaf658bb945fda72b4991a7c07ad505ed81749a2a9c9c5c84eaee"
+    },
+    {
+      "file": "upload-task-identity.patch",
+      "sha256": "4f54dcd4ed3369c5c9c3619fde4695e49c7a2c9c798901d1a099aa3441abc03c"
+    },
+    {
+      "file": "prepared-quiz.patch",
+      "sha256": "ddd7b3d64ce770825a90ff454fc5c0225a4653aefac26535d6ebd438d600ed9b"
+    },
+    {
+      "file": "editorial-bridge.patch",
+      "sha256": "9c18f43b31d45d0a47ef7201b57272f7851b02905f751110aed382b478a049b5"
+    }
+  ],
+  "finalModules": {
+    "core": {
+      "wheel": "deeptutor-1.7.2-py3-none-any.whl",
+      "sha256": "b3f1a388a3d08396b75544c084b0450f6b4b8d4740081e4e3b428df7a9951b7b",
+      "installedFilesVerified": 675
+    },
+    "server": {
+      "wheel": "deeptutor_server-1.7.2-py3-none-any.whl",
+      "sha256": "9ce2e66dc34919a1386d79f830fef4d3449d957b444e6a1792a460eed3f8e845",
+      "installedFilesVerified": 46
+    },
+    "books": {
+      "wheel": "deeptutor_books-1.7.2-py3-none-any.whl",
+      "sha256": "1d1563f4fa27bd5887e922e4b56786a3c12c8aac4d67ad3a2adcc66cf0450d29",
+      "installedFilesVerified": 77
+    },
+    "knowledge": {
+      "wheel": "deeptutor_knowledge-1.7.2-py3-none-any.whl",
+      "sha256": "7148932e19e744b9eaca422262ed64138a3311f6258243ec03eff14764102c8e",
+      "installedFilesVerified": 165
+    },
+    "parsing": {
+      "wheel": "deeptutor_parsing-1.7.2-py3-none-any.whl",
+      "sha256": "3e179ec667ff9b40dd08ce79ac9befa21d9fb0c3d01583c2b395a88eb9471241",
+      "installedFilesVerified": 53
+    },
+    "questions": {
+      "wheel": "deeptutor_questions-1.7.2-py3-none-any.whl",
+      "sha256": "54ce696bc2a6fb3fc79bce89aa8c8a414830d3c89ba45f84ba04ba667d3601f7",
+      "installedFilesVerified": 23
+    },
+    "visualize": {
+      "wheel": "deeptutor_visualize-1.7.2-py3-none-any.whl",
+      "sha256": "b16f38059c0b2dc0421f8e60699edcd98bec75844f8887158c2bf7a75c5e3dd5",
+      "installedFilesVerified": 26
+    },
+    "mastery": {
+      "wheel": "deeptutor_mastery-1.7.2-py3-none-any.whl",
+      "sha256": "2490485d0aceddd79fce185583a9d3551175676204ec794dd4f146469a2974bc",
+      "installedFilesVerified": 44
+    }
+  },
+  "finalSourceLfSha256": {
+    "deeptutor/api/routers/book.py": "869ba4d7c3e0f52c8abcf4d73ed78ee6d594edb24519b6ae585adb18e4b534e5",
+    "deeptutor/knowledge/add_documents.py": "8ae24086827acc88018e3f1ce638324e0aa93291bc6bfe3715a907cc50293407",
+    "deeptutor/book/blocks/quiz.py": "bcc347cf4255e22aac7536db0d7e010bb4d89ef3aa2300479124656349bfc7bb",
+    "deeptutor/agents/question/pipeline.py": "5d535ea8231c28a6c6af01c6d57790a2915c98632417d17417e932abecb1024d",
+    "deeptutor/book/engine.py": "8a493e07b322c096e3f3ff775243a60bf8c6231d58101e46cb12b7235cdf4926"
+  }
+}

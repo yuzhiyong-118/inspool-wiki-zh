@@ -1,0 +1,493 @@
+{
+  "fixture_version": "1.0",
+  "protocol_identity": {
+    "identity_id": "shared-v1",
+    "task_runtime": "Task Runtime",
+    "invocation": "Invocation",
+    "knowledge_package": "KnowledgePackage",
+    "readiness": "Readiness",
+    "authorization": "Authorization",
+    "executor": "Executor",
+    "budget_ledger": "Invocation",
+    "acceptance_record": "Executor first complete WAL"
+  },
+  "scenarios": [
+    {
+      "scenario_id": "normal-text",
+      "fixture_version": "1.0",
+      "input_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "protocol_identity_ref": "shared-v1",
+      "expected_state": "processed_after_separate_approve",
+      "required_evidence_layers": ["script", "semantic_review", "real_host", "owner"],
+      "business_acceptance": false,
+      "allowed_side_effects": [
+        {"stage": "S5", "effect": "Executor ingest updates Wiki and moves raw to pending_review", "executed": false},
+        {"stage": "S5", "effect": "Separate Executor approve moves raw to processed", "executed": false}
+      ],
+      "stage_ownership": [
+        {"stage": "S0", "scope": "Shared identities and executable negative protocols"},
+        {"stage": "S2", "scope": "Persistent evidence, KnowledgePackage and complete candidate coverage"},
+        {"stage": "S3", "scope": "Lesson, applicable calibration, independent assessment and Readiness"},
+        {"stage": "S5", "scope": "Real ingest and independent approve transactions"}
+      ],
+      "steps": [
+        {
+          "step_id": "normal-01", "action": "persist_source", "stage": "S2",
+          "expected_state": "persistent_source_available",
+          "required_evidence": {
+            "script": ["UTF-8 bytes and source content digest"],
+            "semantic_review": ["Readable range and source version"],
+            "real_host": ["Authorized source reader"], "owner": []
+          },
+          "allowed_side_effects": ["Persist approved synthetic source in temporary store"],
+          "currently_verifiable": false, "acceptance_status": "not_passed",
+          "protocols": ["Source", "Task Runtime"]
+        },
+        {
+          "step_id": "normal-02", "action": "build_source_evidence_claim_package", "stage": "S2",
+          "expected_state": "versioned_knowledge_package",
+          "required_evidence": {
+            "script": ["Source Evidence Claim relation and package digest validation"],
+            "semantic_review": ["Claims evidence conditions and conflicts match source"],
+            "real_host": [], "owner": []
+          },
+          "allowed_side_effects": ["Store private KnowledgePackage"],
+          "currently_verifiable": false, "acceptance_status": "not_passed",
+          "protocols": ["Source", "Evidence", "Claim", "EvidenceClaimRelation", "KnowledgePackage"]
+        },
+        {
+          "step_id": "normal-03", "action": "render_short_lesson", "stage": "S3",
+          "expected_state": "lesson_ready_before_assessment",
+          "required_evidence": {
+            "script": ["Lesson package binding"],
+            "semantic_review": ["Independent lesson review covers conditions and limitations"],
+            "real_host": ["Independent reviewer identity"], "owner": []
+          },
+          "allowed_side_effects": ["Store private lesson"],
+          "currently_verifiable": false, "acceptance_status": "not_passed",
+          "protocols": ["KnowledgePackage", "Objective", "Rubric", "ReviewCredential", "Invocation"]
+        },
+        {
+          "step_id": "normal-04", "action": "calibrate_and_independently_assess", "stage": "S3",
+          "expected_state": "understanding_verified",
+          "required_evidence": {
+            "script": ["Applicable template evaluator calibration and L2 binding checks"],
+            "semantic_review": ["Lesson rubric evidence review and independent response quality"],
+            "real_host": ["Independent assessor context"], "owner": ["User unaided response"]
+          },
+          "allowed_side_effects": ["Store private Calibration and Assessment"],
+          "currently_verifiable": false, "acceptance_status": "not_passed",
+          "protocols": ["RubricTemplate", "Evaluator", "Calibration", "Assessment", "ReviewCredential", "Invocation"]
+        },
+        {
+          "step_id": "normal-05", "action": "compile_final_candidate_and_complete_coverage", "stage": "S2",
+          "expected_state": "candidate_preview_with_complete_coverage",
+          "required_evidence": {
+            "script": ["Every final semantic change has exactly one CoverageDisposition"],
+            "semantic_review": ["Required reuse optional and non-teaching classifications are justified"],
+            "real_host": [], "owner": []
+          },
+          "allowed_side_effects": ["Store private CandidatePreview and CoverageDisposition records"],
+          "currently_verifiable": false, "acceptance_status": "not_passed",
+          "protocols": ["KnowledgePackage", "CandidatePreview", "CoverageDisposition"]
+        },
+        {
+          "step_id": "normal-06", "action": "certify_readiness", "stage": "S3",
+          "expected_state": "current_readiness_without_authorization",
+          "required_evidence": {
+            "script": ["Candidate package credentials dependencies and rules digests match"],
+            "semantic_review": ["Final diff and necessary understanding are current"],
+            "real_host": ["Task Runtime certifies bindings"], "owner": []
+          },
+          "allowed_side_effects": ["Store private immutable Readiness"],
+          "currently_verifiable": false, "acceptance_status": "not_passed",
+          "protocols": ["Readiness", "CandidatePreview", "ReviewCredential", "Task Runtime"]
+        },
+        {
+          "step_id": "normal-07", "action": "authorize_ingest_and_execute", "stage": "S5",
+          "operation": "ingest", "operation_id": "normal-ingest-operation",
+          "authorization_id": "normal-ingest-authorization",
+          "expected_state": "applied_and_pending_review",
+          "required_evidence": {
+            "script": ["Acceptance check complete WAL and applied result"],
+            "semantic_review": ["Executor independent final review"],
+            "real_host": ["Real Executor and current fencing"],
+            "owner": ["Owner confirms current ingest candidate and Readiness"]
+          },
+          "allowed_side_effects": ["Executor ingest writes Wiki and marks raw pending_review"],
+          "currently_verifiable": false, "acceptance_status": "not_passed",
+          "protocols": ["Authorization", "Readiness", "Executor", "ExecutionResultBinding", "Task Runtime", "Invocation"]
+        },
+        {
+          "step_id": "normal-08", "action": "independently_authorize_approve_and_execute", "stage": "S5",
+          "operation": "approve", "operation_id": "normal-approve-operation",
+          "authorization_id": "normal-approve-authorization", "preissued_by_ingest": false,
+          "expected_state": "applied_and_processed",
+          "required_evidence": {
+            "script": ["Independent approve operation candidate manifest snapshot and result"],
+            "semantic_review": ["Executor approve review"],
+            "real_host": ["ApprovalStore and Executor"],
+            "owner": ["Owner independently confirms actual approve context"]
+          },
+          "allowed_side_effects": ["Separate Executor approve moves raw to processed"],
+          "currently_verifiable": false, "acceptance_status": "not_passed",
+          "protocols": ["Authorization", "Executor", "ExecutionResultBinding", "Task Runtime"]
+        },
+        {
+          "step_id": "normal-09", "action": "run_s0_negative_protocols", "stage": "S0",
+          "expected_state": "negative_protocols_pass_future_business_not_passed",
+          "required_evidence": {
+            "script": ["Task 1 and Task 2 existing negative tests"],
+            "semantic_review": [], "real_host": [], "owner": []
+          },
+          "allowed_side_effects": [],
+          "currently_verifiable": true, "acceptance_status": "passed",
+          "protocols": ["KnowledgePackage", "Readiness", "Authorization", "Executor", "CandidatePreview"]
+        }
+      ],
+      "negative_protocol_markers": [
+        {
+          "marker_id": "package_version_invalidates_bindings", "stage": "S0",
+          "protocol": "KnowledgePackage", "acceptance_status": "passed",
+          "verification_test": "test_learning_s0_modules.ModuleProtocolTests.test_all_outputs_learning_and_candidate_share_package_binding"
+        },
+        {
+          "marker_id": "rubric_calibration_misuse", "stage": "S0",
+          "protocol": "RubricTemplate", "acceptance_status": "passed",
+          "verification_test": "test_learning_s0_modules.ModuleProtocolTests.test_unrelated_template_calibration_cannot_replace_lesson_evidence_review"
+        },
+        {
+          "marker_id": "candidate_ab_complete", "stage": "S0",
+          "protocol": "CoverageDisposition", "acceptance_status": "passed",
+          "verification_test": "test_learning_s0_modules.ModuleProtocolTests.test_candidate_ab_requires_coverage_for_both_a_and_b"
+        },
+        {
+          "marker_id": "acceptance_current_authorization_readiness_credentials", "stage": "S0",
+          "protocol": "Readiness", "acceptance_status": "passed",
+          "verification_test": "test_learning_s0_protocol.ProtocolTests.test_acceptance_rejects_revoked_missing_stale_and_wrong_credentials"
+        },
+        {
+          "marker_id": "terminal_replay_no_new_work", "stage": "S0",
+          "protocol": "Executor", "acceptance_status": "passed",
+          "verification_test": "test_learning_s0_protocol.ProtocolTests.test_terminal_lookup_precedes_new_review_and_budget"
+        }
+      ]
+    },
+    {
+      "scenario_id": "external-correction",
+      "fixture_version": "1.0",
+      "input_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "protocol_identity_ref": "shared-v1",
+      "expected_state": "corrected_knowledge_only_after_independent_learning_and_ingest",
+      "required_evidence_layers": ["script", "semantic_review", "real_host", "owner"],
+      "business_acceptance": false,
+      "capture_boundary": {
+        "independent_authorization": true,
+        "authorization_protocol": "CollectionAuthorization",
+        "advances_original_batch": false,
+        "joins_original_ingest_group": false,
+        "on_later_ingest_failure": "retain_legal_capture",
+        "temporary_directory_is_evidence_substitute": false,
+        "allowed_effects": ["Authorized capture/import persists correction source without applying original ingest"]
+      },
+      "allowed_side_effects": [
+        {"stage": "S2", "effect": "Independently authorized capture/import persists correction source", "executed": false},
+        {"stage": "S5", "effect": "Separate approved correction ingest updates Wiki", "executed": false}
+      ],
+      "stage_ownership": [
+        {"stage": "S0", "scope": "Capture grouping boundaries and negative protocols"},
+        {"stage": "S2", "scope": "Persistent correction evidence conflict relations and actual G3 input_refs"},
+        {"stage": "S3", "scope": "Local learning invalidation and relearning"},
+        {"stage": "S5", "scope": "Real correction persistence after all gates"}
+      ],
+      "steps": [
+        {
+          "step_id": "external-01", "action": "authorize_independent_capture_import", "stage": "S2",
+          "expected_state": "capture_authorized_without_original_ingest_advancement",
+          "required_evidence": {
+            "script": ["Capture scope and side-effect boundary"],
+            "semantic_review": ["Correction source is relevant and necessary"],
+            "real_host": ["Host identity and capture entry"],
+            "owner": ["Owner authorizes external collection and its side effects"]
+          },
+          "allowed_side_effects": ["Only authorized capture/import persistence"],
+          "currently_verifiable": false, "acceptance_status": "not_passed",
+          "protocols": ["CollectionAuthorization", "Task Runtime"]
+        },
+        {
+          "step_id": "external-02", "action": "collect_temporary_material", "stage": "S2",
+          "expected_state": "temporary_material_not_yet_authoritative",
+          "required_evidence": {
+            "script": ["Temporary capture digest"],
+            "semantic_review": ["Visible range and limitations"],
+            "real_host": ["Actual collector result"], "owner": []
+          },
+          "allowed_side_effects": ["Private temporary capture"],
+          "currently_verifiable": false, "acceptance_status": "not_passed",
+          "protocols": ["Source", "Invocation"]
+        },
+        {
+          "step_id": "external-03", "action": "register_conflict", "stage": "S2",
+          "expected_state": "conflict_registered_without_forced_winner",
+          "required_evidence": {
+            "script": ["Both claims and material references"],
+            "semantic_review": ["Independent conflict reviewer compares conditions"],
+            "real_host": ["Independent reviewer context"], "owner": []
+          },
+          "allowed_side_effects": ["Store private Conflict and ReviewCredential"],
+          "currently_verifiable": false, "acceptance_status": "not_passed",
+          "protocols": ["Claim", "EvidenceClaimRelation", "ReviewCredential"]
+        },
+        {
+          "step_id": "external-04", "action": "persist_correction_source", "stage": "S2",
+          "expected_state": "persistent_correction_source_separate_from_original_group",
+          "required_evidence": {
+            "script": ["Persistent bytes version digest and readable range"],
+            "semantic_review": ["Persistent source supports correction"],
+            "real_host": ["Capture/import completed"], "owner": []
+          },
+          "allowed_side_effects": ["Retain legal capture even if later ingest fails"],
+          "currently_verifiable": false, "acceptance_status": "not_passed",
+          "protocols": ["Source", "Evidence", "KnowledgePackage"]
+        },
+        {
+          "step_id": "external-05", "action": "bind_evidence_claim_and_propagate_dependencies", "stage": "S2",
+          "expected_state": "evidence_and_dependency_impacts_identified",
+          "required_evidence": {
+            "script": ["Evidence Claim relations and dependency propagation"],
+            "semantic_review": ["Correction applies to affected claims and evidence"],
+            "real_host": [], "owner": []
+          },
+          "allowed_side_effects": ["Store private evidence and dependency impact records"],
+          "currently_verifiable": false, "acceptance_status": "not_passed",
+          "protocols": ["Evidence", "Claim", "EvidenceClaimRelation", "KnowledgePackage"]
+        },
+        {
+          "step_id": "external-05-learning", "action": "invalidate_affected_learning_objectives", "stage": "S3",
+          "expected_state": "only_affected_learning_objectives_stale",
+          "required_evidence": {
+            "script": ["Propagate S2 impacts to Objective Assessment and package bindings"],
+            "semantic_review": ["Only affected learning objectives require reassessment"],
+            "real_host": [], "owner": []
+          },
+          "allowed_side_effects": ["Invalidate affected private learning bindings"],
+          "currently_verifiable": false, "acceptance_status": "not_passed",
+          "protocols": ["KnowledgePackage", "Objective", "Assessment"]
+        },
+        {
+          "step_id": "external-06", "action": "relearn_affected_objectives", "stage": "S3",
+          "expected_state": "affected_objectives_independently_reassessed",
+          "required_evidence": {
+            "script": ["New package binding and L2 checks"],
+            "semantic_review": ["Updated rubric evidence review and corrected answer"],
+            "real_host": ["Independent assessor"], "owner": ["New unaided response for affected objectives"]
+          },
+          "allowed_side_effects": ["Store revised private lesson and Assessment"],
+          "currently_verifiable": false, "acceptance_status": "not_passed",
+          "protocols": ["KnowledgePackage", "Objective", "Rubric", "Assessment", "ReviewCredential"]
+        },
+        {
+          "step_id": "external-07", "action": "bind_g3_actual_input_refs", "stage": "S2",
+          "expected_state": "g3_reads_persistent_original_and_correction_sources",
+          "input_refs_kind": "persistent_raw_paths",
+          "input_refs": ["raw/unprocessed/original.md", "raw/unprocessed/correction-source.md"],
+          "evidence_metadata_substitute": false,
+          "required_evidence": {
+            "script": ["Readable UTF-8 input_refs and content hashes"],
+            "semantic_review": ["G3 receives actual source bytes not Evidence metadata"],
+            "real_host": ["Real file reads"], "owner": []
+          },
+          "allowed_side_effects": ["Read-only source access for G3"],
+          "currently_verifiable": false, "acceptance_status": "not_passed",
+          "protocols": ["Source", "Evidence", "CandidatePreview", "ReviewCredential"]
+        },
+        {
+          "step_id": "external-08", "action": "persist_knowledge", "stage": "S5",
+          "expected_state": "correction_applied_after_current_readiness_and_authorization",
+          "required_evidence": {
+            "script": ["New operation complete WAL and applied result"],
+            "semantic_review": ["Executor final independent review"],
+            "real_host": ["Real Executor"],
+            "owner": ["Owner confirms corrected candidate and current Readiness"]
+          },
+          "allowed_side_effects": ["Approved correction Executor transaction"],
+          "currently_verifiable": false, "acceptance_status": "not_passed",
+          "protocols": ["Readiness", "Authorization", "Executor", "ExecutionResultBinding"]
+        },
+        {
+          "step_id": "external-09", "action": "run_s0_negative_protocols", "stage": "S0",
+          "expected_state": "negative_protocols_pass_future_business_not_passed",
+          "required_evidence": {
+            "script": ["Existing Invocation and package binding negative tests"],
+            "semantic_review": [], "real_host": [], "owner": []
+          },
+          "allowed_side_effects": [],
+          "currently_verifiable": true, "acceptance_status": "passed",
+          "protocols": ["Invocation", "KnowledgePackage"]
+        }
+      ],
+      "negative_protocol_markers": [
+        {
+          "marker_id": "invocation_replay_binding", "stage": "S0",
+          "protocol": "Invocation", "acceptance_status": "passed",
+          "verification_test": "test_learning_s0_protocol.ProtocolTests.test_replay_rejects_different_spec_and_cross_task_or_run"
+        },
+        {
+          "marker_id": "invocation_unknown_conservative", "stage": "S0",
+          "protocol": "Invocation", "acceptance_status": "passed",
+          "verification_test": "test_learning_s0_protocol.ProtocolTests.test_unknown_never_resends_replays_or_releases_reservation"
+        },
+        {
+          "marker_id": "package_version_invalidates_bindings", "stage": "S0",
+          "protocol": "KnowledgePackage", "acceptance_status": "passed",
+          "verification_test": "test_learning_s0_modules.ModuleProtocolTests.test_all_outputs_learning_and_candidate_share_package_binding"
+        }
+      ]
+    },
+    {
+      "scenario_id": "cross-session-recovery",
+      "fixture_version": "1.0",
+      "input_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "protocol_identity_ref": "shared-v1",
+      "expected_state": "recovered_or_applied_from_executor_without_runtime_duplication",
+      "required_evidence_layers": ["script", "semantic_review", "real_host", "owner"],
+      "business_acceptance": false,
+      "allowed_side_effects": [
+        {"stage": "S1", "effect": "Real Executor independently recovers an already accepted transaction", "executed": false},
+        {"stage": "S5", "effect": "Rebuilt transaction may be applied only with new authorization", "executed": false}
+      ],
+      "stage_ownership": [
+        {"stage": "S0", "scope": "Shared identities and result projection negative protocols"},
+        {"stage": "S1", "scope": "Real Task Run Invocation fencing terminal replay and independent recovery"},
+        {"stage": "S2", "scope": "Transaction dependency rebuild"},
+        {"stage": "S3", "scope": "Learning evidence reuse and local invalidation"}
+      ],
+      "steps": [
+        {
+          "step_id": "cross-01", "action": "restore_task_and_run", "stage": "S1",
+          "expected_state": "same_task_progress_restored_in_new_run",
+          "required_evidence": {
+            "script": ["Persistent Task Run and recovery point"],
+            "semantic_review": [],
+            "real_host": ["Real Task Runtime restoration"], "owner": []
+          },
+          "allowed_side_effects": ["Restore private runtime records"],
+          "currently_verifiable": false, "acceptance_status": "not_passed",
+          "protocols": ["Task Runtime", "ExecutionOwnership"]
+        },
+        {
+          "step_id": "cross-02", "action": "inherit_invocation_budget_and_replay", "stage": "S1",
+          "expected_state": "same_invocation_ledger_without_double_charge",
+          "new_ledger": false, "new_charge_on_success_replay": false,
+          "unknown_retry": false, "unknown_refund": false,
+          "required_evidence": {
+            "script": ["Same Invocation spec digest reservation result and settlement"],
+            "semantic_review": [],
+            "real_host": ["Cross-process invocation replay probe"], "owner": []
+          },
+          "allowed_side_effects": ["Read saved result without external call"],
+          "currently_verifiable": false, "acceptance_status": "not_passed",
+          "protocols": ["Task Runtime", "Invocation"]
+        },
+        {
+          "step_id": "cross-03", "action": "reject_late_old_generation_submission", "stage": "S1",
+          "expected_state": "old_generation_renew_release_and_business_submit_rejected",
+          "renew_release_business_submit_valid": false,
+          "required_evidence": {
+            "script": ["Current owner generation and conditional commit"],
+            "semantic_review": [],
+            "real_host": ["Real fencing and cross-process serialization"], "owner": []
+          },
+          "allowed_side_effects": ["Reject stale write without business mutation"],
+          "currently_verifiable": false, "acceptance_status": "not_passed",
+          "protocols": ["ExecutionOwnership", "Task Runtime", "Authorization"]
+        },
+        {
+          "step_id": "cross-04", "action": "rebuild_transaction_for_unrelated_library_change", "stage": "S2",
+          "expected_state": "new_transaction_with_reusable_learning_evidence",
+          "transaction_rebuilt": true, "learning_evidence_reused": true,
+          "required_evidence": {
+            "script": ["New candidate dependencies Readiness operation and authorization"],
+            "semantic_review": ["Unrelated change does not invalidate knowledge"],
+            "real_host": [], "owner": ["Owner confirms rebuilt final candidate"]
+          },
+          "allowed_side_effects": ["Store rebuilt private transaction candidate"],
+          "currently_verifiable": false, "acceptance_status": "not_passed",
+          "protocols": ["KnowledgePackage", "CandidatePreview", "Readiness", "Authorization"]
+        },
+        {
+          "step_id": "cross-05", "action": "invalidate_related_evidence_locally", "stage": "S3",
+          "expected_state": "only_affected_learning_bindings_require_reassessment",
+          "learning_evidence_reused": false, "invalidation_scope": "affected_objectives_only",
+          "required_evidence": {
+            "script": ["Evidence to Claim Objective and Assessment dependency propagation"],
+            "semantic_review": ["Changed evidence affects selected objectives"],
+            "real_host": [], "owner": ["New independent response where required"]
+          },
+          "allowed_side_effects": ["Mark affected private records stale"],
+          "currently_verifiable": false, "acceptance_status": "not_passed",
+          "protocols": ["Evidence", "Claim", "Objective", "Assessment", "KnowledgePackage"]
+        },
+        {
+          "step_id": "cross-06", "action": "recover_accepted_executor_transaction_without_old_lease", "stage": "S1",
+          "expected_state": "executor_recovery_proceeds_after_lease_expiry",
+          "accepted": true, "requires_old_lease": false,
+          "required_evidence": {
+            "script": ["First complete WAL is sole acceptance evidence"],
+            "semantic_review": [],
+            "real_host": ["Real Executor recovery after Task lease expiry"], "owner": []
+          },
+          "allowed_side_effects": ["Executor completes or rolls back accepted transaction"],
+          "currently_verifiable": false, "acceptance_status": "not_passed",
+          "protocols": ["Executor", "ExecutionResultBinding", "ExecutionOwnership"]
+        },
+        {
+          "step_id": "cross-07", "action": "merge_recovered_as_not_applied", "stage": "S1",
+          "expected_state": "recovered_rollback_not_applied_and_not_consumed",
+          "applied": false, "authorization_consumed": false,
+          "required_evidence": {
+            "script": ["Recovered ExecutionResultBinding projection"],
+            "semantic_review": [],
+            "real_host": ["Real rollback result"], "owner": []
+          },
+          "allowed_side_effects": ["Retain valid learning evidence and require new operation for reapply"],
+          "currently_verifiable": false, "acceptance_status": "not_passed",
+          "protocols": ["Executor", "ExecutionResultBinding", "Authorization", "Task Runtime"]
+        },
+        {
+          "step_id": "cross-08", "action": "run_s0_negative_protocols", "stage": "S0",
+          "expected_state": "negative_protocols_pass_real_recovery_not_passed",
+          "required_evidence": {
+            "script": ["Existing fencing terminal replay and recovery tests"],
+            "semantic_review": [], "real_host": [], "owner": []
+          },
+          "allowed_side_effects": [],
+          "currently_verifiable": true, "acceptance_status": "passed",
+          "protocols": ["Invocation", "ExecutionOwnership", "Executor", "ExecutionResultBinding"]
+        }
+      ],
+      "negative_protocol_markers": [
+        {
+          "marker_id": "ownership_old_generation", "stage": "S0",
+          "protocol": "ExecutionOwnership", "acceptance_status": "passed",
+          "verification_test": "test_learning_s0_protocol.ProtocolTests.test_old_generation_cannot_renew_release_or_submit"
+        },
+        {
+          "marker_id": "accepted_recovery_without_lease", "stage": "S0",
+          "protocol": "ExecutionOwnership", "acceptance_status": "passed",
+          "verification_test": "test_learning_s0_protocol.ProtocolTests.test_accepted_recovery_does_not_require_old_lease"
+        },
+        {
+          "marker_id": "recovered_not_applied", "stage": "S0",
+          "protocol": "ExecutionResultBinding", "acceptance_status": "passed",
+          "verification_test": "test_learning_s0_protocol.ProtocolTests.test_result_projection_distinguishes_applied_recovered_and_incomplete"
+        },
+        {
+          "marker_id": "terminal_replay_no_new_work", "stage": "S0",
+          "protocol": "Executor", "acceptance_status": "passed",
+          "verification_test": "test_learning_s0_protocol.ProtocolTests.test_terminal_lookup_precedes_new_review_and_budget"
+        }
+      ]
+    }
+  ]
+}

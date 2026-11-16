@@ -1,0 +1,27 @@
+{
+  "localPatchId": "inspool-i5-learning-state-1",
+  "baseCommit": "60fb3bdfddb30b7740c7ce3bd9b28d908f2af6db",
+  "baseVersion": "1.7.2",
+  "capability": "book-learning-state-read/1",
+  "i4BasePatchSha256": "8eafee08f29dab8b97c721495eedbc97b3b45f4edd3c14ac255a82c5a8bf88eb",
+  "i4BaseWheelSha256": "348c7784558951dcd7dcc92be34354c734cc3c9b2fb0878a817a19d28e73a922",
+  "patchSha256": "09992fc36bd05f6d2599bb06f274e1688496b090424558771d5297457908e917",
+  "owningModule": "books",
+  "ownershipEvidence": {
+    "manifest": "deeptutor/modules/manifests/books.json",
+    "sha256": "eea2cba8f822028de4947c184bdf9f12e13d5cb159f820c2b4180fa90808f4b3"
+  },
+  "files": {
+    "deeptutor/api/routers/book.py": {
+      "i4BaseLfSha256": "e2f9c22a6635b545b685326276d7fbc1d69cb39df0221705534ae840e973808d",
+      "patchedLfSha256": "f5cbcb9fe165ec69b310f5c1fbd0627cc98165f95acd91e0d9e030fcc0486e63"
+    },
+    "deeptutor/book/learning_state_read.py": {
+      "i4BaseLfSha256": null,
+      "patchedLfSha256": "7af7e5629c7aa31f6eee1d56a4b17bc5d26517d583287b03a4fe7528226d3cf7"
+    }
+  },
+  "inheritedFiles": {
+    "deeptutor/book/storage.py": "1181182819fcd4773d119b821f0353ef3d57f5ce8dab6dad3b24e15dd7239379"
+  }
+}

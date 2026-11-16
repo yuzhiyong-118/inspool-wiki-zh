@@ -1,0 +1,79 @@
+--- a/lib/book-types.ts
++++ b/lib/book-types.ts
+@@ -96,6 +96,16 @@
+ }
+ 
+ export interface Page {
++  generation?: {
++    operationId: string;
++    kind: string;
++    blockId?: string | null;
++    state: "running" | "completed" | "failed" | "cancelled" | "interrupted";
++    showingLastComplete: boolean;
++    lastComplete?: Page | null;
++    reason?: string;
++    retryOf?: string | null;
++  };
+   id: string;
+   book_id: string;
+   chapter_id: string;
+--- a/app/(workspace)/learning/books/components/PageReader.tsx
++++ b/app/(workspace)/learning/books/components/PageReader.tsx
+@@ -145,6 +145,10 @@
+   onToggleBookmark,
+   onCaptureSelection,
+ }: PageReaderProps) {
++  const generation = page?.generation;
++  if (page && generation?.state === "running" && generation.lastComplete) {
++    page = { ...generation.lastComplete, generation };
++  }
+   const { t } = useTranslation();
+   const pathname = usePathname();
+   const [showInsertMenu, setShowInsertMenu] = useState(false);
+@@ -459,6 +463,20 @@
+     // anchor to the viewport-stable column instead of being trapped inside
+     // the scrollable inner div.
+     <div className="relative flex h-full flex-col">
++      {generation && generation.state !== "completed" && (
++        <div role="status" className="border-b border-amber-300 bg-amber-50 px-6 py-3 text-sm text-amber-950">
++          {generation.state === "running" ? "正在生成课程内容。" : "本次生成未完成。"}
++          {generation.showingLastComplete ? " 当前显示上次完整内容。" : " 当前内容尚未完整生成。"}
++          <span className="ml-2 text-xs">操作：{generation.operationId}</span>
++          {generation.state !== "running" && (onRegenerateBlock || onRecompile) && (
++            <button type="button" className="ml-3 underline" onClick={() => {
++              const block = page?.blocks.find((item) => item.id === generation.blockId);
++              if (block && onRegenerateBlock) onRegenerateBlock(block);
++              else onRecompile?.();
++            }}>重新生成</button>
++          )}
++        </div>
++      )}
+       <header
+         className={[
+           "bg-[var(--background)] transition-all duration-200 ease-out",
+--- a/app/(workspace)/learning/books/components/BookChatPanel.tsx
++++ b/app/(workspace)/learning/books/components/BookChatPanel.tsx
+@@ -531,12 +531,17 @@
+                     </div>
+                   ) : null}
+                   {m.role === "assistant" ? (
+-                    <AssistantResponse
+-                      content={m.content}
+-                      language={book?.language || appLanguage}
+-                      className="text-sm leading-relaxed"
+-                      isStreaming={Boolean(m.streaming)}
+-                    />
++                    <>
++                      <AssistantResponse
++                        content={m.content}
++                        language={book?.language || appLanguage}
++                        className="text-sm leading-relaxed"
++                        isStreaming={Boolean(m.streaming)}
++                      />
++                      {!m.streaming && <div className="mt-2 text-xs opacity-60">
++                        原文字符：{Array.from(m.content.replace(/\s/gu, "")).length}（不计空白）
++                      </div>}
++                    </>
+                   ) : (
+                     <div className="whitespace-pre-wrap break-words">
+                       {m.content}

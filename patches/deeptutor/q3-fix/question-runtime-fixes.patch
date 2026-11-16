@@ -1,0 +1,250 @@
+--- a/deeptutor/agents/question/pipeline.py
++++ b/deeptutor/agents/question/pipeline.py
+@@ -379,12 +379,14 @@
+         max_quiz_iterations_per_question: int = DEFAULT_MAX_QUIZ_ITERATIONS_PER_QUESTION,
+         runtime_config: dict[str, Any] | None = None,
+         builtin_tool_whitelist: set[str] | None = None,
++        allow_tools: bool = True,
+     ) -> None:
+         self.language = parse_language(language)
+         self.kb_name = (kb_name or "").strip() or None
+         self.enabled_tools = list(enabled_tools or [])
+         self.runtime_config: dict[str, Any] = dict(runtime_config or {})
+         self.builtin_tool_whitelist = builtin_tool_whitelist
++        self.allow_tools = allow_tools
+ 
+         # Pull the exploring sub-config. Direct kwargs win for callers that
+         # don't go through ``build_question_runtime_config``; runtime_config
+@@ -1599,7 +1601,7 @@
+         from deeptutor.modules.catalog import require_module
+ 
+         self._pageindex_tool_context = None
+-        if not self.kb_name:
++        if not self.allow_tools or not self.kb_name:
+             return
+         require_module("knowledge")
+         from deeptutor.services.rag.pipelines.pageindex.tools import (
+@@ -1628,6 +1630,8 @@
+         )
+ 
+     def _resolved_tools(self, context: UnifiedContext) -> list[str]:
++        if not self.allow_tools:
++            return []
+         names = compose_enabled_tools(
+             registry=self.registry,
+             requested_tools=self.enabled_tools,
+@@ -2083,6 +2087,8 @@
+         iteration: int,
+         tool_calls: list[dict[str, Any]],
+     ) -> DispatchOutcome:
++        if not self._pipeline.allow_tools:
++            raise PermissionError("tools_disabled_for_prepared_questions")
+         too_many = None
+         if len(tool_calls) > MAX_PARALLEL_TOOL_CALLS:
+             too_many = self._pipeline._t(
+--- a/deeptutor/book/question_publication.py
++++ b/deeptutor/book/question_publication.py
+@@ -16,6 +16,7 @@
+ from tools.learning_book.question_spec import question_content, question_digest
+ 
+ CAPABILITY = 'learning-question-publication/1'
++SAFETY_REVISION = 'learning-question-q3-fix/1'  # pinned with full install manifest
+ _inside = ContextVar('question_write', default=False)
+ _lock = threading.RLock()  # one backend worker; storage operations below never await
+ 
+--- a/deeptutor/book/blocks/quiz.py
++++ b/deeptutor/book/blocks/quiz.py
+@@ -67,7 +67,7 @@
+                 # Reuse the pipeline's existing mimic path and question renderer.
+                 effective_kb = None
+                 pipeline_options = {"max_quiz_iterations_per_question": 2,
+-                                    "builtin_tool_whitelist": set()}
++                                    "builtin_tool_whitelist": set(), "allow_tools": False}
+             pipeline = QuestionPipeline(language=ctx.language, kb_name=effective_kb, **pipeline_options)
+             result = await pipeline.run(
+                 context=UnifiedContext(
+--- a/deeptutor/book/engine.py
++++ b/deeptutor/book/engine.py
+@@ -1695,9 +1695,24 @@
+     # ── Maintenance / health (Phase 4) ─────────────────────────────────
+ 
+     def kb_drift_report(self, book_id: str) -> dict[str, Any]:
+-        """Compute and persist the current KB drift report for *book_id*."""
+-        from .kb_health import mark_drift_on_book
+-
++        """Observe controlled books read-only; legacy books retain drift maintenance."""
++        from .kb_health import mark_drift_on_book, detect_kb_drift, _scheme_changed
++        from .question_publication import CAPABILITY
++
++        book = self.storage.load_book(book_id)
++        if book is not None and book.metadata.get("learning_question_controlled") == CAPABILITY:
++            baseline = ("missing" if book.knowledge_bases and not book.kb_fingerprints else
++                        "scheme_mismatch" if _scheme_changed(book.kb_fingerprints) else "available")
++            try:
++                value = detect_kb_drift(book, storage=self.storage).to_dict()
++                value.update(read_only=True, baseline_status=baseline,
++                    observation="unknown" if baseline != "available" else
++                                "drift" if value["has_drift"] else "unchanged")
++                return value
++            except Exception:
++                return {"book_id": book_id, "has_drift": False, "read_only": True,
++                    "observation": "unknown", "baseline_status": baseline,
++                    "diagnostic": "kb_observation_unavailable", "stale_page_ids": list(book.stale_page_ids)}
+         report = mark_drift_on_book(book_id, storage=self.storage)
+         if report is None:
+             return {"book_id": book_id, "has_drift": False, "missing": True}
+--- a/deeptutor/services/llm/metrics.py
++++ b/deeptutor/services/llm/metrics.py
+@@ -131,7 +131,7 @@
+                 for tool in getattr(delta, "tool_calls", []) or []:
+                     self.delta(getattr(getattr(tool, "function", None), "arguments", None))
+ 
+-    def finish(self, response: Any = None, *, status: str = "completed") -> None:
++    def finish(self, response: Any = None, *, status: str = "completed", require_reported_usage: bool = False) -> None:
+         if self.finished or not self.enabled:
+             return
+         self.finished = True
+@@ -197,7 +197,7 @@
+                     raise
+         if self.runtime_guard is not None:
+             # Only settle after the authoritative per-account ledger commit.
+-            self.runtime_guard.finish(self.call_id)
++            self.runtime_guard.finish(self.call_id, require_reported=require_reported_usage)
+ 
+ 
+ async def measure_provider_call(call: Any, *, provider: str = "", **kwargs: Any) -> Any:
+@@ -232,9 +232,15 @@
+ 
+ 
+ class MeasuredStream:
++    """Preserve supplier completion and usage trailers when a consumer closes early."""
++
+     def __init__(self, stream: Any, meter: CallMeasurement):
+         self.stream, self.meter = stream, meter
+         self.iterator: Any = None
++        self._reasons: dict[int, str | None] = {}
++        self._failure: str | None = None
++        self._exhausted = False
++        self._closed = False
+ 
+     def __getattr__(self, name: str) -> Any:
+         return getattr(self.stream, name)
+@@ -242,28 +248,89 @@
+     def __aiter__(self) -> Any:
+         return self
+ 
++    def _observe(self, chunk: Any) -> None:
++        self.meter.chunk(chunk)
++        for choice in getattr(chunk, "choices", []) or []:
++            index = getattr(choice, "index", 0)
++            reason = getattr(choice, "finish_reason", None)
++            self._reasons[index] = reason or self._reasons.get(index)
++
++    def _terminal(self) -> bool:
++        return bool(self._reasons) and all(self._reasons.values())
++
++    def _status(self) -> str:
++        if self._failure:
++            return self._failure
++        reasons = set(self._reasons.values())
++        if reasons & {"error", "content_filter"}:
++            return "failed"
++        if "length" in reasons:
++            return "truncated"
++        if self._terminal():
++            return "completed" if reasons <= {"stop", "tool_calls", "function_call"} else "interrupted"
++        return "completed" if self._exhausted else "interrupted"
++
++    def _finish(self) -> None:
++        # An estimate remains in the ledger for conservative cost accounting;
++        # an active guard must not treat it as reconciled supplier usage.
++        self.meter.finish(status=self._status(), require_reported_usage=True)
++
+     async def __anext__(self) -> Any:
++        if self._closed:
++            raise StopAsyncIteration
+         token = measurement_active.set(True)
+         try:
+             if self.iterator is None:
+                 self.iterator = self.stream.__aiter__()
+             chunk = await self.iterator.__anext__()
+-            self.meter.chunk(chunk)
++            self._observe(chunk)
+             return chunk
+         except StopAsyncIteration:
+-            self.meter.finish()
++            self._exhausted = True
++            self._finish()
+             raise
+-        except BaseException:
+-            self.meter.finish(status="interrupted")
++        except BaseException as exc:
++            import asyncio
++            self._failure = "interrupted" if isinstance(exc, asyncio.CancelledError) else "failed"
++            self._finish()
+             raise
+         finally:
+             measurement_active.reset(token)
+ 
+     async def close(self) -> None:
+-        self.meter.finish(status="interrupted")
+-        close = getattr(self.stream, "close", None) or getattr(self.stream, "aclose", None)
+-        if close:
+-            await close()
++        if self._closed:
++            return
++        import asyncio
++        token = measurement_active.set(True)
++        try:
++            # A consumer may stop at finish_reason, one frame before usage.
++            # Drain only after an observed terminal, with finite time/frames.
++            if self._terminal() and not self._failure and not self._exhausted and not self.meter.usage:
++                try:
++                    async with asyncio.timeout(1.0):
++                        for _ in range(16):
++                            chunk = await self.iterator.__anext__()
++                            self._observe(chunk)
++                            if self.meter.usage:
++                                break
++                except StopAsyncIteration:
++                    self._exhausted = True
++                except TimeoutError:
++                    pass  # Missing usage is still blocked by _finish.
++                except BaseException as exc:
++                    self._failure = "interrupted" if isinstance(exc, asyncio.CancelledError) else "failed"
++                    raise
++        finally:
++            self._closed = True
++            try:
++                self._finish()
++            finally:
++                try:
++                    close = getattr(self.stream, "close", None) or getattr(self.stream, "aclose", None)
++                    if close:
++                        await close()
++                finally:
++                    measurement_active.reset(token)
+ 
+     async def aclose(self) -> None:
+         await self.close()
+@@ -272,7 +339,11 @@
+         return self
+ 
+     async def __aexit__(self, *args: Any) -> None:
++        if args and args[0] is not None:
++            import asyncio
++            self._failure = "interrupted" if issubclass(args[0], asyncio.CancelledError) else "failed"
+         await self.close()
++
+ 
+ 
+ def instrument_client(client: Any, *, model: str = "", provider: str = "") -> Any:
+@@ -290,7 +361,7 @@
+             meter.finish(result)
+             return result
+         except BaseException:
+-            meter.finish(status="failed")
++            meter.finish(status="failed", require_reported_usage=bool(kwargs.get("stream")))
+             raise
+         finally:
+             measurement_active.reset(token)

@@ -1,0 +1,206 @@
+{
+  "fixture_version": "1.0",
+  "valid": {
+    "workflow_ref": {
+      "workflow_id": "learning-ingest-synthetic",
+      "implementation_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+      "contract_version": "loop-v1",
+      "required_checks": ["L0", "L1", "L2", "L3"],
+      "allowed_capabilities": ["synthetic.review"]
+    },
+    "learning_state": {
+      "task_id": "task-1",
+      "learning_task_id": "task-learning-1",
+      "state": "awaiting_confirmation",
+      "knowledge_version": 1
+    },
+    "policy_revision": {
+      "revision": 1,
+      "policy_digest": "2804d87fa9e9db37c6b6fa7e968cf0b5b63e46c3ebe18c3ca5cc21598d04a426",
+      "budget": {
+        "requests": 20,
+        "pages": 40,
+        "input_bytes": 1048576,
+        "model_calls": 10,
+        "active_seconds": 900.0,
+        "repairs": 3,
+        "appeals": 1
+      },
+      "stop_policy": {
+        "max_step_attempts": 3,
+        "identical_failure_limit": 2
+      },
+      "creation_reason": "S1 Task 0 synthetic baseline"
+    },
+    "event": {
+      "event_id": "event-1",
+      "producer": "trusted-host",
+      "task_id": "task-1",
+      "type": "answer_submitted",
+      "payload_digest": "2222222222222222222222222222222222222222222222222222222222222222",
+      "payload_ref": "artifacts/event-1",
+      "target_version": 1,
+      "causation_id": null,
+      "receipt_sequence": 1,
+      "processing_state": "pending"
+    },
+    "step": {
+      "step_id": "step-1",
+      "task_id": "task-1",
+      "capability_id": "synthetic.review",
+      "implementation_digest": "3333333333333333333333333333333333333333333333333333333333333333",
+      "input_digest": "4444444444444444444444444444444444444444444444444444444444444444",
+      "dependency_digests": ["5555555555555555555555555555555555555555555555555555555555555555"],
+      "attempt": 1,
+      "generation": 1,
+      "state": "completed",
+      "result_digest": "a9603a82ab4a455c83a16b03f69374a522ab5853f1d97ecd6c15c0c0b8f4ff5f"
+    },
+    "wait": {
+      "wait_id": "wait-1",
+      "task_id": "task-1",
+      "condition_type": "user_answer",
+      "target_step_id": "step-1",
+      "knowledge_version": 1,
+      "question_version": 1,
+      "rubric_version": 1,
+      "answer_policy": "ordered_revisions",
+      "consumption_state": "pending",
+      "continuation_condition": "answer_revision > consumed_revision"
+    },
+    "work_item": {
+      "work_item_id": "work-1",
+      "task_id": "task-1",
+      "step_id": "step-1",
+      "ready_at": 100.0,
+      "schedule_key": "step-1:attempt-1:generation-1",
+      "claimed_by": "driver-1",
+      "generation": 1,
+      "lease_expires_at": 120.0,
+      "state": "claimed"
+    },
+    "step_result": {
+      "step_id": "step-1",
+      "attempt": 1,
+      "generation": 1,
+      "input_digest": "4444444444444444444444444444444444444444444444444444444444444444",
+      "result_digest": "a9603a82ab4a455c83a16b03f69374a522ab5853f1d97ecd6c15c0c0b8f4ff5f",
+      "artifact_digests": ["7777777777777777777777777777777777777777777777777777777777777777"],
+      "domain_change_digest": "8888888888888888888888888888888888888888888888888888888888888888",
+      "wait_request_digest": null,
+      "follow_up_digests": ["9999999999999999999999999999999999999999999999999999999999999999"],
+      "failure": null
+    },
+    "retry_policy": {
+      "error_category": "environment",
+      "failure_fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "attempt_limit": 2,
+      "not_before": 105.0,
+      "stop_reason": null
+    },
+    "capability_manifest": {
+      "capability_id": "synthetic.review",
+      "implementation_digest": "3333333333333333333333333333333333333333333333333333333333333333",
+      "contract_version": "loop-v1",
+      "required_checks": ["independent_review"],
+      "usage_visibility": "exact",
+      "cancellation": "unavailable"
+    }
+  },
+  "invalid": {
+    "event_cross_task": {
+      "event_id": "event-1",
+      "producer": "trusted-host",
+      "task_id": "task-2",
+      "type": "answer_submitted",
+      "payload_digest": "2222222222222222222222222222222222222222222222222222222222222222",
+      "payload_ref": "artifacts/event-1",
+      "target_version": 1,
+      "causation_id": null,
+      "receipt_sequence": 1,
+      "processing_state": "pending"
+    },
+    "event_cross_type": {
+      "event_id": "event-1",
+      "producer": "trusted-host",
+      "task_id": "task-1",
+      "type": "authorization_submitted",
+      "payload_digest": "2222222222222222222222222222222222222222222222222222222222222222",
+      "payload_ref": "artifacts/event-1",
+      "target_version": 1,
+      "causation_id": null,
+      "receipt_sequence": 1,
+      "processing_state": "pending"
+    },
+    "event_cross_version": {
+      "event_id": "event-1",
+      "producer": "trusted-host",
+      "task_id": "task-1",
+      "type": "answer_submitted",
+      "payload_digest": "2222222222222222222222222222222222222222222222222222222222222222",
+      "payload_ref": "artifacts/event-1",
+      "target_version": 2,
+      "causation_id": null,
+      "receipt_sequence": 1,
+      "processing_state": "pending"
+    },
+    "step_result_missing_digest": {
+      "step_id": "step-1",
+      "attempt": 1,
+      "generation": 1,
+      "input_digest": "4444444444444444444444444444444444444444444444444444444444444444",
+      "artifact_digests": ["7777777777777777777777777777777777777777777777777777777777777777"],
+      "domain_change_digest": "8888888888888888888888888888888888888888888888888888888888888888",
+      "wait_request_digest": null,
+      "follow_up_digests": ["9999999999999999999999999999999999999999999999999999999999999999"],
+      "failure": null
+    },
+    "step_result_stale_digest": {
+      "step_id": "step-1",
+      "attempt": 1,
+      "generation": 1,
+      "input_digest": "4444444444444444444444444444444444444444444444444444444444444444",
+      "result_digest": "a9603a82ab4a455c83a16b03f69374a522ab5853f1d97ecd6c15c0c0b8f4ff5f",
+      "artifact_digests": ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],
+      "domain_change_digest": "8888888888888888888888888888888888888888888888888888888888888888",
+      "wait_request_digest": null,
+      "follow_up_digests": ["9999999999999999999999999999999999999999999999999999999999999999"],
+      "failure": null
+    },
+    "policy_wrong_digest": {
+      "revision": 1,
+      "policy_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+      "budget": {
+        "requests": 20,
+        "pages": 40,
+        "input_bytes": 1048576,
+        "model_calls": 10,
+        "active_seconds": 900.0,
+        "repairs": 3,
+        "appeals": 1
+      },
+      "stop_policy": {
+        "max_step_attempts": 3,
+        "identical_failure_limit": 2
+      },
+      "creation_reason": "S1 Task 0 synthetic baseline"
+    },
+    "capability_with_permissions": {
+      "capability_id": "synthetic.review",
+      "implementation_digest": "3333333333333333333333333333333333333333333333333333333333333333",
+      "contract_version": "loop-v1",
+      "required_checks": ["independent_review"],
+      "usage_visibility": "exact",
+      "cancellation": "unavailable",
+      "permissions": {"shell": true}
+    },
+    "retry_with_progress_claim": {
+      "error_category": "environment",
+      "failure_fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "attempt_limit": 2,
+      "not_before": 105.0,
+      "stop_reason": null,
+      "progress_claim": "almost_done"
+    }
+  }
+}

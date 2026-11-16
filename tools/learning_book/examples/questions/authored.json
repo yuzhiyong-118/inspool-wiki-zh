@@ -1,0 +1,76 @@
+{
+  "schema": "learning-question-spec/1",
+  "specId": "baiyu-questions-1",
+  "lessonRef": "baiyu-lesson@1",
+  "lessonSha256": "dd8bb4b26a1afccc22f676e26b4d36042a61ed93526e400a850c3fd3486f6f8f",
+  "sources": [
+    {
+      "sourceId": "baiyu",
+      "sourceVersionId": "1",
+      "sha256": "ea63edbd987bf023fb679a7db76d3d6da78e560effda4379ae031d16693c02fa",
+      "locator": "规则 C3 与案例 BY-042",
+      "excerpt": "规则 C3：编号不一致时不签收，隔离并登记实际编号。\n案例 BY-042：纸单为 F-017，实际封签为 F-071。完整封签不能豁免编号核对。\n例外：扫描仪故障仅在编号与封签合格时等待扫描。\n"
+    }
+  ],
+  "objectives": [
+    {
+      "id": "conflict",
+      "description": "辨别编号冲突",
+      "evidenceRequired": "在封签完整但编号不一致时选择不签收并隔离登记"
+    }
+  ],
+  "items": [
+    {
+      "questionId": "baiyu-choice-1",
+      "mode": "authored",
+      "targetObjectiveId": "conflict",
+      "sourceRefs": [
+        "baiyu"
+      ],
+      "criteria": {
+        "requiredLiterals": [
+          "BY-042",
+          "F-017",
+          "F-071"
+        ],
+        "forbiddenLiterals": [],
+        "scenarioConditions": [
+          "纸单编号与实际封签编号冲突；完整封签不豁免核对"
+        ],
+        "allowedChanges": []
+      },
+      "misconceptions": [
+        {
+          "id": "seal-exempts",
+          "reason": "误以为封签完整可豁免编号冲突处理",
+          "sourceRefs": [
+            "baiyu"
+          ]
+        },
+        {
+          "id": "sign-first",
+          "reason": "误以为可先签收再修正编号，同样违反 C3",
+          "sourceRefs": [
+            "baiyu"
+          ]
+        }
+      ],
+      "hints": [
+        "分别判断封签与编号条件，不要互相替代。"
+      ],
+      "authoredItem": {
+        "question_id": "baiyu-choice-1",
+        "question_type": "choice",
+        "question": "BY-042 的纸单 F-017 与实际封签 F-071 不一致，封签完整，应如何处置？",
+        "options": {
+          "A": "不签收，隔离并登记实际编号与异常",
+          "B": "封签完整即可签收",
+          "C": "先签收再补改编号",
+          "D": "按扫描仪故障留台等待"
+        },
+        "correct_answer": "A",
+        "explanation": "编号冲突适用 C3；完整封签不能豁免核对。扫描故障的例外不适用。"
+      }
+    }
+  ]
+}

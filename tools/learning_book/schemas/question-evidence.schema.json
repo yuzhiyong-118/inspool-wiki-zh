@@ -1,0 +1,763 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "learning-question-evidence/1"
+    },
+    "activityId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 180
+    },
+    "bookId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 180
+    },
+    "blocks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "pageId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 180
+          },
+          "blockId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 180
+          },
+          "binding": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "schema": {
+                "const": "learning-question-binding/1"
+              },
+              "specDigest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "lessonRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 180
+              },
+              "lessonSha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "sources": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 16,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "sourceId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 180
+                    },
+                    "sourceVersionId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 180
+                    },
+                    "sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  },
+                  "required": [
+                    "sourceId",
+                    "sourceVersionId",
+                    "sha256"
+                  ]
+                }
+              },
+              "mode": {
+                "enum": [
+                  "authored",
+                  "variant"
+                ]
+              },
+              "questionIds": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 8,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 180
+                }
+              },
+              "questionDigests": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "maxProperties": 8
+              },
+              "preparationDigest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "reviewDigest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            },
+            "required": [
+              "schema",
+              "specDigest",
+              "lessonRef",
+              "lessonSha256",
+              "sources",
+              "mode",
+              "questionIds",
+              "questionDigests",
+              "preparationDigest",
+              "reviewDigest"
+            ],
+            "x-relationalRules": [
+              "来源与题目 ID 唯一，来源引用闭合；authored 摘要完整匹配，variant 生成前为空；题目摘要包含选项显示顺序。"
+            ]
+          },
+          "archive": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "schema": {
+                "const": "learning-question-evidence/1"
+              },
+              "spec": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "schema",
+                  "specId",
+                  "lessonRef",
+                  "lessonSha256",
+                  "sources",
+                  "objectives",
+                  "items"
+                ],
+                "properties": {
+                  "schema": {
+                    "const": "learning-question-spec/1"
+                  },
+                  "specId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 180,
+                    "pattern": "^(?=.*\\S)[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "lessonRef": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 180,
+                    "pattern": "^(?=.*\\S)[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "lessonSha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "learningAgreementRef": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 180,
+                    "pattern": "^(?=.*\\S)[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "sources": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 16,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "sourceId",
+                        "sourceVersionId",
+                        "sha256",
+                        "locator",
+                        "excerpt"
+                      ],
+                      "properties": {
+                        "sourceId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 180,
+                          "pattern": "^(?=.*\\S)[^\\x00-\\x1f\\x7f]+$"
+                        },
+                        "sourceVersionId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 180,
+                          "pattern": "^(?=.*\\S)[^\\x00-\\x1f\\x7f]+$"
+                        },
+                        "sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "locator": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 32768,
+                          "pattern": "\\S"
+                        },
+                        "excerpt": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 32768,
+                          "pattern": "\\S"
+                        }
+                      }
+                    }
+                  },
+                  "objectives": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 32,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "description",
+                        "evidenceRequired"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 180,
+                          "pattern": "^(?=.*\\S)[^\\x00-\\x1f\\x7f]+$"
+                        },
+                        "description": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 32768,
+                          "pattern": "\\S"
+                        },
+                        "evidenceRequired": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 32768,
+                          "pattern": "\\S"
+                        }
+                      }
+                    }
+                  },
+                  "items": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 8,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "questionId",
+                        "mode",
+                        "targetObjectiveId",
+                        "sourceRefs",
+                        "criteria"
+                      ],
+                      "properties": {
+                        "questionId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 180,
+                          "pattern": "^(?=.*\\S)[^\\x00-\\x1f\\x7f]+$"
+                        },
+                        "mode": {
+                          "enum": [
+                            "authored",
+                            "variant"
+                          ]
+                        },
+                        "targetObjectiveId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 180,
+                          "pattern": "^(?=.*\\S)[^\\x00-\\x1f\\x7f]+$"
+                        },
+                        "sourceRefs": {
+                          "type": "array",
+                          "minItems": 1,
+                          "maxItems": 16,
+                          "items": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 180,
+                            "pattern": "^(?=.*\\S)[^\\x00-\\x1f\\x7f]+$"
+                          },
+                          "uniqueItems": true
+                        },
+                        "criteria": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "requiredLiterals",
+                            "forbiddenLiterals",
+                            "scenarioConditions",
+                            "allowedChanges"
+                          ],
+                          "properties": {
+                            "requiredLiterals": {
+                              "type": "array",
+                              "minItems": 0,
+                              "maxItems": 32,
+                              "items": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 32768,
+                                "pattern": "\\S"
+                              },
+                              "uniqueItems": true
+                            },
+                            "forbiddenLiterals": {
+                              "type": "array",
+                              "minItems": 0,
+                              "maxItems": 32,
+                              "items": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 32768,
+                                "pattern": "\\S"
+                              },
+                              "uniqueItems": true
+                            },
+                            "scenarioConditions": {
+                              "type": "array",
+                              "minItems": 1,
+                              "maxItems": 32,
+                              "items": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 32768,
+                                "pattern": "\\S"
+                              },
+                              "uniqueItems": true
+                            },
+                            "allowedChanges": {
+                              "type": "array",
+                              "minItems": 0,
+                              "maxItems": 32,
+                              "items": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 32768,
+                                "pattern": "\\S"
+                              },
+                              "uniqueItems": true
+                            }
+                          }
+                        },
+                        "misconceptions": {
+                          "type": "array",
+                          "minItems": 0,
+                          "maxItems": 8,
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "id",
+                              "reason",
+                              "sourceRefs"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 180,
+                                "pattern": "^(?=.*\\S)[^\\x00-\\x1f\\x7f]+$"
+                              },
+                              "reason": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 32768,
+                                "pattern": "\\S"
+                              },
+                              "sourceRefs": {
+                                "type": "array",
+                                "minItems": 1,
+                                "maxItems": 16,
+                                "items": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 180,
+                                  "pattern": "^(?=.*\\S)[^\\x00-\\x1f\\x7f]+$"
+                                },
+                                "uniqueItems": true
+                              }
+                            }
+                          }
+                        },
+                        "hints": {
+                          "type": "array",
+                          "minItems": 0,
+                          "maxItems": 8,
+                          "items": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 32768,
+                            "pattern": "\\S"
+                          },
+                          "uniqueItems": true
+                        },
+                        "authoredItem": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "question_id",
+                            "question_type",
+                            "question",
+                            "options",
+                            "correct_answer",
+                            "explanation"
+                          ],
+                          "properties": {
+                            "question_id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 180,
+                              "pattern": "^(?=.*\\S)[^\\x00-\\x1f\\x7f]+$"
+                            },
+                            "question_type": {
+                              "const": "choice"
+                            },
+                            "question": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 32768,
+                              "pattern": "\\S"
+                            },
+                            "options": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "A",
+                                "B",
+                                "C",
+                                "D"
+                              ],
+                              "properties": {
+                                "A": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 32768,
+                                  "pattern": "\\S"
+                                },
+                                "B": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 32768,
+                                  "pattern": "\\S"
+                                },
+                                "C": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 32768,
+                                  "pattern": "\\S"
+                                },
+                                "D": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 32768,
+                                  "pattern": "\\S"
+                                }
+                              }
+                            },
+                            "correct_answer": {
+                              "enum": [
+                                "A",
+                                "B",
+                                "C",
+                                "D"
+                              ]
+                            },
+                            "explanation": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 32768,
+                              "pattern": "\\S"
+                            }
+                          }
+                        },
+                        "referenceTemplate": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "question_id",
+                            "topic",
+                            "question_type",
+                            "difficulty",
+                            "reference_question",
+                            "reference_answer"
+                          ],
+                          "properties": {
+                            "question_id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 180,
+                              "pattern": "^(?=.*\\S)[^\\x00-\\x1f\\x7f]+$"
+                            },
+                            "topic": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 32768,
+                              "pattern": "\\S"
+                            },
+                            "question_type": {
+                              "const": "choice"
+                            },
+                            "difficulty": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 32768,
+                              "pattern": "\\S"
+                            },
+                            "reference_question": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 32768,
+                              "pattern": "\\S"
+                            },
+                            "reference_answer": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 32768,
+                              "pattern": "\\S"
+                            }
+                          }
+                        }
+                      },
+                      "allOf": [
+                        {
+                          "if": {
+                            "properties": {
+                              "mode": {
+                                "const": "authored"
+                              }
+                            }
+                          },
+                          "then": {
+                            "required": [
+                              "authoredItem"
+                            ],
+                            "not": {
+                              "required": [
+                                "referenceTemplate"
+                              ]
+                            }
+                          },
+                          "else": {
+                            "required": [
+                              "referenceTemplate"
+                            ],
+                            "not": {
+                              "required": [
+                                "authoredItem"
+                              ]
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                },
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "title": "课程题目规格（Q1）",
+                "x-serializedByteLimit": 262144,
+                "x-relationalRules": [
+                  "sourceId/objective.id/questionId/misconception.id 各自唯一",
+                  "引用必须闭合且题目 ID 与内嵌内容一致",
+                  "requiredLiterals 与 forbiddenLiterals 不得交集",
+                  "来源、讲义及摘录须以实际字节核对；不是 Schema 可证明的语义"
+                ]
+              },
+              "lesson": {
+                "type": "string"
+              },
+              "sources": {
+                "type": "object",
+                "minProperties": 1,
+                "maxProperties": 16,
+                "additionalProperties": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "sourceVersionId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 180
+                    },
+                    "content": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "sourceVersionId",
+                    "content"
+                  ]
+                }
+              },
+              "productionReview": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "schema": {
+                    "const": "learning-question-preparation-review/1"
+                  },
+                  "reviewId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 180
+                  },
+                  "reviewedBy": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 180
+                  },
+                  "specDigest": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "mode": {
+                    "enum": [
+                      "authored",
+                      "variant"
+                    ]
+                  },
+                  "decision": {
+                    "const": "reviewed_for_production"
+                  },
+                  "checks": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 8,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "questionId": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 180
+                        },
+                        "contentDigest": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "reason": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 32768
+                        }
+                      },
+                      "required": [
+                        "questionId",
+                        "contentDigest",
+                        "reason"
+                      ]
+                    }
+                  },
+                  "assurance": {
+                    "const": "operator_supplied"
+                  }
+                },
+                "required": [
+                  "schema",
+                  "reviewId",
+                  "reviewedBy",
+                  "specDigest",
+                  "mode",
+                  "decision",
+                  "checks",
+                  "assurance"
+                ]
+              }
+            },
+            "required": [
+              "schema",
+              "spec",
+              "lesson",
+              "sources",
+              "productionReview"
+            ]
+          },
+          "questions": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": {
+              "type": "object"
+            }
+          },
+          "questionDigests": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "checks": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": {
+              "type": "object"
+            }
+          },
+          "production": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "request",
+              "response"
+            ],
+            "properties": {
+              "request": {
+                "type": "object"
+              },
+              "response": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "required": [
+          "pageId",
+          "blockId",
+          "binding",
+          "archive",
+          "questions",
+          "questionDigests",
+          "checks",
+          "production"
+        ]
+      }
+    }
+  },
+  "required": [
+    "schema",
+    "activityId",
+    "bookId",
+    "blocks"
+  ],
+  "x-relationalRules": [
+    "必须执行 question_evidence.verify：实际正文、选项顺序、题目、绑定、来源版本、摘录、审查摘要闭合。普通 Schema 不证明语义。"
+  ]
+}

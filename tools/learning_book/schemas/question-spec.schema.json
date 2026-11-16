@@ -1,0 +1,454 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "specId",
+    "lessonRef",
+    "lessonSha256",
+    "sources",
+    "objectives",
+    "items"
+  ],
+  "properties": {
+    "schema": {
+      "const": "learning-question-spec/1"
+    },
+    "specId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 180,
+      "pattern": "^(?=.*\\S)[^\\x00-\\x1f\\x7f]+$"
+    },
+    "lessonRef": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 180,
+      "pattern": "^(?=.*\\S)[^\\x00-\\x1f\\x7f]+$"
+    },
+    "lessonSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "learningAgreementRef": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 180,
+      "pattern": "^(?=.*\\S)[^\\x00-\\x1f\\x7f]+$"
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sourceId",
+          "sourceVersionId",
+          "sha256",
+          "locator",
+          "excerpt"
+        ],
+        "properties": {
+          "sourceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 180,
+            "pattern": "^(?=.*\\S)[^\\x00-\\x1f\\x7f]+$"
+          },
+          "sourceVersionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 180,
+            "pattern": "^(?=.*\\S)[^\\x00-\\x1f\\x7f]+$"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "locator": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32768,
+            "pattern": "\\S"
+          },
+          "excerpt": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32768,
+            "pattern": "\\S"
+          }
+        }
+      }
+    },
+    "objectives": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "description",
+          "evidenceRequired"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 180,
+            "pattern": "^(?=.*\\S)[^\\x00-\\x1f\\x7f]+$"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32768,
+            "pattern": "\\S"
+          },
+          "evidenceRequired": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32768,
+            "pattern": "\\S"
+          }
+        }
+      }
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "questionId",
+          "mode",
+          "targetObjectiveId",
+          "sourceRefs",
+          "criteria"
+        ],
+        "properties": {
+          "questionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 180,
+            "pattern": "^(?=.*\\S)[^\\x00-\\x1f\\x7f]+$"
+          },
+          "mode": {
+            "enum": [
+              "authored",
+              "variant"
+            ]
+          },
+          "targetObjectiveId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 180,
+            "pattern": "^(?=.*\\S)[^\\x00-\\x1f\\x7f]+$"
+          },
+          "sourceRefs": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 16,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 180,
+              "pattern": "^(?=.*\\S)[^\\x00-\\x1f\\x7f]+$"
+            },
+            "uniqueItems": true
+          },
+          "criteria": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "requiredLiterals",
+              "forbiddenLiterals",
+              "scenarioConditions",
+              "allowedChanges"
+            ],
+            "properties": {
+              "requiredLiterals": {
+                "type": "array",
+                "minItems": 0,
+                "maxItems": 32,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 32768,
+                  "pattern": "\\S"
+                },
+                "uniqueItems": true
+              },
+              "forbiddenLiterals": {
+                "type": "array",
+                "minItems": 0,
+                "maxItems": 32,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 32768,
+                  "pattern": "\\S"
+                },
+                "uniqueItems": true
+              },
+              "scenarioConditions": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 32,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 32768,
+                  "pattern": "\\S"
+                },
+                "uniqueItems": true
+              },
+              "allowedChanges": {
+                "type": "array",
+                "minItems": 0,
+                "maxItems": 32,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 32768,
+                  "pattern": "\\S"
+                },
+                "uniqueItems": true
+              }
+            }
+          },
+          "misconceptions": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 8,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "reason",
+                "sourceRefs"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 180,
+                  "pattern": "^(?=.*\\S)[^\\x00-\\x1f\\x7f]+$"
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 32768,
+                  "pattern": "\\S"
+                },
+                "sourceRefs": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 16,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 180,
+                    "pattern": "^(?=.*\\S)[^\\x00-\\x1f\\x7f]+$"
+                  },
+                  "uniqueItems": true
+                }
+              }
+            }
+          },
+          "hints": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 8,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 32768,
+              "pattern": "\\S"
+            },
+            "uniqueItems": true
+          },
+          "authoredItem": {
+            "$ref": "#/$defs/question"
+          },
+          "referenceTemplate": {
+            "$ref": "#/$defs/template"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "mode": {
+                  "const": "authored"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "authoredItem"
+              ],
+              "not": {
+                "required": [
+                  "referenceTemplate"
+                ]
+              }
+            },
+            "else": {
+              "required": [
+                "referenceTemplate"
+              ],
+              "not": {
+                "required": [
+                  "authoredItem"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "课程题目规格（Q1）",
+  "$defs": {
+    "question": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "question_id",
+        "question_type",
+        "question",
+        "options",
+        "correct_answer",
+        "explanation"
+      ],
+      "properties": {
+        "question_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 180,
+          "pattern": "^(?=.*\\S)[^\\x00-\\x1f\\x7f]+$"
+        },
+        "question_type": {
+          "const": "choice"
+        },
+        "question": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32768,
+          "pattern": "\\S"
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "properties": {
+            "A": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 32768,
+              "pattern": "\\S"
+            },
+            "B": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 32768,
+              "pattern": "\\S"
+            },
+            "C": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 32768,
+              "pattern": "\\S"
+            },
+            "D": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 32768,
+              "pattern": "\\S"
+            }
+          }
+        },
+        "correct_answer": {
+          "enum": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ]
+        },
+        "explanation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32768,
+          "pattern": "\\S"
+        }
+      }
+    },
+    "template": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "question_id",
+        "topic",
+        "question_type",
+        "difficulty",
+        "reference_question",
+        "reference_answer"
+      ],
+      "properties": {
+        "question_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 180,
+          "pattern": "^(?=.*\\S)[^\\x00-\\x1f\\x7f]+$"
+        },
+        "topic": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32768,
+          "pattern": "\\S"
+        },
+        "question_type": {
+          "const": "choice"
+        },
+        "difficulty": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32768,
+          "pattern": "\\S"
+        },
+        "reference_question": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32768,
+          "pattern": "\\S"
+        },
+        "reference_answer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32768,
+          "pattern": "\\S"
+        }
+      }
+    }
+  },
+  "x-serializedByteLimit": 262144,
+  "x-relationalRules": [
+    "sourceId/objective.id/questionId/misconception.id 各自唯一",
+    "引用必须闭合且题目 ID 与内嵌内容一致",
+    "requiredLiterals 与 forbiddenLiterals 不得交集",
+    "来源、讲义及摘录须以实际字节核对；不是 Schema 可证明的语义"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "contract_version": "1.0",
+  "operation_id": "example-001",
+  "operation_type": "index_rebuild",
+  "task": "重建索引",
+  "input_refs": [
+    "wiki/index.md"
+  ],
+  "allowed_paths": [
+    "wiki/index.md"
+  ],
+  "rules_path": "AGENTS.md",
+  "rules_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mapping_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+  "validator_version": "gates-1.0",
+  "review_prompt_version": "none",
+  "dependencies_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+  "candidate_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+  "round": 1,
+  "required_gates": [
+    "G0",
+    "G1",
+    "G2",
+    "G4",
+    "G5"
+  ],
+  "authorization_refs": []
+}

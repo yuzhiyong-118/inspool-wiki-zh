@@ -1,0 +1,10 @@
+--- a/deeptutor/book/engine.py
++++ b/deeptutor/book/engine.py
+@@ -1901,6 +1901,7 @@
+                 _body_key(block): body,
+                 "format": "markdown",
+             }
++            block.payload.pop("bridge_text", None)
+         block.status = BlockStatus.READY
+         block.error = ""
+         block.metadata = {**(block.metadata or {}), "edited_by_user": True}

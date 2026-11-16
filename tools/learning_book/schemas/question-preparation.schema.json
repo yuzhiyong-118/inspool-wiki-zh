@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "learning-question-preparation/1"
+    },
+    "root": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 32768
+    },
+    "specPath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 32768
+    },
+    "specDigest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "lessonPath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 32768
+    },
+    "sourceInputs": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "sourceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 180
+          },
+          "sourceVersionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 180
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32768
+          }
+        },
+        "required": [
+          "sourceId",
+          "sourceVersionId",
+          "path"
+        ]
+      }
+    },
+    "reviewPath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 32768
+    }
+  },
+  "required": [
+    "schema",
+    "root",
+    "specPath",
+    "specDigest",
+    "lessonPath",
+    "sourceInputs",
+    "reviewPath"
+  ],
+  "x-pathRules": [
+    "root 必须为绝对允许根；所有成员为根内无重定向相对路径；真实来源与讲义字节在冻结、发送前重验。"
+  ]
+}

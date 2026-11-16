@@ -1,0 +1,15 @@
+{
+  "operation_id": "example-001",
+  "candidate_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+  "dependencies_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+  "rules_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mapping_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+  "validator_version": "gates-1.0",
+  "review_prompt_version": "review-1.0",
+  "reviewer_id": "reviewer-001",
+  "result": "recommend_pass",
+  "findings": [],
+  "evidence_refs": [
+    "sources/示例#证据摘录"
+  ]
+}

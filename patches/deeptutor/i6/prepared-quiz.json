@@ -1,0 +1,13 @@
+{
+  "patchSha256": "ddd7b3d64ce770825a90ff454fc5c0225a4653aefac26535d6ebd438d600ed9b",
+  "files": {
+    "deeptutor/book/blocks/quiz.py": {
+      "baseLfSha256": "ce16447f37039d81e5a169741c9d6b8398ae4cf78436a8ee9f5b443d683b655b",
+      "patchedLfSha256": "bcc347cf4255e22aac7536db0d7e010bb4d89ef3aa2300479124656349bfc7bb"
+    },
+    "deeptutor/agents/question/pipeline.py": {
+      "baseLfSha256": "a35c4bacc87256269d5dbfdb14fc0b25399f8130294dc98a5c74acc7e861cbe5",
+      "patchedLfSha256": "5d535ea8231c28a6c6af01c6d57790a2915c98632417d17417e932abecb1024d"
+    }
+  }
+}

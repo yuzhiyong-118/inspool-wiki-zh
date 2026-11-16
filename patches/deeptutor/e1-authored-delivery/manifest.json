@@ -1,0 +1,41 @@
+{
+  "baseCommit": "60fb3bdfddb30b7740c7ce3bd9b28d908f2af6db",
+  "localPatchId": "learning-authored-delivery/1",
+  "parentPatchSha256": "2ac81d10f4ec20b1f8d264898983a7bb2aa8447b53edd5e82408aae4af627a6e",
+  "parentReleaseSha256": "66a0602df3b4f93904d677f631e1f59b1879742d06a8fbb0fe598d1f5f719863",
+  "patchSha256": "e2d305ff66b1bc7ce94be6f396a3d62da146366945f19a1512d5cb31c0afae9d",
+  "files": {
+    "deeptutor/book/author_delivery.py": {
+      "before": null,
+      "after": "d0f1311a48e8acd2dd62130062e8d89f5e841c139b6c0791aeaa5c3f572db07b"
+    },
+    "deeptutor/book/question_publication.py": {
+      "before": "578b39da27dad926da870134841cf54080b36ffbb63527285a6894ac2f1e559b",
+      "after": "f5268dc483914898a5c97220295e5264f2108d68e0c8f94d10ea454848a41e93"
+    },
+    "deeptutor/book/engine.py": {
+      "before": "4b6c98bb9e5d5c61e014f42aff3cc660a53fdb515e6a5daabbb9de14607f2c07",
+      "after": "1911d0f0cf4d92cb7bfbcbb6a697e1580cb5f1fa99b1aa2bc7d087c36546be2b"
+    },
+    "deeptutor/api/routers/book.py": {
+      "before": "8768851eecc73c8ffa4c152ab9dc413cec976d19377b5c87ba2dcda2f03ccd9b",
+      "after": "850748f3c19522f5526f48da35f0b55d9258986411e5c4f0c7e643bf85489eac"
+    }
+  },
+  "targets": {
+    "deeptutor/book/author_delivery.py": "deeptutor_books-1.7.2-py3-none-any.whl",
+    "deeptutor/book/question_publication.py": "deeptutor_books-1.7.2-py3-none-any.whl",
+    "deeptutor/book/engine.py": "deeptutor_books-1.7.2-py3-none-any.whl",
+    "deeptutor/api/routers/book.py": "deeptutor_books-1.7.2-py3-none-any.whl"
+  },
+  "inputWheels": {
+    "deeptutor-1.7.2-py3-none-any.whl": "b60f38dacd4ecc5af47e953d4ee421f7b7b90f6b8e4446ebaa9b97ddb5cf7c8f",
+    "deeptutor_books-1.7.2-py3-none-any.whl": "5937e2d4c612eaef3a3522aa7ef94b49e5dd3916d880253a9937efbd1eda3fc0",
+    "deeptutor_server-1.7.2-py3-none-any.whl": "fc61ac486959c181b3ec9c95e0285f26cfdb66e5190f239be539920409f3c886",
+    "deeptutor_questions-1.7.2-py3-none-any.whl": "b6b0044f8306d23837fee536d94a0456390d643cd938efc8b7736bb7b60c4ff8",
+    "deeptutor_knowledge-1.7.2-py3-none-any.whl": "a29cd6a4034bd3e5a5ef2cb81048fdc0af0c5ae18956e75b99d6ae7b28ed68de",
+    "deeptutor_mastery-1.7.2-py3-none-any.whl": "d5a9b564a509cd110952b188a1f23891df688022ab74fc1ab7d1ba810c26ea33",
+    "deeptutor_parsing-1.7.2-py3-none-any.whl": "dc892010161beea9fc32fab9526ae3a38b5c84772436279ba2ab1004e9f02304",
+    "deeptutor_visualize-1.7.2-py3-none-any.whl": "e8fc180d5e7bd9911ce92b23e22fec2902bcf1f9618a056a17e9f5d197ecb888"
+  }
+}

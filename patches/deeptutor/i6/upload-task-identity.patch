@@ -1,0 +1,22 @@
+diff --git a/deeptutor/knowledge/add_documents.py b/deeptutor/knowledge/add_documents.py
+--- a/deeptutor/knowledge/add_documents.py
++++ b/deeptutor/knowledge/add_documents.py
+@@ -371,5 +371,6 @@ class DocumentAdder:
+             success = await rag_service.add_documents(
+                 self.kb_name,
+                 [str(path) for path in new_files],
++                task_id=getattr(self.progress_tracker, "task_id", "") or "",
+                 indexed_file_callback=on_indexed,
+             )
+@@ -450,7 +451,10 @@ class DocumentAdder:
+                         total=total_files,
+                     )
+ 
+-                success = await rag_service.add_documents(self.kb_name, [str(doc_file)])
++                success = await rag_service.add_documents(
++                    self.kb_name, [str(doc_file)],
++                    task_id=getattr(self.progress_tracker, "task_id", "") or "",
++                )
+                 if success:
+                     processed_files.append(doc_file)
+                     # Re-hashes the whole file, so it stays off the event loop:

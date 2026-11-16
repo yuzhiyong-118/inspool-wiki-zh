@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "packageId": "example-package-1",
+  "preparationDecision": "learn",
+  "sources": [
+    {
+      "sourceId": "example-source",
+      "sourceVersionId": "example-source-version-1",
+      "sha256": "4ec189d312bc7ed6200f9636a8f56a0ea929bb48942985069ef2f55a41263bef",
+      "path": "lesson.md",
+      "metadata": {
+        "title": "重试约定示例",
+        "author": "格式示例"
+      }
+    }
+  ],
+  "inputArtifacts": [
+    {
+      "inputArtifactId": "example-input-v1",
+      "sourceId": "example-source",
+      "sourceVersionId": "example-source-version-1",
+      "sha256": "4ec189d312bc7ed6200f9636a8f56a0ea929bb48942985069ef2f55a41263bef",
+      "path": "lesson.md",
+      "mediaType": "text/markdown",
+      "extraction": {
+        "method": "verbatim-copy",
+        "version": "1"
+      },
+      "coverage": {
+        "status": "complete",
+        "truncated": false
+      }
+    }
+  ],
+  "corpusId": "example-corpus",
+  "corpusVersionId": "example-corpus-v1",
+  "learningGoal": "理解示例中的重试条件与等待间隔",
+  "language": "zh",
+  "depth": "brief"
+}

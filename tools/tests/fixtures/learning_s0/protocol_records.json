@@ -1,0 +1,561 @@
+{
+  "valid": {
+    "task": {
+      "task_id": "task-1", "learning_task_id": "task-learning-1",
+      "workflow_ref": {
+        "workflow_id": "learning-ingest-synthetic",
+        "implementation_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+        "contract_version": "loop-v1",
+        "required_checks": ["L0", "L1", "L2", "L3"],
+        "allowed_capabilities": ["synthetic.review"]
+      },
+      "current_policy_digest": "2804d87fa9e9db37c6b6fa7e968cf0b5b63e46c3ebe18c3ca5cc21598d04a426",
+      "submission_epoch": 1, "revision": 1, "state": "running"
+    },
+    "run": {
+      "run_id": "run-1", "task_id": "task-1", "learning_task_id": "task-learning-1",
+      "state": "running",
+      "execution_history": [{"invocation_id": "invocation-1", "role": "Worker"}]
+    },
+    "invocation_spec": {
+      "invocation_id": "invocation-1", "task_id": "task-1",
+      "learning_task_id": "task-learning-1", "run_id": "run-1",
+      "operation_id": "operation-1", "lease_generation": 2,
+      "policy_digest": "2804d87fa9e9db37c6b6fa7e968cf0b5b63e46c3ebe18c3ca5cc21598d04a426",
+      "role": "Worker", "kind": "candidate_repair",
+      "input_digest": "2222222222222222222222222222222222222222222222222222222222222222",
+      "requested_budget": {
+        "requests": 1, "pages": 2, "input_bytes": 512, "model_calls": 1,
+        "active_seconds": 10.0, "repairs": 0, "appeals": 0
+      }
+    },
+    "invocation": {
+      "spec": {
+        "invocation_id": "invocation-1", "task_id": "task-1",
+        "learning_task_id": "task-learning-1", "run_id": "run-1",
+        "operation_id": "operation-1", "lease_generation": 2,
+        "policy_digest": "2804d87fa9e9db37c6b6fa7e968cf0b5b63e46c3ebe18c3ca5cc21598d04a426",
+        "role": "Worker", "kind": "candidate_repair",
+        "input_digest": "2222222222222222222222222222222222222222222222222222222222222222",
+        "requested_budget": {
+          "requests": 1, "pages": 2, "input_bytes": 512, "model_calls": 1,
+          "active_seconds": 10.0, "repairs": 0, "appeals": 0
+        }
+      },
+      "spec_digest": "5b38cbbdfc6d897ed25a9a59aca7e8bbf03b9527c31d1c893117fff1cc49c235",
+      "limit_check": {
+        "task": "passed", "run": "passed", "concurrency": "passed",
+        "final_review_reserve": "passed"
+      },
+      "reservation": {
+        "state": "reserved",
+        "budget": {
+          "requests": 1, "pages": 2, "input_bytes": 512, "model_calls": 1,
+          "active_seconds": 10.0, "repairs": 0, "appeals": 0
+        }
+      },
+      "send_state": "sent", "result_state": "succeeded", "result": {"output": "candidate-ok"},
+      "settlement": {
+        "state": "settled",
+        "actual_usage": {
+          "requests": 1, "pages": 2, "input_bytes": 512, "model_calls": 1,
+          "active_seconds": 8.5, "repairs": 0, "appeals": 0, "tokens": 120
+        }
+      }
+    },
+    "ownership": {
+      "task_id": "task-1", "learning_task_id": "task-learning-1", "owner": "worker-host-1",
+      "generation": 2, "expires_at": 1000.0
+    },
+    "candidate": {
+      "contract_version": "1.0", "operation_id": "operation-1",
+      "changes": [
+        {"action": "write", "path": "wiki/a.md", "payload_path": "payload/wiki/a.md", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "precondition": {"kind": "absent"}},
+        {"action": "write", "path": "wiki/b.md", "payload_path": "payload/wiki/b.md", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "precondition": {"kind": "absent"}},
+        {"action": "write", "path": "wiki/index.md", "payload_path": "payload/wiki/index.md", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "precondition": {"kind": "absent"}}
+      ]
+    },
+    "review_credentials": [
+      {
+        "credential_id": "assessor-opinion-1", "learning_task_id": "task-learning-1",
+        "invocation_id": "invocation-assessor-opinion-1", "role": "Assessor",
+        "identity": "independent-Assessor", "independent": true,
+        "content_digest": "d4e3d13792f14ca6cfca2bf0625195b29a52471c74f5347b188baee16904e517",
+        "evidence_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "dependencies_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "rules_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "prompt_digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "validator_version": "opinion-v1",
+        "review_config_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "scope": {
+          "kind": "understanding_assessment", "objective_ids": ["objective-core"],
+          "candidate_digest": "e3286eaedb6b38d6c1863065e7c833609b9fb7ddc2e55c2533f786bcb4c2cb9e",
+          "package_ref": {
+            "package_id": "package-1", "version": 1,
+            "digest": "91cb4973ef6e803d7ffe8d1e444b278e0dfdcc66be8374528a48af9da116d8de"
+          }
+        },
+        "result": "pass", "valid": true
+      },
+      {
+        "credential_id": "final-reviewer-1", "learning_task_id": "task-learning-1",
+        "invocation_id": "invocation-final-reviewer-1", "role": "Reviewer",
+        "identity": "independent-Reviewer", "independent": true,
+        "content_digest": "3ecd94a21afea1a48830d4dae9bee43c8a86afd45a040d2a387228fd8e2b7b93",
+        "evidence_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "dependencies_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "rules_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "prompt_digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "validator_version": "opinion-v1",
+        "review_config_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "scope": {
+          "kind": "final_candidate_coverage",
+          "objective_ids": ["objective-core", "objective-optional"],
+          "candidate_digest": "e3286eaedb6b38d6c1863065e7c833609b9fb7ddc2e55c2533f786bcb4c2cb9e",
+          "package_ref": {
+            "package_id": "package-1", "version": 1,
+            "digest": "91cb4973ef6e803d7ffe8d1e444b278e0dfdcc66be8374528a48af9da116d8de"
+          }
+        },
+        "result": "pass", "valid": true
+      }
+    ],
+    "readiness": {
+      "learning_task_id": "task-learning-1", "raw_batch_id": "batch-1",
+      "candidate_digest": "e3286eaedb6b38d6c1863065e7c833609b9fb7ddc2e55c2533f786bcb4c2cb9e",
+      "coverage_digest": "3ecd94a21afea1a48830d4dae9bee43c8a86afd45a040d2a387228fd8e2b7b93",
+      "assessments_digest": "f07c4276de46502b74287651e3c67d4932c9665629c828da25d2f72b7391f9d1",
+      "evidence_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "dependencies_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "rules_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "required_credentials": [
+        {
+          "credential_ref": "assessor-opinion-1",
+          "credential_digest": "875f2c75bb74738d1703fc39e0c24d10a80c21db655e35a0f8f35a2c0b278757",
+          "content_digest": "d4e3d13792f14ca6cfca2bf0625195b29a52471c74f5347b188baee16904e517",
+          "role": "Assessor", "scope_kind": "understanding_assessment",
+          "objective_ids": ["objective-core"]
+        },
+        {
+          "credential_ref": "final-reviewer-1",
+          "credential_digest": "f51fdfb17b830485b7b92336302380feb665e1a2060723254bfec2ed6dd0267c",
+          "content_digest": "3ecd94a21afea1a48830d4dae9bee43c8a86afd45a040d2a387228fd8e2b7b93",
+          "role": "Reviewer", "scope_kind": "final_candidate_coverage",
+          "objective_ids": ["objective-core", "objective-optional"]
+        }
+      ],
+      "blockers": [], "state": "current"
+    },
+    "authorization": {
+      "authorization_ref": "authorization-1", "action": "ingest", "task_id": "task-1",
+      "learning_task_id": "task-learning-1", "raw_batch_id": "batch-1", "operation_id": "operation-1",
+      "policy_digest": "2804d87fa9e9db37c6b6fa7e968cf0b5b63e46c3ebe18c3ca5cc21598d04a426",
+      "submission_epoch": 1,
+      "candidate_digest": "e3286eaedb6b38d6c1863065e7c833609b9fb7ddc2e55c2533f786bcb4c2cb9e",
+      "readiness_digest": "cc8805d3bd6138d0e2841dba7f18f2e429c966a65909dc2559f8c0b56a8827d2",
+      "dependencies_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "rules_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "state": "issued"
+    },
+    "admission": {
+      "task_id": "task-1", "learning_task_id": "task-learning-1", "raw_batch_id": "batch-1",
+      "run_id": "run-1", "operation_id": "operation-1", "created_generation": 2,
+      "policy_digest": "2804d87fa9e9db37c6b6fa7e968cf0b5b63e46c3ebe18c3ca5cc21598d04a426",
+      "submission_epoch": 1,
+      "manifest_digest": "9999999999999999999999999999999999999999999999999999999999999999",
+      "candidate_digest": "e3286eaedb6b38d6c1863065e7c833609b9fb7ddc2e55c2533f786bcb4c2cb9e",
+      "readiness_digest": "cc8805d3bd6138d0e2841dba7f18f2e429c966a65909dc2559f8c0b56a8827d2",
+      "dependencies_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "rules_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "authorization_ref": "authorization-1"
+    },
+    "executor_context": {
+      "runtime_task": {
+        "task_id": "task-1", "learning_task_id": "task-learning-1",
+        "workflow_ref": {
+          "workflow_id": "learning-ingest-synthetic",
+          "implementation_digest": "1111111111111111111111111111111111111111111111111111111111111111",
+          "contract_version": "loop-v1",
+          "required_checks": ["L0", "L1", "L2", "L3"],
+          "allowed_capabilities": ["synthetic.review"]
+        },
+        "current_policy_digest": "2804d87fa9e9db37c6b6fa7e968cf0b5b63e46c3ebe18c3ca5cc21598d04a426",
+        "submission_epoch": 1, "revision": 1, "state": "running"
+      },
+      "learning_state": {
+        "task_id": "task-1", "learning_task_id": "task-learning-1",
+        "state": "awaiting_confirmation", "knowledge_version": 1
+      },
+      "policy_revision": {
+        "revision": 1,
+        "policy_digest": "2804d87fa9e9db37c6b6fa7e968cf0b5b63e46c3ebe18c3ca5cc21598d04a426",
+        "budget": {
+          "requests": 20, "pages": 40, "input_bytes": 1048576, "model_calls": 10,
+          "active_seconds": 900.0, "repairs": 3, "appeals": 1
+        },
+        "stop_policy": {"max_step_attempts": 3, "identical_failure_limit": 2},
+        "creation_reason": "S1 Task 0 synthetic baseline"
+      },
+      "run": {
+        "run_id": "run-1", "task_id": "task-1", "learning_task_id": "task-learning-1",
+        "state": "running",
+        "execution_history": [{"invocation_id": "invocation-1", "role": "Worker"}]
+      },
+      "action": "ingest", "task_id": "task-1", "learning_task_id": "task-learning-1",
+      "raw_batch_id": "batch-1", "run_id": "run-1", "operation_id": "operation-1",
+      "current_generation": 2, "now": 100.0,
+      "manifest_digest": "9999999999999999999999999999999999999999999999999999999999999999",
+      "candidate_digest": "e3286eaedb6b38d6c1863065e7c833609b9fb7ddc2e55c2533f786bcb4c2cb9e",
+      "evidence_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "dependencies_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "rules_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "ownership": {
+        "task_id": "task-1", "learning_task_id": "task-learning-1", "owner": "worker-host-1",
+        "generation": 2, "expires_at": 1000.0
+      },
+      "candidate": {
+        "contract_version": "1.0", "operation_id": "operation-1",
+        "changes": [
+          {"action": "write", "path": "wiki/a.md", "payload_path": "payload/wiki/a.md", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "precondition": {"kind": "absent"}},
+          {"action": "write", "path": "wiki/b.md", "payload_path": "payload/wiki/b.md", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "precondition": {"kind": "absent"}},
+          {"action": "write", "path": "wiki/index.md", "payload_path": "payload/wiki/index.md", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "precondition": {"kind": "absent"}}
+        ]
+      },
+      "candidate_preview": {
+        "candidate_id": "candidate-1",
+        "package_ref": {
+          "package_id": "package-1", "version": 1,
+          "digest": "91cb4973ef6e803d7ffe8d1e444b278e0dfdcc66be8374528a48af9da116d8de"
+        },
+        "baseline_ref": "baseline-1",
+        "candidate_changes": [
+          {"change_id": "change-a", "candidate_path": "wiki/a.md", "action": "write", "source": null, "claim_id": "claim-a"},
+          {"change_id": "change-b", "candidate_path": "wiki/b.md", "action": "write", "source": null, "claim_id": "claim-b"},
+          {"change_id": "change-c", "candidate_path": "wiki/index.md", "action": "write", "source": null, "claim_id": null}
+        ],
+        "coverage": [
+          {
+            "change_id": "change-a", "candidate_path": "wiki/a.md", "claim_id": "claim-a",
+            "evidence_disposition": "supported", "teaching_disposition": "required_objective",
+            "objective_ref": "objective-core", "reason": "核心机制必须独立理解"
+          },
+          {
+            "change_id": "change-b", "candidate_path": "wiki/b.md", "claim_id": "claim-b",
+            "evidence_disposition": "disputed", "teaching_disposition": "optional_extension",
+            "objective_ref": "objective-optional", "reason": "非核心可选争议拓展"
+          },
+          {
+            "change_id": "change-c", "candidate_path": "wiki/index.md", "claim_id": null,
+            "evidence_disposition": "mechanical", "teaching_disposition": "non_teaching",
+            "objective_ref": null, "reason": "仅机械索引变更"
+          }
+        ],
+        "state": "preview"
+      },
+      "understanding_records": [
+        {
+          "learning_task_id": "task-learning-1",
+          "objective": {
+            "objective_id": "objective-core", "objective_type": "mechanism",
+            "required_evidence": "independent_explanation",
+            "prerequisite_objectives": ["external-foundation"], "rubric_id": "rubric-lesson-1",
+            "rubric_version": 1,
+            "rubric_digest": "3b25a4c7b22ab6c62d85d38eb9ad64d4686ddc447416005079d461e99cb3d767",
+            "pass_condition": "独立解释机制和必要条件", "core": true
+          },
+          "rubric": {
+            "rubric_id": "rubric-lesson-1", "version": 1,
+            "package_ref": {
+              "package_id": "package-1", "version": 1,
+              "digest": "91cb4973ef6e803d7ffe8d1e444b278e0dfdcc66be8374528a48af9da116d8de"
+            },
+            "objective_id": "objective-core", "criteria": ["解释机制", "说明条件"],
+            "evidence_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          },
+          "rubric_template": {
+            "template_id": "template-independent-1", "version": 2,
+            "content_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "applicable_objective_types": ["mechanism", "transfer"]
+          },
+          "evaluator": {
+            "evaluator_id": "evaluator-1", "version": 3,
+            "config_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+          },
+          "calibration": {
+            "calibration_id": "calibration-1",
+            "suite_digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            "rubric_template_id": "template-independent-1", "rubric_template_version": 2,
+            "rubric_template_digest": "0165b1fff5fc98f4083df3526a18d94254b0384c0f64a2b52e627ee87933860c",
+            "evaluator_id": "evaluator-1", "evaluator_version": 3,
+            "evaluator_digest": "ffda0719437c7977d52ffb73ec5ddd489a953b3db330cd871baf835961bad2bb",
+            "objective_types": ["mechanism"], "result": "pass", "valid": true
+          },
+          "rubric_review": {
+            "credential_id": "rubric-review-1", "learning_task_id": "task-learning-1",
+            "invocation_id": "invocation-rubric-review-1", "role": "Reviewer",
+            "identity": "independent-reviewer", "independent": true,
+            "content_digest": "3b25a4c7b22ab6c62d85d38eb9ad64d4686ddc447416005079d461e99cb3d767",
+            "evidence_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "dependencies_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "rules_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "prompt_digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+            "validator_version": "rubric-review-v1",
+            "review_config_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "scope": {
+              "kind": "lesson_rubric", "objective_ids": ["objective-core"],
+              "candidate_digest": "91cb4973ef6e803d7ffe8d1e444b278e0dfdcc66be8374528a48af9da116d8de",
+              "package_ref": {
+                "package_id": "package-1", "version": 1,
+                "digest": "91cb4973ef6e803d7ffe8d1e444b278e0dfdcc66be8374528a48af9da116d8de"
+              }
+            },
+            "result": "pass", "valid": true
+          },
+          "assessment": {
+            "assessment_id": "assessment-1",
+            "package_ref": {
+              "package_id": "package-1", "version": 1,
+              "digest": "91cb4973ef6e803d7ffe8d1e444b278e0dfdcc66be8374528a48af9da116d8de"
+            },
+            "objective_id": "objective-core",
+            "objective_digest": "9dfaf92db17c959bb6c9fd6942810bdfa3984e4baf03ec802bc627454e18d0a4",
+            "rubric_id": "rubric-lesson-1", "rubric_version": 1,
+            "rubric_digest": "3b25a4c7b22ab6c62d85d38eb9ad64d4686ddc447416005079d461e99cb3d767",
+            "rubric_template_id": "template-independent-1", "rubric_template_version": 2,
+            "rubric_template_digest": "0165b1fff5fc98f4083df3526a18d94254b0384c0f64a2b52e627ee87933860c",
+            "evaluator_id": "evaluator-1", "evaluator_version": 3,
+            "evaluator_digest": "ffda0719437c7977d52ffb73ec5ddd489a953b3db330cd871baf835961bad2bb",
+            "calibration_digest": "0857a95e3115aea7c6dfb7b3a4f09f85f7b3ee2c304fd491a8af7ea3b9fc7bac",
+            "rubric_review_digest": "9e7957f7b11e2c2f01b86b1e8426bde85a54458a23616ede9555b1e815572d9a",
+            "response_evidence": {
+              "evidence_id": "response-1",
+              "content_digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+              "evidence_type": "independent_explanation", "independent": true,
+              "assistance": "none", "conditions": ["condition-x", "new-scenario"]
+            },
+            "result": "pass", "valid": true
+          },
+          "assessor_review": {
+            "credential_id": "assessor-opinion-1", "learning_task_id": "task-learning-1",
+            "invocation_id": "invocation-assessor-opinion-1", "role": "Assessor",
+            "identity": "independent-Assessor", "independent": true,
+            "content_digest": "d4e3d13792f14ca6cfca2bf0625195b29a52471c74f5347b188baee16904e517",
+            "evidence_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "dependencies_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "rules_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "prompt_digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+            "validator_version": "opinion-v1",
+            "review_config_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "scope": {
+              "kind": "understanding_assessment", "objective_ids": ["objective-core"],
+              "candidate_digest": "e3286eaedb6b38d6c1863065e7c833609b9fb7ddc2e55c2533f786bcb4c2cb9e",
+              "package_ref": {
+                "package_id": "package-1", "version": 1,
+                "digest": "91cb4973ef6e803d7ffe8d1e444b278e0dfdcc66be8374528a48af9da116d8de"
+              }
+            },
+            "result": "pass", "valid": true
+          }
+        }
+      ],
+      "final_review_credential": {
+        "credential_id": "final-reviewer-1", "learning_task_id": "task-learning-1",
+        "invocation_id": "invocation-final-reviewer-1", "role": "Reviewer",
+        "identity": "independent-Reviewer", "independent": true,
+        "content_digest": "3ecd94a21afea1a48830d4dae9bee43c8a86afd45a040d2a387228fd8e2b7b93",
+        "evidence_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "dependencies_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "rules_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "prompt_digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "validator_version": "opinion-v1",
+        "review_config_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "scope": {
+          "kind": "final_candidate_coverage", "objective_ids": ["objective-core", "objective-optional"],
+          "candidate_digest": "e3286eaedb6b38d6c1863065e7c833609b9fb7ddc2e55c2533f786bcb4c2cb9e",
+          "package_ref": {
+            "package_id": "package-1", "version": 1,
+            "digest": "91cb4973ef6e803d7ffe8d1e444b278e0dfdcc66be8374528a48af9da116d8de"
+          }
+        },
+        "result": "pass", "valid": true
+      },
+      "terminal_results": []
+    },
+    "execution_results": {
+      "applied": {
+        "task_id": "task-1", "learning_task_id": "task-learning-1", "raw_batch_id": "batch-1", "operation_id": "operation-1",
+        "candidate_digest": "e3286eaedb6b38d6c1863065e7c833609b9fb7ddc2e55c2533f786bcb4c2cb9e",
+        "dependencies_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "rules_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "state": "applied", "recovery_status": "not_needed"
+      },
+      "recovered": {
+        "task_id": "task-1", "learning_task_id": "task-learning-1", "raw_batch_id": "batch-1", "operation_id": "operation-1",
+        "candidate_digest": "e3286eaedb6b38d6c1863065e7c833609b9fb7ddc2e55c2533f786bcb4c2cb9e",
+        "dependencies_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "rules_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "state": "recovered", "recovery_status": "recovered"
+      },
+      "prepared": {
+        "task_id": "task-1", "learning_task_id": "task-learning-1", "raw_batch_id": "batch-1", "operation_id": "operation-1",
+        "candidate_digest": "e3286eaedb6b38d6c1863065e7c833609b9fb7ddc2e55c2533f786bcb4c2cb9e",
+        "dependencies_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "rules_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "state": "prepared", "recovery_status": "required"
+      },
+      "applying": {
+        "task_id": "task-1", "learning_task_id": "task-learning-1", "raw_batch_id": "batch-1", "operation_id": "operation-1",
+        "candidate_digest": "e3286eaedb6b38d6c1863065e7c833609b9fb7ddc2e55c2533f786bcb4c2cb9e",
+        "dependencies_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "rules_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "state": "applying", "recovery_status": "required"
+      },
+      "recovery_required": {
+        "task_id": "task-1", "learning_task_id": "task-learning-1", "raw_batch_id": "batch-1", "operation_id": "operation-1",
+        "candidate_digest": "e3286eaedb6b38d6c1863065e7c833609b9fb7ddc2e55c2533f786bcb4c2cb9e",
+        "dependencies_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "rules_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "state": "recovery_required", "recovery_status": "required"
+      },
+      "conflict": {
+        "task_id": "task-1", "learning_task_id": "task-learning-1", "raw_batch_id": "batch-1", "operation_id": "operation-1",
+        "candidate_digest": "e3286eaedb6b38d6c1863065e7c833609b9fb7ddc2e55c2533f786bcb4c2cb9e",
+        "dependencies_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "rules_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "state": "recovery_required", "recovery_status": "conflict"
+      }
+    }
+  },
+  "invalid": {
+    "different_input_spec": {
+      "invocation_id": "invocation-1", "task_id": "task-1", "learning_task_id": "task-learning-1", "run_id": "run-1",
+      "operation_id": "operation-1", "lease_generation": 2,
+      "policy_digest": "2804d87fa9e9db37c6b6fa7e968cf0b5b63e46c3ebe18c3ca5cc21598d04a426",
+      "role": "Worker",
+      "kind": "candidate_repair",
+      "input_digest": "3333333333333333333333333333333333333333333333333333333333333333",
+      "requested_budget": {
+        "requests": 1, "pages": 2, "input_bytes": 512, "model_calls": 1,
+        "active_seconds": 10.0, "repairs": 0, "appeals": 0
+      }
+    },
+    "cross_task_spec": {
+      "invocation_id": "invocation-1", "task_id": "task-1", "learning_task_id": "task-learning-other", "run_id": "run-1",
+      "operation_id": "operation-1", "lease_generation": 2,
+      "policy_digest": "2804d87fa9e9db37c6b6fa7e968cf0b5b63e46c3ebe18c3ca5cc21598d04a426",
+      "role": "Worker",
+      "kind": "candidate_repair",
+      "input_digest": "2222222222222222222222222222222222222222222222222222222222222222",
+      "requested_budget": {
+        "requests": 1, "pages": 2, "input_bytes": 512, "model_calls": 1,
+        "active_seconds": 10.0, "repairs": 0, "appeals": 0
+      }
+    },
+    "cross_run_spec": {
+      "invocation_id": "invocation-1", "task_id": "task-1", "learning_task_id": "task-learning-1", "run_id": "run-other",
+      "operation_id": "operation-1", "lease_generation": 2,
+      "policy_digest": "2804d87fa9e9db37c6b6fa7e968cf0b5b63e46c3ebe18c3ca5cc21598d04a426",
+      "role": "Worker",
+      "kind": "candidate_repair",
+      "input_digest": "2222222222222222222222222222222222222222222222222222222222222222",
+      "requested_budget": {
+        "requests": 1, "pages": 2, "input_bytes": 512, "model_calls": 1,
+        "active_seconds": 10.0, "repairs": 0, "appeals": 0
+      }
+    },
+    "wrong_binding": {
+      "task_id": "task-1", "learning_task_id": "task-learning-1", "raw_batch_id": "batch-1",
+      "operation_id": "operation-1",
+      "candidate_digest": "4444444444444444444444444444444444444444444444444444444444444444",
+      "dependencies_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "rules_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "state": "applied", "recovery_status": "not_needed"
+    },
+    "wrong_generation_admission": {
+      "task_id": "task-1", "learning_task_id": "task-learning-1", "raw_batch_id": "batch-1",
+      "run_id": "run-1", "operation_id": "operation-1", "created_generation": 1,
+      "policy_digest": "2804d87fa9e9db37c6b6fa7e968cf0b5b63e46c3ebe18c3ca5cc21598d04a426",
+      "submission_epoch": 1,
+      "candidate_digest": "e3286eaedb6b38d6c1863065e7c833609b9fb7ddc2e55c2533f786bcb4c2cb9e",
+      "readiness_digest": "cc8805d3bd6138d0e2841dba7f18f2e429c966a65909dc2559f8c0b56a8827d2",
+      "dependencies_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "rules_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "authorization_ref": "authorization-1"
+    },
+    "revoked_authorization": {
+      "authorization_ref": "authorization-1", "action": "ingest", "task_id": "task-1",
+      "learning_task_id": "task-learning-1", "raw_batch_id": "batch-1", "operation_id": "operation-1",
+      "policy_digest": "2804d87fa9e9db37c6b6fa7e968cf0b5b63e46c3ebe18c3ca5cc21598d04a426",
+      "submission_epoch": 1,
+      "candidate_digest": "e3286eaedb6b38d6c1863065e7c833609b9fb7ddc2e55c2533f786bcb4c2cb9e",
+      "readiness_digest": "cc8805d3bd6138d0e2841dba7f18f2e429c966a65909dc2559f8c0b56a8827d2",
+      "dependencies_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "rules_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "state": "revoked"
+    },
+    "stale_readiness": {
+      "learning_task_id": "task-learning-1", "raw_batch_id": "batch-1",
+      "candidate_digest": "e3286eaedb6b38d6c1863065e7c833609b9fb7ddc2e55c2533f786bcb4c2cb9e",
+      "coverage_digest": "3ecd94a21afea1a48830d4dae9bee43c8a86afd45a040d2a387228fd8e2b7b93",
+      "assessments_digest": "f07c4276de46502b74287651e3c67d4932c9665629c828da25d2f72b7391f9d1",
+      "evidence_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "dependencies_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "rules_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "required_credentials": [
+        {
+          "credential_ref": "assessor-opinion-1",
+          "credential_digest": "875f2c75bb74738d1703fc39e0c24d10a80c21db655e35a0f8f35a2c0b278757",
+          "content_digest": "d4e3d13792f14ca6cfca2bf0625195b29a52471c74f5347b188baee16904e517",
+          "role": "Assessor", "scope_kind": "understanding_assessment", "objective_ids": ["objective-core"]
+        },
+        {
+          "credential_ref": "final-reviewer-1",
+          "credential_digest": "f51fdfb17b830485b7b92336302380feb665e1a2060723254bfec2ed6dd0267c",
+          "content_digest": "3ecd94a21afea1a48830d4dae9bee43c8a86afd45a040d2a387228fd8e2b7b93",
+          "role": "Reviewer", "scope_kind": "final_candidate_coverage",
+          "objective_ids": ["objective-core", "objective-optional"]
+        }
+      ],
+      "blockers": [], "state": "stale"
+    },
+    "unauthorized_readiness": {
+      "learning_task_id": "task-learning-1", "raw_batch_id": "batch-1",
+      "candidate_digest": "e3286eaedb6b38d6c1863065e7c833609b9fb7ddc2e55c2533f786bcb4c2cb9e",
+      "coverage_digest": "3ecd94a21afea1a48830d4dae9bee43c8a86afd45a040d2a387228fd8e2b7b93",
+      "assessments_digest": "f07c4276de46502b74287651e3c67d4932c9665629c828da25d2f72b7391f9d1",
+      "evidence_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "dependencies_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "rules_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "required_credentials": [
+        {
+          "credential_ref": "assessor-opinion-1",
+          "credential_digest": "875f2c75bb74738d1703fc39e0c24d10a80c21db655e35a0f8f35a2c0b278757",
+          "content_digest": "d4e3d13792f14ca6cfca2bf0625195b29a52471c74f5347b188baee16904e517",
+          "role": "Assessor", "scope_kind": "understanding_assessment", "objective_ids": ["objective-core"]
+        },
+        {
+          "credential_ref": "final-reviewer-1",
+          "credential_digest": "f51fdfb17b830485b7b92336302380feb665e1a2060723254bfec2ed6dd0267c",
+          "content_digest": "3ecd94a21afea1a48830d4dae9bee43c8a86afd45a040d2a387228fd8e2b7b93",
+          "role": "Reviewer", "scope_kind": "final_candidate_coverage",
+          "objective_ids": ["objective-core", "objective-optional"]
+        }
+      ],
+      "blockers": [], "state": "current", "authorization_ref": "authorization-1"
+    },
+    "conflict_state": {
+      "task_id": "task-1", "learning_task_id": "task-learning-1", "raw_batch_id": "batch-1", "operation_id": "operation-1",
+      "candidate_digest": "e3286eaedb6b38d6c1863065e7c833609b9fb7ddc2e55c2533f786bcb4c2cb9e",
+      "dependencies_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "rules_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "state": "conflict", "recovery_status": "conflict"
+    },
+    "wrong_state_binding": {
+      "task_id": "task-1", "learning_task_id": "task-learning-1", "raw_batch_id": "batch-1", "operation_id": "operation-1",
+      "candidate_digest": "e3286eaedb6b38d6c1863065e7c833609b9fb7ddc2e55c2533f786bcb4c2cb9e",
+      "dependencies_digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "rules_digest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "state": "recovered", "recovery_status": "not_needed"
+    }
+  }
+}

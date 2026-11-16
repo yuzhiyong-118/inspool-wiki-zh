@@ -1,0 +1,60 @@
+{
+  "contract_version": "1.0",
+  "package_version": "1.0",
+  "source_id": "source-001",
+  "source_revision": "0000000000000000000000000000000000000000000000000000000000000000",
+  "input_type": "markdown",
+  "source": {
+    "origin": "user:资料.md",
+    "title": "示例资料",
+    "author": "",
+    "published_at": "",
+    "acquired_at": "2026-10-26T00:00:00Z",
+    "unavailable_fields": [
+      "author",
+      "published_at"
+    ]
+  },
+  "originals": [
+    {
+      "path": "original/资料.md",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "media_type": "text/markdown"
+    }
+  ],
+  "extracted": {
+    "path": "extracted/资料.md",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "media_type": "text/markdown"
+  },
+  "attachments": [],
+  "locators": [
+    {
+      "block_id": "b1",
+      "artifact_path": "original/资料.md",
+      "location": "lines:1-2"
+    }
+  ],
+  "parser": {
+    "adapter_id": "markdown",
+    "adapter_version": "1.0",
+    "parser_version": "identity-1",
+    "config_digest": "0000000000000000000000000000000000000000000000000000000000000000",
+    "used_ocr": false,
+    "used_model": false
+  },
+  "quality": {
+    "status": "complete",
+    "errors": [],
+    "missing": [],
+    "evidence": [
+      "UTF-8 严格解码成功；非空；原件和抽取字节一致"
+    ],
+    "statistics": {
+      "blocks": 1,
+      "characters": 10,
+      "pages_total": 0,
+      "pages_extracted": 0
+    }
+  }
+}

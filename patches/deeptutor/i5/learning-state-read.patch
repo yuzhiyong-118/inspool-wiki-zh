@@ -1,0 +1,287 @@
+--- a/deeptutor/api/routers/book.py
++++ b/deeptutor/api/routers/book.py
+@@ -773,6 +773,23 @@
+     }
+ 
+ 
++@router.get("/books/{book_id}/learning-state")
++async def get_book_learning_state(book_id: str) -> dict[str, Any]:
++    """Persisted reader observations; no UI defaults, writes or generation."""
++    from deeptutor.book.learning_state_read import BookStateUnavailable, read_learning_state
++    from deeptutor.services.workspace.context import current_workspace_id
++
++    resolved = _resolve_book_or_404(book_id)
++    try:
++        value = await asyncio.to_thread(read_learning_state, resolved, book_id)
++    except BookStateUnavailable as exc:
++        raise HTTPException(status_code=409, detail={"code": "book_state_unavailable", "observation": exc.item}) from None
++    user = get_current_user()
++    value["readerScope"] = {"workspaceId": current_workspace_id(), "actorId": user.id,
++                            "identityKind": "authenticated" if _auth_enabled() else "local_single_user"}
++    return value
++
++
+ @router.get("/books/{book_id}/content")
+ async def get_book_content(book_id: str) -> dict[str, Any]:
+     """Content evidence read: no resume, progress, chat or generation writes."""
+--- /dev/null
++++ b/deeptutor/book/learning_state_read.py
+@@ -0,0 +1,258 @@
++"""Strict, read-only observations of the selected reader's persisted state.
++
++This deliberately does not use the forgiving loaders or serialize Progress:
++their defaults are useful for the UI but are not historical observations.
++"""
++from __future__ import annotations
++
++import hashlib
++import json
++import math
++import os
++from pathlib import Path
++import stat
++from typing import Any
++
++from .learning_overlay import BookLearningOverlay
++from .storage import BookStorage, _safe_book_id
++
++SCHEMA = "book-learning-state-read/1"
++MAX_ITEM_BYTES = 16 * 1024 * 1024
++
++
++def _diagnostic(code: str, pointer: str = "") -> dict[str, str]:
++    return {"code": code, "pointer": pointer}
++
++
++def _failure(status: str, code: str) -> dict[str, Any]:
++    return {"status": status, "valueAcquired": False, "coverage": "partial",
++            "diagnostics": [_diagnostic(code)]}
++
++
++def _stamp(value: os.stat_result) -> tuple[int, ...]:
++    # Windows 3.12 exposes creation-time ctime via different pathname/handle
++    # APIs; atomic replacement can produce different ctime for the same inode.
++    # File identity, size and mtime remain comparable on both observation paths.
++    common = (value.st_dev, value.st_ino, value.st_size, value.st_mtime_ns)
++    return common if os.name == "nt" else (*common, value.st_ctime_ns)
++
++
++def _checked_path(path: Path, root: Path) -> Path:
++    # Anchor at the selected PathService, not at a resolved book directory
++    # which could itself have been redirected into another reader's store.
++    root = root.absolute()
++    path = path.absolute()
++    path.relative_to(root)
++    for item in (root, *reversed(path.parents), path):
++        if item == root or root in item.parents:
++            # lstat reparse attributes also cover junctions on Python 3.11,
++            # where Path.is_junction has not yet been introduced.
++            try:
++                reparse = bool(getattr(item.lstat(), "st_file_attributes", 0) &
++                               getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0))
++            except FileNotFoundError:
++                reparse = False
++            if item.is_symlink() or reparse:
++                raise ValueError("redirected_store")
++    resolved = path.resolve()
++    resolved.relative_to(root.resolve())
++    return resolved
++
++
++def _pairs(items):
++    value = {}
++    for key, item in items:
++        if key in value:
++            raise ValueError("duplicate_key")
++        value[key] = item
++    return value
++
++
++def _not_constant(_value):
++    raise ValueError("non_finite_json")
++
++
++def _float(value):
++    number = float(value)
++    if not math.isfinite(number):
++        raise ValueError("non_finite_json")
++    return number
++
++
++def read_item(path: Path, root: Path) -> dict[str, Any]:
++    """No writes. Compare pathname and open-file identity before/after read.
++
++    Detects observable replacement/deletion; this is not a cross-file lock or
++    a promise to detect an ABA entirely outside the observation window.
++    """
++    try:
++        checked = _checked_path(path, root)
++        before = checked.stat()
++        if not stat.S_ISREG(before.st_mode):
++            return _failure("invalid", "not_regular_file")
++    except FileNotFoundError:
++        return _failure("missing", "file_missing")
++    except (ValueError, RuntimeError):
++        return _failure("invalid", "path_outside_store_or_redirected")
++    except OSError:
++        return _failure("unreadable", "stat_failed")
++    try:
++        # Check the opened handle before obtaining bytes, so a visible race
++        # cannot import bytes from a replaced file as the selected record.
++        with checked.open("rb") as stream:
++            if _stamp(os.fstat(stream.fileno())) != _stamp(before):
++                return _failure("changed", "file_replaced")
++            data = stream.read(MAX_ITEM_BYTES + 1)
++            after_handle = os.fstat(stream.fileno())
++        after_path = _checked_path(path, root).stat()
++        if _stamp(before) != _stamp(after_handle) or _stamp(before) != _stamp(after_path):
++            return _failure("changed", "file_changed")
++    except FileNotFoundError:
++        return _failure("changed", "file_deleted_during_read")
++    except (ValueError, RuntimeError):
++        return _failure("changed", "path_redirected_during_read")
++    except OSError:
++        return _failure("unreadable", "read_failed")
++    if len(data) > MAX_ITEM_BYTES:
++        return _failure("unreadable", "item_size_limit")
++    facts = {"sha256": hashlib.sha256(data).hexdigest(), "byteLength": len(data)}
++    try:
++        value = json.loads(data.decode("utf-8"), object_pairs_hook=_pairs,
++                           parse_constant=_not_constant, parse_float=_float)
++        # Unpaired surrogates are not safe public UTF-8 JSON observations.
++        json.dumps(value, ensure_ascii=False, allow_nan=False).encode("utf-8")
++    except (ValueError, UnicodeError, RecursionError, OverflowError):
++        return {**_failure("invalid", "json_invalid"), **facts}
++    return {"status": "valid", "valueAcquired": True, "value": value,
++            "coverage": "complete", "diagnostics": [], **facts}
++
++
++def _issues(item: dict, problems: list[dict], *, invalid: bool = True) -> dict:
++    item["diagnostics"].extend(problems)
++    if problems:
++        item["coverage"] = "partial"
++        if invalid:
++            item["status"] = "invalid"
++    return item
++
++
++def validate_progress(item: dict, book_id: str) -> dict:
++    if not item["valueAcquired"]:
++        return item
++    value = item["value"]
++    if not isinstance(value, dict):
++        return _issues(item, [_diagnostic("progress_not_object")])
++    errors, omissions = [], []
++    if value.get("book_id") != book_id:
++        errors.append(_diagnostic("book_identity", "/book_id"))
++    strings = ("current_page_id",)
++    lists = ("visited_page_ids", "bookmarked_page_ids", "weak_chapters")
++    for name in (*strings, *lists, "quiz_attempts", "score", "updated_at"):
++        if name not in value:
++            omissions.append(_diagnostic("legacy_field_missing", "/" + name))
++    for name in strings:
++        if name in value and not isinstance(value[name], str):
++            errors.append(_diagnostic("expected_string", "/" + name))
++    for name in lists:
++        if name not in value:
++            continue
++        if not isinstance(value[name], list):
++            errors.append(_diagnostic("expected_array", "/" + name))
++        else:
++            for index, member in enumerate(value[name]):
++                if not isinstance(member, str) or not member.strip():
++                    errors.append(_diagnostic("expected_nonempty_string", f"/{name}/{index}"))
++    if "score" in value and type(value["score"]) is not int:
++        errors.append(_diagnostic("expected_integer", "/score"))
++    if "updated_at" in value and type(value["updated_at"]) not in (int, float):
++        errors.append(_diagnostic("expected_number", "/updated_at"))
++    if "quiz_attempts" in value:
++        attempts = value["quiz_attempts"]
++        if not isinstance(attempts, list):
++            errors.append(_diagnostic("expected_array", "/quiz_attempts"))
++        else:
++            for index, attempt in enumerate(attempts):
++                pointer = f"/quiz_attempts/{index}"
++                if not isinstance(attempt, dict):
++                    errors.append(_diagnostic("attempt_not_object", pointer))
++                    continue
++                for name in ("page_id", "block_id", "question_id", "submission_id", "user_answer", "is_correct", "timestamp"):
++                    if name not in attempt:
++                        omissions.append(_diagnostic("legacy_field_missing", pointer + "/" + name))
++                for name in ("page_id", "block_id", "question_id", "submission_id", "user_answer"):
++                    if name in attempt and (not isinstance(attempt[name], str) or
++                                            (name in ("page_id", "block_id") and not attempt[name].strip())):
++                        errors.append(_diagnostic("invalid_attempt_string", pointer + "/" + name))
++                if "is_correct" in attempt and attempt["is_correct"] is not None and type(attempt["is_correct"]) is not bool:
++                    errors.append(_diagnostic("invalid_verdict", pointer + "/is_correct"))
++                if "timestamp" in attempt and type(attempt["timestamp"]) not in (int, float):
++                    errors.append(_diagnostic("expected_number", pointer + "/timestamp"))
++    _issues(item, omissions, invalid=False)
++    return _issues(item, errors)
++
++
++def validate_mapping(item: dict) -> dict:
++    if not item["valueAcquired"]:
++        return item
++    value = item["value"]
++    if not isinstance(value, dict):
++        return _issues(item, [_diagnostic("mapping_not_object")])
++    # Do not echo arbitrary keys into diagnostics, including path-like keys.
++    problems = [_diagnostic("invalid_mapping_entry", f"/@entry/{index}")
++                for index, (key, session) in enumerate(value.items())
++                if not key.strip() or not isinstance(session, str) or not session.strip()]
++    return _issues(item, problems)
++
++
++class BookStateUnavailable(ValueError):
++    def __init__(self, item: dict):
++        self.item = {k: v for k, v in item.items() if k != "value"}
++
++
++def read_learning_state(resolved, book_id: str) -> dict[str, Any]:
++    """Use only stores chosen by the existing own/shared access resolver."""
++    _safe_book_id(book_id)
++    storage = resolved.engine.storage
++    if not isinstance(storage, BookStorage):
++        raise BookStateUnavailable(_failure("invalid", "unsupported_canonical_store"))
++    manifest = read_item(storage.path_service.get_book_manifest_file(book_id),
++                         storage.path_service.workspace_root)
++    if manifest["status"] != "valid":
++        raise BookStateUnavailable(manifest)
++    raw = manifest["value"]
++    # Validate the manifest without returning or defaulting any of its fields.
++    from .models import Book
++    try:
++        if not isinstance(raw, dict) or raw.get("id") != book_id:
++            raise ValueError("manifest_identity")
++        Book.model_validate(raw)
++    except Exception:
++        raise BookStateUnavailable(_failure("invalid", "manifest_invalid")) from None
++    learning = resolved.learning
++    if resolved.source == "own" and learning is storage:
++        root = storage.path_service.workspace_root
++        progress_path = storage.path_service.get_book_progress_file(book_id)
++        metadata = raw.get("metadata")
++        if "metadata" not in raw:
++            mapping = _failure("missing", "manifest_metadata_missing")
++        elif not isinstance(metadata, dict):
++            mapping = _failure("invalid", "manifest_metadata_invalid")
++        elif "page_chat_sessions" not in metadata:
++            mapping = _failure("missing", "manifest_mapping_missing")
++        else:
++            mapping = {"status": "valid", "valueAcquired": True,
++                       "value": metadata["page_chat_sessions"], "coverage": "complete", "diagnostics": []}
++        mapping["storage"] = {"kind": "canonical_manifest", "pointer": "/metadata/page_chat_sessions",
++                              "sha256": manifest["sha256"], "byteLength": manifest["byteLength"]}
++    elif resolved.source == "shared" and isinstance(learning, BookLearningOverlay):
++        root = learning.path_service.workspace_root
++        progress_path = learning._progress_path(book_id)
++        mapping = read_item(learning._chat_path(book_id), root)
++        mapping["storage"] = {"kind": "reader_overlay", "pointer": ""}
++    else:
++        raise BookStateUnavailable(_failure("invalid", "unsupported_learning_store"))
++    return {"schema": SCHEMA, "bookId": book_id,
++            "contentAccess": {"source": resolved.source, "permission": resolved.permission},
++            "progress": validate_progress(read_item(progress_path, root), book_id),
++            "pageChatSessions": validate_mapping(mapping),
++            "diagnostics": [], "consistency": "per_item_observation"}

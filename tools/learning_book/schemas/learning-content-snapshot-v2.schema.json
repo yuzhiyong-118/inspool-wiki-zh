@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "learning-content-snapshot/2"
+    },
+    "snapshotId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 180
+    },
+    "captureId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 180
+    },
+    "captureDigest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "activityId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 180
+    },
+    "bookId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 180
+    },
+    "scope": {
+      "type": "object"
+    },
+    "identity": {
+      "type": "object"
+    },
+    "captureStatus": {
+      "enum": [
+        "inconsistent",
+        "partial",
+        "stable_complete"
+      ]
+    },
+    "resultStatus": {
+      "enum": [
+        "partial",
+        "succeeded"
+      ]
+    },
+    "files": {
+      "type": "object",
+      "required": [
+        "content.json",
+        "resources.json",
+        "sources.json",
+        "capture.json",
+        "questions.json"
+      ],
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    },
+    "questionEvidenceDigest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  },
+  "required": [
+    "schema",
+    "snapshotId",
+    "captureId",
+    "captureDigest",
+    "activityId",
+    "bookId",
+    "scope",
+    "identity",
+    "captureStatus",
+    "resultStatus",
+    "files",
+    "questionEvidenceDigest"
+  ]
+}

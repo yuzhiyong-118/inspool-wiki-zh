@@ -1,0 +1,128 @@
+--- a/deeptutor/book/storage.py
++++ b/deeptutor/book/storage.py
+@@ -350,6 +350,70 @@
+         result.sort(key=lambda p: (p.order, p.created_at))
+         return result
+ 
++    def list_pages_strict(self, book_id: str) -> tuple[list[Page], dict[str, Any]]:
++        """Read every page JSON or return explicit incomplete diagnostics.
++
++        This is observational, not a cross-file transaction. Keep list_pages'
++        historical best-effort behaviour for existing callers. Error locations
++        are opaque inventory ordinals, never runtime paths or file contents.
++        """
++        book_id = _safe_book_id(book_id)
++        directory = self.path_service.get_book_pages_dir(book_id)
++        errors: list[dict[str, Any]] = []
++
++        def inventory() -> dict[str, tuple[int, int, int]]:
++            return {
++                path.name: (path.lstat().st_ino, path.lstat().st_size, path.lstat().st_mtime_ns)
++                for path in directory.iterdir() if path.suffix.lower() == ".json"
++            }
++
++        def unique(pairs):
++            result = {}
++            for key, value in pairs:
++                if key in result:
++                    raise ValueError("duplicate key")
++                result[key] = value
++            return result
++
++        try:
++            if directory.is_symlink() or directory.resolve() != directory.absolute():
++                raise ValueError("linked directory")
++            before = inventory()
++        except (OSError, ValueError):
++            return [], {"mode": "strict", "fileCount": 0, "returnedCount": 0,
++                        "errors": [{"code": "page_inventory_unreadable"}]}
++        result: list[Page] = []
++        seen: set[str] = set()
++        for index, name in enumerate(sorted(before)):
++            path = directory / name
++            location = {"fileIndex": index}
++            try:
++                if path.is_symlink() or path.resolve().parent != directory.resolve():
++                    raise ValueError("linked page")
++                data = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique,
++                                  parse_constant=lambda _: (_ for _ in ()).throw(ValueError()))
++                if not isinstance(data, dict) or not isinstance(data.get("id"), str):
++                    raise ValueError("missing explicit identity")
++                page_id = data["id"]
++                if page_id in seen:
++                    errors.append({"code": "duplicate_page_id", **location})
++                seen.add(page_id)
++                if _safe_page_id(page_id) != page_id or path.name != page_id + ".json":
++                    errors.append({"code": "page_file_identity", **location})
++                if data.get("book_id") != book_id:
++                    errors.append({"code": "page_book_identity", **location})
++                result.append(Page.model_validate(data))
++            except (OSError, ValueError, TypeError):
++                errors.append({"code": "page_unreadable_or_invalid", **location})
++        try:
++            if before != inventory():
++                errors.append({"code": "page_inventory_changed"})
++        except OSError:
++            errors.append({"code": "page_inventory_changed"})
++        result.sort(key=lambda p: (p.order, p.created_at, p.id))
++        return result, {"mode": "strict", "fileCount": len(before),
++                        "returnedCount": len(result), "errors": errors}
++
+     def delete_page(self, book_id: str, page_id: str) -> bool:
+         try:
+             path = self.path_service.get_book_page_file(
+--- a/deeptutor/api/routers/book.py
++++ b/deeptutor/api/routers/book.py
+@@ -771,6 +771,52 @@
+         "progress": progress.model_dump(mode="json"),
+         "generation": engine.generation_summary(book_id, book=book, pages=pages),
+     }
++
++
++@router.get("/books/{book_id}/content")
++async def get_book_content(book_id: str) -> dict[str, Any]:
++    """Content evidence read: no resume, progress, chat or generation writes."""
++    resolved = _resolve_book_or_404(book_id)
++    engine = resolved.engine
++
++    def _read() -> dict[str, Any]:
++        book = engine.load_book(book_id)
++        if book is None:
++            raise HTTPException(status_code=404, detail="Book not found")
++        spine = engine.load_spine(book_id)
++        pages, enumeration = engine.storage.list_pages_strict(book_id)
++        errors = enumeration["errors"]
++        ids = {page.id for page in pages}
++        if spine is None or spine.book_id != book_id:
++            errors.append({"code": "spine_missing_or_invalid"})
++        else:
++            for chapter in spine.chapters:
++                for page_id in chapter.page_ids:
++                    if page_id not in ids:
++                        errors.append({"code": "referenced_page_missing"})
++        for page in pages:
++            refs = [link.target_page_id for link in page.links]
++            if page.parent_page_id:
++                refs.append(page.parent_page_id)
++            if any(ref not in ids for ref in refs):
++                errors.append({"code": "referenced_page_missing"})
++        if book.page_count != len(pages):
++            errors.append({"code": "manifest_page_count"})
++        payload = book.model_dump(mode="json")
++        # Canonical manifests can contain the owner's chat mapping. A shared
++        # reader gets content, never that mapping or another learning overlay.
++        payload.pop("chat_session_id", None)
++        metadata = dict(payload.get("metadata") or {})
++        metadata.pop("page_chat_sessions", None)
++        payload["metadata"] = metadata
++        payload.update(resolved.capabilities())
++        return {"schema": "book-content-read/1", "book": payload,
++                "spine": spine.model_dump(mode="json") if spine else None,
++                "pages": [page.model_dump(mode="json") for page in pages],
++                "generation": engine.generation_summary(book_id, book=book, pages=pages),
++                "pageEnumeration": enumeration}
++
++    return await asyncio.to_thread(_read)
+ 
+ 
+ @router.get("/books/{book_id}/spine")

@@ -1,0 +1,80 @@
+--- a/deeptutor/book/blocks/quiz.py
++++ b/deeptutor/book/blocks/quiz.py
+@@ -40,14 +40,35 @@
+         # the slowest block in the book was discarded. Publishing to the book's
+         # own stream means the reader sees the quiz being written.
+         try:
+-            from deeptutor.agents.question.pipeline import QuestionPipeline
++            from deeptutor.agents.question.pipeline import QuestionPipeline, QuizTemplate
+             from deeptutor.core.context import UnifiedContext
+ 
+             from ..event_hub import get_book_bus
+ 
+             # Mirrors the facade's `_active_kb_name`: no KB when RAG is off.
+             effective_kb = ctx.primary_kb if (ctx.rag_enabled and ctx.primary_kb) else None
+-            pipeline = QuestionPipeline(language=ctx.language, kb_name=effective_kb)
++            prepared = params.get("prepared_templates")
++            templates = None
++            pipeline_options = {}
++            if prepared is not None:
++                required = {"question_id", "topic", "question_type", "difficulty",
++                            "reference_question", "reference_answer"}
++                if (not isinstance(prepared, list) or len(prepared) != num_questions
++                        or any(not isinstance(row, dict) or set(row) != required
++                               or any(not isinstance(v, str) or not v.strip() or len(v) > 32768
++                                      for v in row.values()) for row in prepared)):
++                    raise GenerationFailure("prepared_templates must match the requested count and reference schema")
++                if (len({row["question_id"] for row in prepared}) != len(prepared)
++                        or any(row["question_type"] != "choice" for row in prepared)
++                        or question_type != "choice"):
++                    raise GenerationFailure("prepared_templates require unique choice question identities")
++                templates = [QuizTemplate(**row, source="mimic") for row in prepared]
++                # Reviewed templates already include their bounded source.
++                # Reuse the pipeline's existing mimic path and question renderer.
++                effective_kb = None
++                pipeline_options = {"max_quiz_iterations_per_question": 2,
++                                    "builtin_tool_whitelist": set()}
++            pipeline = QuestionPipeline(language=ctx.language, kb_name=effective_kb, **pipeline_options)
+             result = await pipeline.run(
+                 context=UnifiedContext(
+                     session_id=f"book-{ctx.book_id}",
+@@ -60,6 +81,7 @@
+                 num_questions=max(1, int(num_questions or 1)),
+                 difficulty=difficulty,
+                 question_types=question_types,
++                templates_override=templates,
+                 stream=get_book_bus(ctx.book_id),
+             )
+             summary = dict(result.get("summary") or {})
+@@ -78,6 +100,7 @@
+                 "completed": summary.get("completed", 0),
+                 "failed": summary.get("failed", 0),
+                 "kb": ctx.primary_kb,
++                "prepared_templates": templates is not None,
+             },
+         )
+ 
+--- a/deeptutor/agents/question/pipeline.py
++++ b/deeptutor/agents/question/pipeline.py
+@@ -378,11 +378,13 @@
+         max_explore_iterations: int = DEFAULT_MAX_EXPLORE_ITERATIONS,
+         max_quiz_iterations_per_question: int = DEFAULT_MAX_QUIZ_ITERATIONS_PER_QUESTION,
+         runtime_config: dict[str, Any] | None = None,
++        builtin_tool_whitelist: set[str] | None = None,
+     ) -> None:
+         self.language = parse_language(language)
+         self.kb_name = (kb_name or "").strip() or None
+         self.enabled_tools = list(enabled_tools or [])
+         self.runtime_config: dict[str, Any] = dict(runtime_config or {})
++        self.builtin_tool_whitelist = builtin_tool_whitelist
+ 
+         # Pull the exploring sub-config. Direct kwargs win for callers that
+         # don't go through ``build_question_runtime_config``; runtime_config
+@@ -1631,6 +1633,7 @@
+             requested_tools=self.enabled_tools,
+             optional_whitelist=self._optional_tools,
+             mount_flags=self._mount_flags(context),
++            builtin_whitelist=self.builtin_tool_whitelist,
+         )
+         resolved = list(dict.fromkeys([*names, *self._pageindex_tool_names()]))
+         return drop_unconfigured_generation_tools(resolved)

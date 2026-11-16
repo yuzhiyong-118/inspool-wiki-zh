@@ -1,0 +1,61 @@
+{
+  "baseCommit": "60fb3bdfddb30b7740c7ce3bd9b28d908f2af6db",
+  "localPatchId": "learning-controlled-extension/1",
+  "parentPatchSha256": "e2d305ff66b1bc7ce94be6f396a3d62da146366945f19a1512d5cb31c0afae9d",
+  "parentReleaseSha256": "9ca10867c992729632ca3b4688a56a2828644f061db8bb51086422c1a0a9122d",
+  "files": {
+    "deeptutor/book/extension_delivery.py": {
+      "before": null,
+      "after": "f45ef57db082822e34e861367b1347f3166102ee501dfc3cd6f4d214c826c22c"
+    },
+    "deeptutor/book/extension_generation.py": {
+      "before": null,
+      "after": "65ab76732bab715f4b1490321ff5d572703ecd57ae5c041263c9a5666fc17784"
+    },
+    "deeptutor/book/question_publication.py": {
+      "before": "f5268dc483914898a5c97220295e5264f2108d68e0c8f94d10ea454848a41e93",
+      "after": "16c1e3daf8cc45804cd0de4f6444570ba8b29fc9df2a65b2c10a6d7d76dad44c"
+    },
+    "deeptutor/book/storage.py": {
+      "before": "1b3f48b4c7128548071afc173c75d7b81d7c96c7c60f3bb7b063843064758cdf",
+      "after": "a096336b1fecbdf632a438aa25db1d1ce9572e4c5bfad5bf90b2542df48ed40f"
+    },
+    "deeptutor/api/routers/book.py": {
+      "before": "850748f3c19522f5526f48da35f0b55d9258986411e5c4f0c7e643bf85489eac",
+      "after": "781d70999daf3d19ebcc7f1024558f568de1c99737ef2a8e721408f782a75aa4"
+    },
+    "deeptutor/book/blocks/_llm_writer.py": {
+      "before": "4693ea076085c98b0b280ae6b1ed1d9e48be728ca6ea45e21985a4b1bcb3bc93",
+      "after": "f6fec7ec578e4ce7ff1d5d4af5b429abe5360de020d8eea3fdac3c91dbd47ada"
+    },
+    "deeptutor/book/blocks/quiz.py": {
+      "before": "7cbfcac2f9476509777201f6e86b3fcaa4a20cfe9a59f4cbdb6d300351ea8d10",
+      "after": "03d3a2570c79d0494218a9bc75d615d3512ff7ef2c1ef495003e9139f3eef2b3"
+    },
+    "deeptutor/services/llm/metrics.py": {
+      "before": "87e246efc2d075d95874a0d2d9e1be6f6c3b21d363cafeff050f9945e352c6b3",
+      "after": "c0b9881739e67ae5dc7ce2eba172353a79f71853489793d8b822a2c1a2219bea"
+    }
+  },
+  "targets": {
+    "deeptutor/book/extension_delivery.py": "deeptutor_books-1.7.2-py3-none-any.whl",
+    "deeptutor/book/extension_generation.py": "deeptutor_books-1.7.2-py3-none-any.whl",
+    "deeptutor/book/question_publication.py": "deeptutor_books-1.7.2-py3-none-any.whl",
+    "deeptutor/book/storage.py": "deeptutor_books-1.7.2-py3-none-any.whl",
+    "deeptutor/api/routers/book.py": "deeptutor_books-1.7.2-py3-none-any.whl",
+    "deeptutor/book/blocks/_llm_writer.py": "deeptutor_books-1.7.2-py3-none-any.whl",
+    "deeptutor/book/blocks/quiz.py": "deeptutor_books-1.7.2-py3-none-any.whl",
+    "deeptutor/services/llm/metrics.py": "deeptutor-1.7.2-py3-none-any.whl"
+  },
+  "inputWheels": {
+    "deeptutor-1.7.2-py3-none-any.whl": "21cd839ede265f3e2b5a3ae35be489092f707936d1af6beafc795f1316048438",
+    "deeptutor_books-1.7.2-py3-none-any.whl": "2e5f1260f60f5eba7973fb7533a374da721e55ff3452c170e0fd7afa9f15e2ac",
+    "deeptutor_knowledge-1.7.2-py3-none-any.whl": "a6c1d28e2e87abf3e64cf1a40b2222ae10cc38440750a723ffd366ededee5903",
+    "deeptutor_mastery-1.7.2-py3-none-any.whl": "384a764a9e5b295d09f739065d8a420f896f0ec24fbe2ec5dfee4a0e00e00424",
+    "deeptutor_parsing-1.7.2-py3-none-any.whl": "523d52503bea0a634df7ab1d984ba2619e64d38851d4b5ee98a0b79873cd447c",
+    "deeptutor_questions-1.7.2-py3-none-any.whl": "4956d100ad1e1e326140d8eac1101463f6a840c88dc5ef5bedb4850e9adcec54",
+    "deeptutor_server-1.7.2-py3-none-any.whl": "799fe91eedea6efe787da5ab6218e24a56468ecc7e215cd6e9f2cc1341020b0b",
+    "deeptutor_visualize-1.7.2-py3-none-any.whl": "6b7d40426482551526af56838ef14cd9da148522bfcc388fe2bfdd955a5f9dfc"
+  },
+  "patchSha256": "8afa9d11d24aa930b716b0b5048f8fba00a9f0ac6a908c64c7ae97f73bdfe610"
+}

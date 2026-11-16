@@ -1,0 +1,27 @@
+{
+  "contract_version": "1.0",
+  "operation_id": "example-001",
+  "changes": [
+    {
+      "action": "write",
+      "path": "wiki/index.md",
+      "payload_path": "payload/wiki/index.md",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "precondition": {
+        "kind": "hash",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    {
+      "action": "move",
+      "source": "raw/unprocessed/示例.md",
+      "source_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "path": "raw/processed/示例.md",
+      "precondition": {
+        "kind": "absent"
+      },
+      "payload_path": "payload/raw/processed/示例.md",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  ]
+}

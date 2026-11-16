@@ -1,0 +1,62 @@
+{
+  "contract_version": "1.0",
+  "transitions": {
+    "prepared": [
+      "checking",
+      "failed"
+    ],
+    "checking": [
+      "repairing",
+      "rule_review",
+      "awaiting_human",
+      "ready_to_apply",
+      "applied",
+      "failed"
+    ],
+    "repairing": [
+      "checking",
+      "awaiting_human",
+      "failed"
+    ],
+    "rule_review": [
+      "repairing",
+      "checking",
+      "awaiting_human",
+      "failed"
+    ],
+    "awaiting_human": [
+      "checking",
+      "failed"
+    ],
+    "ready_to_apply": [
+      "checking",
+      "applying",
+      "failed"
+    ],
+    "applying": [
+      "applied",
+      "recovery_required"
+    ],
+    "applied": [],
+    "failed": [],
+    "recovery_required": [
+      "recovered"
+    ],
+    "recovered": []
+  },
+  "raw_transitions": {
+    "unprocessed": [
+      "pending_review"
+    ],
+    "pending_review": [
+      "processed"
+    ],
+    "processed": []
+  },
+  "notes": [
+    "checking 到 applied 只用于无写入只读操作",
+    "awaiting_human 必须重新 checking，不能直接应用",
+    "raw 的 pending_review 到 processed 必须有可信用户批准",
+    "恢复失败保持 recovery_required；recovered 是本次操作终态"
+  ]
+}
