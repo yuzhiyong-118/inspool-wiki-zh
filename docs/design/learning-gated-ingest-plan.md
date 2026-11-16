@@ -5,10 +5,24 @@ status: proposed
 updated: 2026-11-08
 topic: 教学闭环与知识维护
 ---
-
 # 学习驱动的知识入库与分级证据校验方案
 
 > 公开版本：保留通用契约与方案；历史验收、用户反馈、运行记录及本地素材不随仓库发布。文中状态与验收计数对应原文写作时点的环境，不代表当前部署或验收完成。
+> 设计方案 v0.7。此前统一运行时及八项修订复核通过见[审查记录](learning-ingest-review.md)第 14 节；2026-11-06 补充持久循环、可恢复步骤、SQLite 与受控扩展，具体见[运行时设计](learning-ingest-runtime-loop.md)。本次新增设计经独立复审通过见第 20 节，新增协议尚未实现或验收。本文**不是已部署功能或现行规则**。本轮只保存设计，不安装技能或 MCP、不处理真实 raw、不更改 AGENTS、ADR、公共契约及执行器。现有协作门禁和已接受的宿主权限限制继续有效。
+
+快速审阅建议：先看第 2 节的入库边界、第 3 节的总体架构、第 6–8 节的分级与冲突链路，以及第 12–13 节的实体、授权和门禁协议。第 14、17 节提供外部调研与出处。
+
+v0.2 补充：第 4 节增加可演进的来源注册与路由；第 6 节按问题选择学术、官方、博主及社区证据；第 15 节拆成六阶段，详见[分阶段调研与实施路线图](learning-ingest-stages.md)。
+
+v0.3 修订：第 9.4、13 节补齐最终候选覆盖不变量；第 4.3、10–12 节明确补证提升、角色认证、长期预算与局部失效边界。五项重要改进落实到路线图的阶段输入、验收和停止条件；这些约束尚待实施验证。
+
+v0.4 补充：保存整体可行性讨论的五项优化——学习知识版本与最终事务分离、贯穿各阶段的小样例、四模块实现、判分器校准、用户时间与学习收益观测。对应 §3.1、§10.1、§15 及 R16–R19，均为待试点验证的设计判断；没有新增“效果已证明”的结论。
+
+v0.6 修订：由 Host 内的 Durable Task Runtime 统一管理长期任务、跨 Run 预算和租约；统一授权语义但保留 ingest 与 approve 的不同凭据边界；正式事务继续由现有 Executor 独立负责；Source／Evidence／Claim 及依赖传播归入统一知识证据子系统。四项均为逻辑职责和数据所有权划分，不新增四套服务。
+
+v0.7 修订：任务运行时成为 Task／Run／Invocation、预算、授权和结果登记的唯一协调权威，Host 只负责交互、工具和身份接入；单次原子预留同时检查 Task、Run 和并发限制；KnowledgePackage 成为证据、输出、学习和知识沉淀共享的稳定版本化产物；可信审查凭据只有在完整绑定和独立身份成立时才允许复用。
+
+实施状态（2026-11-08）：S1 的 T0–T6 已完成各自实现、真实临时库故障测试与独立复审，最终合并 124 项通过；T7 组合矩阵和后续业务阶段尚未完成。上述实施不改变本文的设计状态，不证明真实宿主 Attestation、真实 L3 或教学效果，详见[审查记录](learning-ingest-review.md) §28。
 
 ## 1. 目标与范围
 
@@ -25,6 +39,23 @@ topic: 教学闭环与知识维护
 
 本文中的阈值和预算均是**待试点调整的建议值**，不是已验证最优参数。
 
+## 2. 与当前流程的区别
+
+现行 AGENTS 的 ingest 会先更新 wiki，完成配套文件后把 raw 标为 pending_review；用户批准后再迁入 processed。新提案将“候选教学与理解验收”前移到正式 ingest 应用之前。
+
+| 阶段 | raw 流程状态 | 正式 wiki | 学习材料与运行记录 |
+| --- | --- | --- | --- |
+| 接收、抽取与候选准备 | unprocessed | 不改 | 保存输入快照、候选和来源包 |
+| 出课、学习、讨论、补讲 | unprocessed | 不改 | 保存课程、学习进度与相关证据 |
+| 理解验收通过，等待确认 | unprocessed | 不改 | 绑定候选版本的理解验收记录 |
+| 用户确认应用，Executor 成功 | pending_review | 同批更新页面、反向关系、索引、overview 和日志 | 保存应用与审查记录 |
+| 用户明确批准该批次归档 | processed | 同步修复 raw 引用 | 按现有 approve 流程归档 |
+
+保留 ingest 应用与 approve 归档两步。用户可以在同一条明确指令中表达同一批次的组合处理意图，但这只记录流程意图，不预先生成未来 approve 的真实凭据；ingest 应用报告及 approve 候选生成后，仍须 owner 对实际 approve context 独立确认。理解通过本身不构成归档批准，系统不能静默合并。
+
+学习状态单独保存，不扩充或混用 raw 的三个 processing_status。与现有 AGENTS、固定入口和契约的冲突应在实施前单独列明，经用户批准后统一修订；不能只新增一份 skill 就声称规则已经生效。
+
+已有 pending_review 和 processed 批次不自动回退，不补造学习通过记录。新流程只用于用户明确开启的批次；既有知识可以另建复习或修订任务，避免把历史库一夜之间变成“全部未整理”。
 
 ## 3. 完整链路与暂停恢复
 
@@ -44,6 +75,7 @@ flowchart TD
     I --> J{独立理解验收}
     J -- 未通过 --> I
     J -- 新事实或争议 --> C
+    J -- 通过 --> K[用户确认应用]
     K --> L[现有门禁与 Executor 重新核验]
     L --> M[正式更新 wiki 与 pending_review]
     M --> N[具体批次 approve 后归档]
@@ -69,6 +101,7 @@ flowchart LR
     E --> F[现有 Executor 复验与应用]
 ```
 
+此优化不允许最后生成候选时夹带知识：若最终 diff 新增语义关联、结论或删除造成的范围变化，必须重新映射并返回相应证据／教学检查。早期预览通过不能代替最终 diff 的 B1 覆盖检查，知识版本摘要也不能替代事务依赖摘要或用户确认。S0 要明确两类身份、绑定及编译接口；具体字段和实现尚未确定。
 
 ### 3.2 总体架构与数据所有权
 
@@ -125,9 +158,9 @@ S0 定义实体、模块接口、状态所有权和贯穿场景；S1 实现统�
 ### 3.5 持久循环、存储与扩展决策
 
 具体契约、故障矩阵及阶段前置见持久循环与受控扩展设计（未随公开仓库附带）。采用持久事件→确定性状态迁移→待执行工作→有界 Step→结果归并的循环；事件去重、状态和后续工作由 SQLite 事务串联。Task 执行状态与学习领域阶段分开，Run 是有界活动执行，Invocation 是一次实际外部调用；会话接续只作优化，恢复依赖持久资料与版本绑定。
+具体契约、故障矩阵及阶段前置见[持久循环与受控扩展设计](learning-ingest-runtime-loop.md)。采用持久事件→确定性状态迁移→待执行工作→有界 Step→结果归并的循环；事件去重、状态和后续工作由 SQLite 事务串联。Task 执行状态与学习领域阶段分开，Run 是有界活动执行，Invocation 是一次实际外部调用；会话接续只作优化，恢复依赖持久资料与版本绑定。
 
 工作流、能力与宿主适配器显式注册，固定版本及必需门禁，不建设通用插件平台、热更新、DSL 或完整事件溯源。插件只提议变更；身份、预算、授权和正式写入约束统一执行。S1 仅用合成工作流证明机制，真实证据及教学仍在 S2／S3 验收。目标入口统一委托 Runtime；旧入口若保留仅作适配，不维护双运行模式。数据库事务不代替 Executor 完整 WAL，两者继续通过同一接受屏障协调。
-
 
 ## 4. 输入分类与工具路由
 
@@ -188,9 +221,35 @@ S2 依据该协议实现最小证据与持久来源映射，S3 消费同一证�
 
 | 材料 | 获取／教学范围 | 自动应用范围 |
 | --- | --- | --- |
+| 完整且可追溯的文本 | 经证据、课程审查后教学 | 作为首个闭环样例；须 S5 验收，不等于现已部署 |
 | PDF／OCR／多模态来源 | 按实际可读范围研究或人工补充；提取成功不等于核验通过 | 保留现有暂停策略，扩展支持另做样例验收 |
 | partial／仅摘要可读 | 只讨论可见内容；缺失部分不能支持核心结论或判分 | 不能冒充完整来源；不得改扩展名或删来源类型绕过 |
 
+## 5. 准备提供的工具与接入状态
+
+“已存在模块”“本机可调用”“已接到新流程”分别记录。本表中的服务能力来自官方说明，尚未做服务质量或成本对比，不表示它们都已经安装。
+
+| 能力 | 首版选择 | 状态与边界 |
+| --- | --- | --- |
+| 本地知识检索 | 文件搜索、wiki 索引、关系字段与双链 | 现有能力；需增加主张与证据检索封装 |
+| 通用网络搜索 | 宿主已有搜索 | 本会话可用；其他宿主需提供等价能力 |
+| 可移植搜索 MCP | Tavily／Exa 选一个 | 待选、未接入；不同时安装两个重复覆盖的服务 [R8][R9] |
+| AI 资讯检索 | AIHOT 只读 API；需要时使用其 MCP | 已核对接口说明，未接入学习流程 [R10] |
+| 网页正文提取 | 优先宿主读取；Defuddle 适配 | 技能可参考，当前环境未检测到独立 defuddle CLI；不得把技能存在当作命令已安装 |
+| 难提取页面 | Firecrawl，可选升级 | 官方工具候选；仅在普通提取失败或缺正文时调用，不默认整站抓取 [R7] |
+| 仓库核对 | GitHub API／本地 Git 和文件读取 | 现有工具可完成，MCP 不是前置要求 |
+| 博主与社区资料 | 已有搜索／正文读取，按需增加 RSS 或特定站点读取适配 | 拟增加可演进的来源注册；不默认监控、登录或抓取整个社区 |
+| 学术发现与状态核对 | 文献平台／期刊页、DOI 与 Crossref／Crossmark，可选适配 | 待调研接入；知网全文按实际访问条件处理，不宣称已有匿名全文 API；Crossmark 有覆盖边界 [R14][R15] |
+| 仓库结构探索 | DeepWiki，可选 | 当前未接入；问答作线索，不替代一手证据 [R11] |
+| 版本化文档 | Context7，可选 | 当前未接入，不能替代概念研究和项目核验 [R12] |
+| PDF／OCR | 现有 PDF 工具与保守 partial 策略 | 视觉核对与 OCR 按需处理，不伪称已无缝全支持 |
+| 主张与证据登记 | SQLite 领域记录＋按摘要保存的 Markdown／JSON 产物 | 待实现，复用来源包、摘要与依赖校验；产物文件不是第二账本 |
+| 课程、学习与冲突管理 | SQLite 受控领域状态＋最小独立角色 | 待实现，采用本地事务存储，无数据库服务 |
+| 入库与恢复 | Step Driver／现有 Executor | Coordinator 重构为统一执行 Driver；Executor 保留文件接受与恢复，新学习门禁尚未接入 |
+
+补充的工具链重点是“保留来源、记录版本、去重、识别变化、控制预算”，不是不断增加搜索引擎。
+
+AIHOT 采用提供方自己公布的 API／MCP，资讯证据仍按聚合来源对待。已核对的接口版本为 2.0.0、路径仍为 /api/v1；items 支持关键词和分类，但只有最近七天窗口。保留原文链接和时间信息，遵守缓存、ETag、Retry-After，不默认全量同步或定时监控。本方案用于当前个人知识库，若以后扩展为对外服务，需重新核对其使用范围与条款。[R10]
 
 ## 6. 工具、来源与信息的独立分级
 
@@ -244,7 +303,6 @@ S1／S2 描述证据角色，不是永远固定的高低顺序。针对“是否
 
 若界面需要置信度标签，只展示“依据充分／有条件支持／依据不足／有争议”，附依据与日期；不将多个来源的标签简单求平均。
 
-
 ## 7. 触发条件与处理优先级
 
 | 优先级 | 触发条件 | 必须动作 | 不允许的降级 |
@@ -257,7 +315,6 @@ S1／S2 描述证据角色，不是永远固定的高低顺序。针对“是否
 触发还包括：输入内容／主张摘要改变、被引用来源修订或撤回、依赖版本改变、用户提出有根据的反例、课程审查发现错误。单纯打开页面或重建索引不触发新课程。
 
 同一主张出现多个触发时取最高优先级，记录触发理由。P0 是处理优先级和局部阻断，不是无限预算；普通疑似差异可先快速核对版本、定义和时间，澄清后留下记录并解除阻断。
-
 
 ## 8. 知识冲突核验链路
 
@@ -274,7 +331,6 @@ S1／S2 描述证据角色，不是永远固定的高低顺序。针对“是否
 unresolved 默认不允许受影响的确定性结论或单一答案题入库。其他知识点可以继续学习，但该 ingest 单元保持未整理。用户以后如希望保存“争议本身”，应另行明确批准按争议性知识组织：保留双方观点与证据，验收理解争议及限制，而不是要求选择某方正确；默认不自动启用这一例外。
 
 用户对模型判分的反例也可以触发本链路。若发现是系统、题目或来源错误，修正相关判分并保留原因，不把它算作用户知识薄弱点。
-
 
 ## 9. 课程、练习、追问与验收
 
@@ -319,7 +375,6 @@ unresolved 默认不允许受影响的确定性结论或单一答案题入库。
 
 固定反例：候选从首次冻结就含 A、B，只讲并验收 A，B 从未进入映射；即使候选摘要不变，L3 也必须拒绝。S0 固定该例和可选项正例，S2 建 Wiki 候选完整映射，S3 绑定并核验必过／复用目标，S5 对真实最终 diff 重验。
 
-
 ## 10. 角色与调用策略
 
 | 角色 | 职责 | 何时调用 |
@@ -331,6 +386,7 @@ unresolved 默认不允许受影响的确定性结论或单一答案题入库。
 | Reviewer／Assessor | 独立审查课程与判分依据；验收理解 | 对明确的候选／目标集合批量审查，不每句话都开代理 |
 | Conflict Reviewer | 针对争议进行独立证据核验 | 仅 P0；不自动改规则或授予例外 |
 | Rule Auditor | 审查运行规则／验证器争议 | 有实际失败与申诉依据时，复用现有有界协议 |
+| Executor | 写入前复验并应用、保留恢复记录 | 用户确认后，使用已有流程 |
 
 角色是职责边界，不等于每轮都启动七个 SubAgent。默认同一宿主模型，独立审查使用新的最小上下文，只带任务、规则、原文／证据、候选或作答；不携带生成者的自我辩护。普通授课不无条件开并行代理；冲突任务才追加核验角色。
 
@@ -349,7 +405,6 @@ S0 要给出上述读写／认证责任的最小接口与真实宿主能力清�
 Researcher、Tutor、Reviewer、Assessor、Conflict Reviewer 和 Rule Auditor 共享 Task Runtime 的 Invocation 组件，以角色配置、输入契约和独立任务上下文区分职责。共享模型和基础代码不代表共享身份、权限或统计独立性；每次调用绑定 task、run、invocation、role、输入与证据版本、规则版本和宿主认证记录。
 
 独立审查针对冻结输入和产物形成 ReviewCredential，绑定内容、证据、规则、审查配置、角色和适用范围。只有由 Task Runtime 认证独立调用、完整记录不可变且最终接受时所有绑定仍有效，才允许复用相同语义范围的审查结果。摘要匹配本身不证明语义正确；可信身份或绑定能力未实现时，保留 Executor 重新调用独立 Reviewer，不得以 Coordinator 自带报告替代。
-
 
 ## 11. 调用成本、缓存与停止条件
 
@@ -379,7 +434,6 @@ Task Runtime 只维护一份权威 Invocation 记录和账本。每条记录包�
 复习单独计预算。忘记某个知识点不撤销合格的知识页；发现知识本身错误才启动修订与影响追踪。
 
 同时观测用户成本：实际学习时间、追问／补讲次数、重复确认、恢复学习需要的额外步骤。等待用户不计入模型活动时间，也不能把等待时长冒充学习时间。没有可靠记录时标 unknown。延迟复习是可选效果观察，不能变成长时间入库前置；观察指标与模型／工具预算分别记录。
-
 
 ## 12. 实体、状态与持久化
 
@@ -440,7 +494,6 @@ Assessment 同时绑定实际 rubric_template、rubric 和 evaluator 的版本�
 
 这些仍是待实现的数据契约提案，不是现有 schema。模型不能自填 passed，Task Runtime 的确定性复验只验证字段、引用、摘要、状态、预算和审查凭据，不代替知识、课程或理解的语义判断。
 
-
 ## 13. Readiness、授权与正式写入门禁
 
 暂用 L 前缀区分拟新增教学检查，不占用或重定义现有 G0–G5：
@@ -452,6 +505,7 @@ Assessment 同时绑定实际 rubric_template、rubric 和 evaluator 的版本�
 
 ### 13.1 单向授权协议
 
+用户授权在 L3 之后生成，Task Runtime 侧统一审计语义包含 action、learning_task_id、raw_batch_id、operation_id、candidate_digest、readiness_digest、dependencies_digest 和规则版本。fencing token 是应用时的执行所有权检查，不属于用户业务授权本身，正常更换 Run 不应单独使用户确认失效。
 
 - `ingest_authorization` 是 Task Runtime 管理的新增业务授权，Host 只提供 owner 交互与身份入口。Task Runtime 在普通 ingest 的 Executor apply 前预检，Executor 还须按 §12.4 在 G3 后、首个 WAL 前最终重验；不能声称现有 ApprovalStore 已支持 ingest。
 - `approve_authorization` 继续使用现有 ApprovalStore、ApprovalHandle、完整 Executor context 和 G4。统一审计字段不直接加入封闭的 v1 ApprovalStore context；Task Runtime 私有映射关联 `approval context_digest ↔ learning_task_id／raw_batch_id／ingest execution_result`。
@@ -464,3 +518,140 @@ Assessment 同时绑定实际 rubric_template、rubric 和 evaluator 的版本�
 执行前撤销只使对应授权和待执行操作失效。ingest 已应用后需要撤回时，创建具有新 operation_id、候选和独立授权的补偿性维护事务，保留原历史。approve 已归档后同样通过新的补偿事件处理，不删除旧批准或静默反向迁移 raw。
 
 公共契约 v1 继续冻结。未来若 L 检查或 Readiness 需要进入公开契约，先写版本差异、旧任务兼容和迁移测试，再统一发布；不临时给现有报告塞字段放行。
+## 14. 公开项目与技能调研
+
+调研日期：2026-11-02。搜索入口包括 skills.sh 目录、`npx skills find mastery`、`npx skills find knowledge`、GitHub 检索与官方 API。已核对以下项目元数据及关键源码段落；未安装、未执行、未评测其教学效果。安装量取当次目录输出，Star 取 GitHub API 快照，二者不能相互替代。
+
+| 来源与快照 | 已核对的机制 | 拟吸收／不采纳 |
+| --- | --- | --- |
+| [R1] mattpocock/skills：309,033 Star；commit 4ae2317 | teach 的学习目标、课程与学习记录；grill-me 当前转调 grilling，后者按决策树前沿成批提问并给推荐答案 | 复用短课和记录；借鉴依赖关系；验收改为逐问且不先给答案，不原样调用整套 grilling |
+| [R2] rodbv/socratic-skills：20 Star；commit dda051c | quiz-me 针对材料检验原因，回答含糊或错误时先追问，再给简短纠正 | 只参考追问与反馈设计；小项目不作为成熟裁决引擎，无提示的完整验收另设 |
+| [R3] sanyuan0704/sanyuan-skills：3,969 Star；commit 08b6572；book-study 目录显示约 3.5K 安装 | 章节学习、掌握图、测试与复习、跨书关联 | 借鉴知识点覆盖图与跨资料连接；不照搬书籍目录或另一套正式知识库 |
+| [R4] Bhala-Srinivash/agent-tutor-skill：14 Star；commit e273585 | 讲解→例子→检查→反馈→练习，概念级学习状态、无提示测验及 FSRS 复习设计 | 借鉴教学／验收分离与误解记录；不采用凭模型记忆补事实、未经评测的掌握概率或“保证不遗忘”表述 |
+| [R5] lowwwbank/anything-to-course：29 Star；commit f11bbf2 | 先定义可观察能力与前置依赖，再排课程；缺资料明确标缺口 | 借鉴目标—课程—练习对齐；不默认把短资料扩成大课程 |
+| [R6] Mohamed-El-Sharqawy/agent-tutor：7 Star；commit 5651e2e | Markdown／Obsidian 学习笔记、学习者档案、题目反馈与补教；项目示例使用 70% 通过线 | 借鉴可携带的文本进度；不采用总分抵消核心误解或完整 dashboard 每次重建 |
+| [R13] inkeep/open-knowledge-skills：15 Star；commit 6f27139；discovery 目录显示约 15.1K 安装 | research-with-sources 先查已有覆盖、保留原始来源再研究；研究草稿不直接升级为正式知识 | 借鉴来源保存和候选／正式分离；不迁移到其 MCP／OKF 数据体系，不采用自主模式跳过本项目确认 |
+| [R7] firecrawl/firecrawl-workflows：214 Star；commit d2a9862；knowledge-ingest 目录显示约 31.5K 安装 | 对 JS／分页文档门户抓取，保存来源、提取时间、文章信息及失败页 | 官方供应方可作提取候选，仍需试点；不默认全站抓取、启用付费账户或让其写正式库 |
+
+目录结果存在不匹配：例如 mastery 搜索返回大量非教学技能。只收录实际核对过内容的项目。小众技能只作为设计样本；供应方官方身份、高安装量和来源依据充足是不同指标。
+
+此外，grill-with-docs 当前入口文件很短且继续转调其他技能，仅核对到这一入口，不把它宣传为已验证的完整知识维护流程。先前目录中的 coding-tutor 也不能仅凭目录介绍认定仍存在于上游最新布局。
+
+调研补充了四项设计：知识点覆盖图；提示／独立作答分开记录；目标与题目逐项对齐；先保存来源和草稿再提升为正式知识。以上均需在本库样例中验证，不能用项目自述替代效果评测。
+
+## 15. 最小试点与验收案例
+
+### 分步实施建议
+
+建议拆成六阶段，每阶段开始前做一次有范围的定向调研，完成最小试点和验收后再推进。当前宏观调研不替代阶段实测，也不提前承诺所有候选服务都接入。
+
+| 阶段 | 交付 | 主要依赖 |
+| --- | --- | --- |
+| S0 实体、接口与场景 | 模块边界、状态所有权、核心协议、三个贯穿场景和验收映射 | 用户审阅总体方案 |
+| S1 持久循环与事务基础 | SQLite、Event／Step／Wait、统一 Invocation、能力注册、授权和文件恢复 | S0 既有协议及新增循环契约验收 |
+| S2 最小知识链与 Wiki 候选 | Source／Evidence／Claim、KnowledgePackage、最小核验和 Wiki 候选生成 | S1 |
+| S3 学习与独立验收 | 课程、学习反馈、独立理解验收及必需的判分校准 | S2 |
+| S4 来源与输出扩展 | 来源演进、扩展校准和其他输出类型 | S3 |
+| S5 真实知识沉淀验证 | 真实小批次的正确性、用户负担、运行成本、正式入库与恢复 | S4 |
+
+每阶段的调研问题、样例、停止条件与验收交付见[分阶段调研与实施路线图](learning-ingest-stages.md)。不在本轮一次性创建六套运行框架或修改现行入库规则。
+
+### 贯穿样例、判分校准与学习效果
+
+六阶段门禁保留，S0 选定同一组小样例，S1–S4 随各自前置完成逐步连接已有部分，S5 做最终完整验收，不等到 S5 才第一次核对接口组合。只使用临时库与合成／明确允许的样本；缺部件标“未实现”，不得用替身冒充真实宿主或阶段通过。三个贯穿场景：
+
+1. 完整文本：持久原文→Source／Evidence／Claim→短课→适用校准→独立作答→最终候选→Readiness→ingest 授权与 Executor→approve 授权与独立事务。
+2. 外部证据纠正原 raw：包含独立采集授权、持久原文、Evidence–Claim 关系、冲突裁决、依赖传播和最终 G3 实际原文输入。
+3. 跨会话暂停恢复：包含共享预算继承、旧 generation 迟到提交拒绝、无关库变化、相关证据变化、事务重建，以及 Executor 已接受事务在原租约失效后的独立恢复。
+
+S0 确定审查器／判分器的校准方法；S3 固定教学目标与判据，并实测当前范围必需的模板–evaluator 校准、接入 L2；S4 只扩展适用领域和成本验证。不同上下文有助于职责分离，但不能假定同一模型的错误彼此独立，也不靠增加模型票数放行。校准材料至少覆盖：简短正确、措辞不同但推理成立、流畅却缺关键条件、照搬提示、用户正确纠正标准答案、概念理解正确但迁移失败、提示后正确但独立作答失败、核心目标遗漏。
+
+案例预期判断须经原始证据与独立人工或领域复核确定。固定案例和 holdout 在调试前确定；holdout 的结果、错误详情或内容一旦用于修改 rubric、提示词、规则或 evaluator，即失去 holdout 资格并迁入调试集。重复判分的次数、输入和配置预先固定，禁止选择性重跑；不一致裁决绑定原回答、rubric、原始证据和独立复核结论，不能以多数票或修改预期标签消除失败。
+
+核心目标误放行、提示复述被当作独立掌握、目标证据类型互相替代、关键条件缺失仍通过、重复判分不一致未裁决，以及 rubric／evaluator 变化后沿用旧 Assessment，均阻断 L2。正式独立验收使用已通过适用校准的 rubric–evaluator 组合；校准修复后不得把旧 Assessment 与新校准凭据拼接放行。
+
+记录误放行、误拦截、重复评估不一致、追问次数和人工纠正。小样本只用于定位失败，不宣称已经估计可靠总体准确率。R18 支持检查判分偏差的必要性，不提供当前模型误差率。S0／S3／S4 分阶段确定判据、可接受边界和失败处置，不编造统一百分比。
+
+用户效果另行观察：是否能在已讲范围内的新情境中应用、完成一批的实际耗时、重复解释与确认负担、暂停后是否容易继续。条件允许时用范围与难度相近材料，对比简单的“讲解＋练习”基线，判断新增流程是否带来收益；单个用户的小试点不声称证明普遍因果效果。可选延迟检查用于了解保持情况，不把一次验收通过写成长期掌握，也不因此撤销合格知识页。R19 为检索练习提供教学研究依据，不直接证明本系统的 AI 教学有效。
+
+已有资料足以启动有界设计；新增研究只围绕会影响接口或试点判据的缺口。优先补简单工作流、持久化边界、判分偏差与学习效果四类资料，不继续扩张技能／工具清单。采用新模块、新来源机制或更多 Agent 前，要说明试点中的质量或成本收益。
+
+### 流程与门禁案例
+
+- 新内容先有完整讲解，用户可以在学习阶段要求解释；不能直接给考试。
+- 用户未理解／未确认时，学习 ingest 不改变正式 wiki、索引和 raw 状态。独立获准的补证 capture/import 按 S0 选定协议单独核验其允许副作用；它不构成学习 ingest 的应用确认，原批次不得因此推进。
+- 结构通过但语义扩大，课程审查能指出；用户正确质疑系统时不判其错误。
+- 同内容不同扩展名不改变事实核验路径；partial PDF 不冒充完整原文。
+- 旧版与新版不同能归为条件变化；同条件事实互斥触发 P0，预算不足则停止。
+- 用户同意、多数模型同意、高 Star、多份同源转载，均不能替代冲突直接证据。
+- 无提示复述、迁移与有提示表现分开；不因总分高忽略核心误解。
+- 机械重建索引不出课；相同证据不重复抓取；接口失败不会换一个工具无限重试。
+- 学习中源码／来源／候选变化只让相关记录失效，应用前不能复用旧通过记录。
+- 学习暂停与重启保留预算和进度；正式应用中断继续复用既有恢复与冲突检测。
+
+## 16. 请优先审阅的取舍
+
+1. **入库边界**：是否采用“理解通过并确认后应用为 pending_review，再单独 approve”的首版建议？
+2. **未解决争议**：默认阻断该 ingest 单元；是否允许你另行确认按“争议本身”作为学习成果入库？
+3. **必过目标**：每节 3–5 个关键点是否适合；核心点必过、可选点不阻塞是否合适？
+4. **预算**：C0–C3 的默认投入、每点两次额外追问是否合适；扩大研究前是否逐次询问？
+5. **存储与隐私**：长期保留课程、理解摘要和哪些回答证据；完整对话默认不发布。学习资产是否最终单独集中到 docs/learning，由你决定。
+6. **首版工具**：先用已有搜索、GitHub 和 AIHOT；Tavily／Exa 是否需要现在选一个，或等试点结果再决定？
+
+v0.2 新增审阅点：来源按主题逐步试用与启用、关键裁决用途独立复核的演进边界是否合适；是否按 S0–S5 六阶段推进。具体博主、社区和学术平台名单可以随阶段 S1 逐步补充，不要求现在一次列全。
+
+## 17. 来源与固定版本
+
+以下链接供查证，不要求学习时全部加载。动态接口文档的核对日期均为 2026-11-02；工具未实测项目明确列为待验证。固定 commit 代表此次阅读版本，不表示应永远使用该版本。
+
+- [R1：teach](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/productivity/teach/SKILL.md)；[grilling](https://github.com/mattpocock/skills/blob/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d/skills/productivity/grilling/SKILL.md)。
+- [R2：quiz-me](https://github.com/rodbv/socratic-skills/blob/dda051c2b4390d19d32b33edc222abbfa39927ac/skills/quiz-me/SKILL.md)。
+- [R3：book-study](https://github.com/sanyuan0704/sanyuan-skills/blob/08b6572ef108f22d4e8a3ecf9182a4bbef097744/skills/book-study/SKILL.md)。
+- [R4：agent-tutor-skill](https://github.com/Bhala-Srinivash/agent-tutor-skill/blob/e273585b542d1d77b72c87eaa605d384ea4479f1/SKILL.md)。
+- [R5：anything-to-course](https://github.com/lowwwbank/anything-to-course/blob/f11bbf21572a9864759929946c2c3da6857e1744/SKILL.md)。
+- [R6：agent-tutor](https://github.com/Mohamed-El-Sharqawy/agent-tutor/blob/5651e2eec062785967d07bcb4752a59f1bcf0eee/skills/agent-tutor/SKILL.md)。
+- [R7：Firecrawl knowledge-ingest](https://github.com/firecrawl/firecrawl-workflows/blob/d2a986240f9d786ae54fc33fcfd9ad37308e9cc3/skills/firecrawl-knowledge-ingest/SKILL.md)；[官方正文提取说明](https://docs.firecrawl.dev/features/scrape)。
+- [R8：Tavily MCP](https://docs.tavily.com/documentation/mcp)。
+- [R9：Exa MCP](https://exa.ai/docs/get-started/exa-mcp)。
+- [R10：AIHOT llms.txt](https://aihot.news/llms.txt)；[OpenAPI](https://aihot.news/openapi-v1.json)。其条目窗口、版本、缓存和原文链接以实际接口文档为准。
+- [R11：DeepWiki 官方 MCP](https://github.com/CognitionAI/deepwiki/blob/main/README.md)。
+- [R12：Context7 API 与版本回退说明](https://context7.com/docs/api-guide)。
+- [R13：research-with-sources](https://github.com/inkeep/open-knowledge-skills/blob/6f2713963010ac24d6cf5c17cfda4876eb73defd/skills/starter-packs/knowledge-base/research-with-sources/SKILL.md)。
+- [R14：Nature Portfolio 同行评审政策与局限](https://www.nature.com/nature-portfolio/editorial-policies/peer-review)。已阅读政策页；不据此宣称全部期刊内容经过相同评审。
+- [R15：Crossref Crossmark](https://www.crossref.org/services/crossmark/)。已核对其更新、更正与撤回状态用途，尚未接入或验证具体出版物的覆盖。
+- [知网入口](https://www.cnki.net/)：本轮入口转向站点但未获得可读主页正文；不宣称已核对其全文接口。具体访问方式与文献元数据能力留到 S1 样例验证。
+
+可行性讨论补充参考（本会话于 2026-11-02 定向核对；不是新增依赖或已完成效果评测）：
+
+| 来源 | 已核对范围与设计用途 | 不能据此推出 |
+| --- | --- | --- |
+| [R16：Anthropic，Building effective agents](https://www.anthropic.com/research/building-effective-agents) | 2024-12-19 文章的简单工作流、角色编排与复杂度取舍；支持按实测收益增加复杂度 | 文中工具清单全部仍适用，或本库多 Agent 已有收益 |
+| [R17：LangGraph Persistence](https://docs.langchain.com/oss/python/langgraph/persistence)；[Checkpointers](https://docs.langchain.com/oss/python/langgraph/checkpointers) | 已读持久化与检查点相关说明：运行状态、跨运行数据与恢复点分开；作为任务/run 边界参考 | 需要迁移到 LangGraph／外部数据库，或已有 Executor 应被替换；动态文档未固定 commit |
+| [R18：Zheng 等，Judging LLM-as-a-Judge，v4](https://arxiv.org/abs/2306.05685v4) | 2023 年论文摘要与版本信息；已核对其讨论位置、冗长、自我偏好及推理限制，全文方法留待校准需要时读取 | 论文旧模型结果等于当前模型误差率，或对话偏好判断等于学习掌握判断 |
+| [R19：Karpicke 与 Blunt，Science，2011](https://learninglab.psych.purdue.edu/downloads/2011/2011_Karpicke_Blunt_Science.pdf) | 作者实验室提供的论文，DOI 10.1126/science.1199327；已读科学文本检索练习、推理与延迟测试相关内容 | 本库 AI 教学效果已获证实，或一次即时验收代表长期保持 |
+
+本地衔接依据：[现有维护方案](maintenance-plan.md)、[当前设计入口](README.md)、[现有协调器](../../tools/wiki_runtime/coordinator/README.md)、[执行器](../../tools/wiki_runtime/executor/README.md)、[规则正本](../../AGENTS.md)。外部技能文本仅作为研究资料，不自动成为本库指令。
+
+## 附录：引用编号定义
+
+正文中的 `[R1]`～`[R19]` 指向本文第 14 节「公开项目与技能调研」表格与文末链接清单中的对应条目；此处补齐为可解析的引用定义。
+
+[R1]: https://github.com/mattpocock/skills
+[R2]: https://github.com/rodbv/socratic-skills
+[R3]: https://github.com/sanyuan0704/sanyuan-skills
+[R4]: https://github.com/Bhala-Srinivash/agent-tutor-skill
+[R5]: https://github.com/lowwwbank/anything-to-course
+[R6]: https://github.com/Mohamed-El-Sharqawy/agent-tutor
+[R7]: https://github.com/firecrawl/firecrawl-workflows
+[R8]: https://docs.tavily.com/documentation/mcp
+[R9]: https://exa.ai/docs/get-started/exa-mcp
+[R10]: https://aihot.news/llms.txt
+[R11]: https://github.com/CognitionAI/deepwiki/blob/main/README.md
+[R12]: https://context7.com/docs/api-guide
+[R13]: https://github.com/inkeep/open-knowledge-skills
+[R14]: https://www.nature.com/nature-portfolio/editorial-policies/peer-review
+[R15]: https://www.crossref.org/services/crossmark/
+[R16]: https://www.anthropic.com/research/building-effective-agents
+[R17]: https://docs.langchain.com/oss/python/langgraph/persistence
+[R18]: https://arxiv.org/abs/2306.05685v4
+[R19]: https://learninglab.psych.purdue.edu/downloads/2011/2011_Karpicke_Blunt_Science.pdf
