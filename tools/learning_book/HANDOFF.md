@@ -1,12 +1,10 @@
 # 学习交接包与外部 Agent 消费（I5）
 
 I6 已完成真实部署、原生学习、独立恢复及交接消费的限定范围验收，见 最终报告（未随公开仓库附带）和 真实包（未随公开仓库附带）。本地消费示例见 候选（未随公开仓库附带），实际运行补丁见 [I6 清单](../../patches/deeptutor/i6/README.md)。
-I6 已完成真实部署、原生学习、独立恢复及交接消费的限定范围验收，见 最终报告（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i6/acceptance.md）和 真实包（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i6/handoff/handoff.json）。本地消费示例见 候选（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i6/consumer-candidate.md），实际运行补丁见 [I6 清单](../../patches/deeptutor/i6/README.md)。
 
 `Handoff.export_learning_results(...)` 只读取上游课程／学习记录／所选公开教学会话，输出不可变 `learning-handoff/1` 包。`verify_handoff(...)` 只做本地校验，不连接服务、不访问原 state 或原文定位。上游是唯一可写学习状态；本模块不回放答案、不生成课程、不修改正式 raw/wiki，不自动 ingest/approve。
 
 I5 本地／HTTP 验收已完成，见 最终证据（未随公开仓库附带）。真实部署还需 I6 核对安装的补丁／发行物和实际 I3 活动／语料回执，不能把裸 bookId、合成样例或 I2 旧用量额度当生产授权。
-I5 本地／HTTP 验收已完成，见 最终证据（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i5/validated/README.md）。真实部署还需 I6 核对安装的补丁／发行物和实际 I3 活动／语料回执，不能把裸 bookId、合成样例或 I2 旧用量额度当生产授权。
 
 ## 命令与普通应用方法
 
@@ -54,7 +52,6 @@ export-results 的 status=succeeded／退出码 0 表示本次声明范围的记
 首次基线后存在合法扩展时，包升级为 `learning-handoff/3`。`extensionEvidence` 指向当次原始扩展证据，包含连续内容序号、前驱提交摘要、前后受保护内容摘要和实际 revision 边界；revision 跳号本身不等于内容链断档。离线 verifier 从首次快照有界重放至当前内容，检查链完整、逐题关联及 `unreviewed` 状态，缺文件、缺中间提交、分叉、篡改和降级均拒绝。
 
 旧题继续使用 `baseline_consistent`；新题使用 `extension_consistent` 并携带所属 commitDigest 和 `qualityReview=unreviewed`。这表示扩展内容可关联，不表示正式审查通过、提交时版本证明或用户已掌握。个人笔记不作为受保护正文重放，但也不得借笔记类型掩护正文变化。普通 GET 使用轻量稳定屏障，I4／I5 才执行完整重放；当前上限 1,024 次提交、32 MiB 链证据，超限明确诊断而不截断。旧 `/1`、`/2` 包按原规则读取，不原地改写。候选验证范围见扩展证据（未随公开仓库附带）。
-旧题继续使用 `baseline_consistent`；新题使用 `extension_consistent` 并携带所属 commitDigest 和 `qualityReview=unreviewed`。这表示扩展内容可关联，不表示正式审查通过、提交时版本证明或用户已掌握。个人笔记不作为受保护正文重放，但也不得借笔记类型掩护正文变化。普通 GET 使用轻量稳定屏障，I4／I5 才执行完整重放；当前上限 1,024 次提交、32 MiB 链证据，超限明确诊断而不截断。旧 `/1`、`/2` 包按原规则读取，不原地改写。候选验证范围见扩展证据（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-controlled-extension/README.md）。
 
 ## 选择、稳定性与限额
 

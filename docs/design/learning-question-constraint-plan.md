@@ -101,7 +101,6 @@ Q1 已交付[JSON Schema](../../tools/learning_book/schemas/question-spec.schema
 - `questionDigest`：实际题目的 ID、题型、题干、选项键及内容、答案、解释，加 optionOrder；不把运行时间等观察字段混入。已知 difficulty／concentration 标签不参与此摘要，未知其他字段拒绝。
 
 选项顺序同时按现有投影留存，变化须重审。两个摘要 envelope 及确切算法见Q1 接口核对（未随公开仓库附带）。模板字母与最终选项内容不等价，不能把旧的“A 对应 C3”直接套到生成结果。
-选项顺序同时按现有投影留存，变化须重审。两个摘要 envelope 及确切算法见Q1 接口核对（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-question-q1/interface-check.md）。模板字母与最终选项内容不等价，不能把旧的“A 对应 C3”直接套到生成结果。
 
 ## 6. 两条路径的接口约定
 
@@ -112,7 +111,6 @@ Q1 已交付[JSON Schema](../../tools/learning_book/schemas/question-spec.schema
 由 Production 提供窄业务操作，入参含 activityId、requestId、pageId、blockId、expectedRevision、规格／定稿内容引用及审查引用。只替换当前草稿中的指定 quiz 块；不提供任意 HTTP、路径写入或任意块类型编辑能力。
 
 已选窄端点 `POST /api/books/publish-quiz` 与 `PublishQuizRequest`，并配只读 publication 状态查询，详见Q1 接口记录（未随公开仓库附带）。Q2 通过受管 API／Engine 补丁写入，复用锁、revision、取消／并发控制和事件，**不调用模型**；单文件存储不足以构成多文件事务，须补最小写 journal 并验收后才能开放。不能只在 QuizGenerator 中加分支却漏掉原生入口与授权保护。
-已选窄端点 `POST /api/books/publish-quiz` 与 `PublishQuizRequest`，并配只读 publication 状态查询，详见Q1 接口记录（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-question-q1/interface-check.md）。Q2 通过受管 API／Engine 补丁写入，复用锁、revision、取消／并发控制和事件，**不调用模型**；单文件存储不足以构成多文件事务，须补最小写 journal 并验收后才能开放。不能只在 QuizGenerator 中加分支却漏掉原生入口与授权保护。
 
 应用前重验实际来源、规格、目标块及审查绑定；应用后重新读取并逐字段核对定稿内容、题目摘要和 revision。仅允许协议中显式说明的无损规范化，不修改题干或选项措辞。失败不得假报原样发布成功。
 

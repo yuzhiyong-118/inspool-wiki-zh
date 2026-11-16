@@ -43,12 +43,30 @@ approve、规则及受信工具维护默认缺可信批准回调就拒绝；capt
 
 旧 `health.py --save/--write-graph/--graph-only` 和 `raw_index.py --write` 已转交确定性候选与 Executor，必须显式添加 `--state-dir <库外同卷私有目录>`。缺少目录参数会拒绝写入，不会自动选择位置。Health 保存与重建成功后仍按本次检查问题返回 0/1；`--graph-only` 以及 `host health --apply` 的退出码仅表示应用结果。
 
-heal 默认只读计划，旧 `--apply` 已拒绝；可信 `AgentSession.heal` 重新绑定计划依赖，经过独立内容审查及 Executor，不自动造桩。详见 [host/HEAL.md](host/HEAL.md)。微信 `--raw` 已转交来源包与 Executor，不完整内容停候选；`--out` 限库外普通新文件。详见 [host/WECHAT.md](host/WECHAT.md)。历史 Python 写函数只为可信调用者保留，不向模型角色开放。操作入口位于本仓库 `.agents/skills/` 与 `.claude/commands/`；宿主绑定与权限隔离需要在实际环境另行验证。
-heal 默认只读计划，旧 `--apply` 已拒绝；可信 `AgentSession.heal` 重新绑定计划依赖，经过独立内容审查及 Executor，不自动造桩。详见 [host/HEAL.md](host/HEAL.md)。微信 `--raw` 已转交来源包与 Executor，不完整内容停候选；`--out` 限库外普通新文件。详见 [host/WECHAT.md](host/WECHAT.md)。历史 Python 写函数只为可信调用者保留，不向模型角色开放。父仓库 skills/命令及本地 ingest 命令共 11 个入口已按 `rollout/skills/` 清单部署，备份与日志完整，尚待真实宿主绑定和权限验收。
+heal 默认只读计划，旧 `--apply` 已拒绝；可信 `AgentSession.heal` 重新绑定计划依赖，经过独立内容审查及 Executor，不自动造桩。详见 [host/HEAL.md](host/HEAL.md)。微信 `--raw` 已转交来源包与 Executor，不完整内容停候选；`--out` 限库外普通新文件。详见 [host/WECHAT.md](host/WECHAT.md)。历史 Python 写函数只为可信调用者保留，不向模型角色开放。操作入口位于本仓库 `.agents/skills/` 与 `.claude/commands/`，不依赖父仓库；历史上父仓库 skills 与命令连同本地 ingest 命令共 11 个入口按 `rollout/skills/` 清单部署过，备份与日志完整（见 [入口部署机制说明](rollout/skills/DEPLOYMENT.md)），该部署器本身不随本仓库发布，尚待真实宿主绑定和权限验收。
 
 `python -B tools/wiki_runtime/cli.py host doctor --root <库根>` 默认检查 JSON 后端并报告宿主绑定缺口，不要求 API 配置、不调用模型、不初始化私有状态。`gateway_verified_host_binding_required` 表示网关探针通过，实际受限 dispatcher 仍需宿主实现；不能把此状态解释为生产隔离或正式写入已获批准。
 
 `isolation/` 已提供角色绑定的受限工具网关、部署模板及只读预检，详见 `isolation/README.md`。当前预检明确为 not_verified / may_apply:false；没有实际受限 backend，不能仅修改模板里的字段就启用生产。T11 的脚本与 skills 路由已迁移，目标宿主的受限调用和权限验收仍未完成。
+
+## 子模块与阶段记录
+
+| 模块 | 说明 |
+| --- | --- |
+| [candidate](candidate/README.md) | T02 只读候选视图 |
+| [capture](capture/README.md) | 资料包采集与适配器 |
+| [contracts](contracts/README.md) | 公共契约与样例；[T00 任务记录](contracts/RUN-T00.md) |
+| [coordinator](coordinator/README.md) | 处理、审查、申诉与有界重试；[T08 任务记录](coordinator/RUN-T08.md) |
+| [evidence](evidence/README.md) | 证据操作台账；[KNOWLEDGE](evidence/KNOWLEDGE.md)、[PROJECTION](evidence/PROJECTION.md)、[WORKSHEET](evidence/WORKSHEET.md) |
+| [executor](executor/README.md) | 写入前复验、授权应用与恢复；[VALIDATION](executor/VALIDATION.md) |
+| [gates](gates/README.md) | G0–G2 确定性检查 |
+| [host](host/HOST-INTEGRATION.md) | 宿主接入与权限矩阵；[Codex](host/CODEX.md)、[批准](host/APPROVAL.md)、[后端](host/BACKEND.md)、[原生通道](host/NATIVE.md)、[只读](host/READONLY.md)、[监督器](host/SUPERVISOR.md) |
+| [isolation](isolation/README.md) | 角色绑定的受限工具网关；[T10 任务记录](isolation/RUN-T10.md) |
+| [review](review/content.py) | 内容审查协议（Reviewer 的固定提示与证据定位验证）；[T06 任务记录](review/RUN-T06.md) |
+| [rule_audit](rule_audit/README.md) | 规则申诉与审计；[T07 任务记录](rule_audit/RUN-T07.md) |
+| [入口部署机制](rollout/skills/DEPLOYMENT.md) | 十一个入口的部署、校验与恢复约定 |
+
+候选采集的阶段记录另见 [2026-10-26 候选运行记录](candidate/RUN-2026-10-26.md)。
 
 ## 回归命令
 

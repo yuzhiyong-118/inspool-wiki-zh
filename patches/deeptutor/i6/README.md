@@ -1,7 +1,6 @@
 # I6 固定上游补丁
 
 固定提交 60fb3bdfddb30b7740c7ce3bd9b28d908f2af6db，版本 1.7.2。安装核对见 [最终清单](manifest.json)，实际运行见 I6 验收（未随公开仓库附带）。这些是本机补丁发行物。
-固定提交 60fb3bdfddb30b7740c7ce3bd9b28d908f2af6db，版本 1.7.2。安装核对见 [最终清单](manifest.json)，实际运行见 I6 验收（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i6/README.md）。这些是本机补丁发行物。
 
 ## 补丁顺序
 

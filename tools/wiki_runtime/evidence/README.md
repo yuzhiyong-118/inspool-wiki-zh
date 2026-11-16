@@ -64,4 +64,3 @@ K1 前置处理只支持计划补讲／待澄清，observationRef 为 null；不
 普通 Python 调用使用同名函数；draft_learning_brief 必须传 wiki_root、source_root，先重验实际依赖再构造草案。模块不负责原子持久化或正式写入，调用者后续复用既有应用／Runtime 的保存与调用管理。
 
 可运行合成样例及验收见记录（未随公开仓库附带）；接口依据见[K0](../../../docs/design/knowledge-preparation-k0-contracts.md)。
-可运行合成样例及验收见记录（证据未公开，无法由本仓库独立复核：docs/design/evidence/knowledge-preparation-k1/README.md）；接口依据见[K0](../../../docs/design/knowledge-preparation-k0-contracts.md)。

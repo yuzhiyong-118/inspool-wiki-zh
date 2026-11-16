@@ -1,0 +1,105 @@
+---
+type: meta
+title: 设计迁移摘要
+status: active
+updated: 2026-11-17
+topic: 迁移范围、处理类别与未公开边界
+related_sources: []
+related_synthesis: []
+---
+
+# 设计迁移摘要
+
+本摘要说明这次迁移**做了什么**、**按什么规则处理**、**哪些内容没有公开**。逐项核对记录留在本地，不随仓库发布，因此本文不重复维护第二份设计正本。
+
+## 一、迁移的目标
+
+把原工作区的完整设计信息迁到本仓库作为**唯一设计正本**：背景、需求、备选方案与否决理由、契约、约束、审查发现与修复过程、历史状态、未决问题与证据定位全部保留；私人原文、知识页、课程正文、个人学习记录与真实模型响应不进入公开 Git 历史。
+
+执行方案见[设计信息完整迁移与单一正本方案](public-repo-content-backfill-plan.md)。
+
+## 二、已迁移的主题与入口
+
+| 主题 | 入口 |
+| --- | --- |
+| 维护门禁、反馈循环与多 Agent 协作 | [维护方案](maintenance-plan.md) |
+| 知识层页面规范、关系字段与工作流 | [Wiki 知识层约定](wiki-layer-conventions.md) |
+| 知识准备链、审校与准入入库 | [知识准备链方案](knowledge-preparation-plan.md)、[K0 契约](knowledge-preparation-k0-contracts.md)、[准入接线任务书](knowledge-candidate-admission-plan.md) |
+| 知识库重设计评估 | [审查方案](knowledge-base-redesign-review-plan.md)、[审查记录](knowledge-base-redesign-review.md) |
+| 学习底座选型、数据与交接契约 | [上游研究入口](research/upstream-learning/README.md)、[三专题收敛结论](research/upstream-learning/design-convergence/design-summary.md) |
+| 学习底座各阶段任务书与验收 | [学习实施任务书](learning-book-implementation-tasks.md)、[I3](learning-book-i3-plan.md)、[I4](learning-book-i4-plan.md)、[I5](learning-book-i5-plan.md)、[I6](learning-book-i6-plan.md) |
+| 课程按能力目标重构 | [课程内容重构方案](learning-course-authoring-redesign-plan.md)、[课程体验重设计](learning-course-experience-redesign-plan.md)、[候选蓝图](learning-course-authoring-blueprint.md) |
+| 题目生产、约束绑定与审查 | [出题约束方案](learning-question-constraint-plan.md)、[实施任务书](learning-question-implementation-tasks.md) |
+| 课程受控扩展与块生命周期 | [受控扩展方案](learning-controlled-extension-plan.md)、[评审记录](learning-controlled-extension-review.md) |
+| 学习型入库改造与分期 | [总方案](learning-gated-ingest-plan.md)、[分期路线图](learning-ingest-stages.md)、[S0](learning-ingest-s0-plan.md)、[S1](learning-ingest-s1-plan.md)、[整体审查](learning-ingest-review.md) |
+| token 成本治理 | [成本治理设计](knowledge-token-efficiency-plan.md) |
+| 上游选型的源码依据与来源版本 | [来源清单](upstream-sources.md)、[关键发现报告](research/upstream-learning/report.md)、[设计取舍](research/upstream-learning/upstream-design-rationale.md) |
+| 上游 Harness 审查 | [DeepSeek Harness 候选审查](research/deepseek-harness-review-2026-11-16.md)、[Lattice Harness 审查](research/lattice-harness-review-2026-11-16.md)、[外部审查复核](research/lattice-chatgpt-reports-review-2026-11-16.md) |
+| 框架运行时接口与补丁说明 | [运行时说明](../../tools/wiki_runtime/README.md)、[入口矩阵](../../tools/wiki_runtime/ENTRYPOINTS.md)、[上游补丁](../../patches/deeptutor/README.md) |
+| 2026-10 历史演进 | [设计评估](archive/2026-10/design-review.md)、[任务总表](archive/2026-10/development-tasks.md) |
+
+## 三、处理类别
+
+源侧共清点 2,741 份候选，全部有明确去向，未分类与阻塞均为零。
+
+| 类别 | 份数 | 含义与处理 |
+| --- | --- | --- |
+| 整体保留 | 80 | 源侧唯一版本，正文完整迁入 |
+| 逐小节合并 | 47 | 两侧都有同名文档：按小节双向合并，目标侧独有内容保留，源侧独有内容并入，两侧主张不一致时并列保留 |
+| 提取设计 | 162 | 上游源码长摘录、研究过程记录与证据检索脚本：提取其中的设计判断、复审结论与方法口径，不搬运原件 |
+| 已在目标存在 | 18 | 目标仓库已收录且内容一致，无需重复迁移 |
+| 不属设计信息 | 2,295 | 代码、夹具、locale 资源、运行产物与上游源码副本 |
+| 属私人内容 | 139 | 知识页、课程正文、个人学习记录、真实模型响应与运行验收快照 |
+
+已发布的设计文档共 79 份，覆盖上表全部主题。
+
+### 逐小节合并的规则
+
+同名文档按小节处理，而不是整份覆盖：
+
+- 两侧逐字相同 → 保留；
+- 源侧独有 → 并入；
+- 两侧都有但内容不同 → 行级并集，冲突处两侧主张并列保留，不静默择一；
+- 目标侧独有 → 保留；
+- 一侧是另一侧的裁剪版 → 采用完整版，避免同一内容出现两次；
+- 只在链接目标上不同的同一句 → 保留目标侧版本，避免产生失效锚点。
+
+## 四、必要限制
+
+1. **证据不可独立复核。** 原始证据附件（验收快照、探针结果、模型响应）未随仓库发布。引用这类结论时，正文已标注「证据未公开，无法由本仓库独立复核」；结论、口径与计数本身随正文发布。
+2. **上游源码不随仓库发布。** 全部上游引用改为固定提交永久链接，可按仓库 URL 与提交自行核对；本仓库不搬运任何上游副本。研究为**只读静态审查**，不含运行验证，涉及运行行为、真实模型表现与原生沙箱的判断只能给出源码口径。
+3. **验收计数对应写作时点。** 正文保留原始计数与测量口径，文档头部统一声明「文中状态与验收计数对应原文写作时点的环境」，防止被读成当前部署或验收状态。
+4. **本机路径已抽象。** 本机绝对路径、用户家目录、私有验证工作区与父工作区名一律替换为占位符，命令语义保留。
+5. **私人项目已抽象。** 私人课程仓库的地址与固定提交不发布，只保留设计问题与约束。
+6. **检查器的能力边界。** 公开门禁覆盖暂存树可达性、凭据形态、标题与 frontmatter、锚点与越界路径；不能可靠处理的 Markdown 写法按人工核对逐项处理并记录，不以「工具未报」当作已通过。
+
+## 五、未公开范围
+
+以下内容明确不进入公开仓库，类别与规模如下（逐项清单留在本地核对记录中）：
+
+| 未公开内容 | 规模 | 原因 |
+| --- | --- | --- |
+| 知识页与个人知识层页面 | 31 份 | 私人知识内容 |
+| 课程正文与教学材料 | 约 95 份 | 课程正文不公开 |
+| 验收证据与运行快照 | 约 2,400 份 | 运行产物，非设计信息 |
+| 私人验证目录与凭据 | 不计数 | 本机配置 |
+| 上游源码副本 | 约 32,400 份 | 不搬运上游完整副本，改用固定提交链接 |
+| 研究过程笔记与证据索引 | 约 1.1 MB | 源码摘录与检索产物；方法与结论已在研究入口与来源清单中给出 |
+| 父仓库部署器候选入口 | 11 份 | 与本仓库已本地化的入口重复，避免形成两个正本；部署机制本身保留 |
+
+上述未公开部分中包含**设计信息**的，已按「提取设计」处理并迁入；真正未公开的是原始证据与私人内容本身。
+
+## 六、验证口径
+
+- 公开门禁逐批在**真实暂存树**上运行：白名单、私人目录硬拒绝、凭据形态、链接可达性、锚点、越界路径、本机绝对路径、标题与 frontmatter、空链接标签；例外按位置与摘要绑定，例外失效即阻断。
+- 每批另做私人标记逐行扫描（盘符路径、Unix 家目录、父工作区、个人身份、凭据形态、私有验证目录、私人层链接、私有仓库），以及重复长行与重复标题检查。
+- 结构检查 `tools/health.py` 零 LLM 只读运行，无死链与孤立页。
+- **测试通过不等于迁移完成**：完成与否以正文核对、隐私审阅与导航可达性为准，见[完成标准](public-repo-content-backfill-plan.md)的对应章节。
+
+## 七、相关入口
+
+- [设计入口](README.md)：按问题查找全部设计文档。
+- [迁移方案](public-repo-content-backfill-plan.md)：执行方案、阶段划分与完成标准。
+- [发布边界](../PUBLICATION.md)：哪些内容可公开、哪些留在本地。
+- [迁移说明](../MIGRATION.md)：仓库拆分与本次迁移的关系。
+- [验证记录](../VALIDATION.md)：已执行与未执行的验证范围。

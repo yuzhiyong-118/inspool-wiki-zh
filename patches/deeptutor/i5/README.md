@@ -23,4 +23,3 @@ python -B patches/deeptutor/i5/verify_delivery.py --source <最终隔离树> --o
 准备脚本逐项校验 I4 前置与应用后字节；构建使用上游模块脚本、`PIP_NO_INDEX=1`、无依赖安装，检查 wheel 内三份累计目标文件的实际字节。不安装、不编辑 site-packages、不启动既有实例。不同构建的 ZIP 时间戳可能使 wheel hash 改变，须记录各自实际值。
 
 实际身份、报告及后续入口见 I5-A 验收（未随公开仓库附带）。项目使用独立 `learningStateReadBuild`，兼容旧 `contentReadBuild`；二者都不进入 I3 scope digest。构建配置是操作者绑定，不是服务端安装证明。真实安装／认证中间件与生产闭环留 I6。
-实际身份、报告及后续入口见 I5-A 验收（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i5/README.md）。项目使用独立 `learningStateReadBuild`，兼容旧 `contentReadBuild`；二者都不进入 I3 scope digest。构建配置是操作者绑定，不是服务端安装证明。真实安装／认证中间件与生产闭环留 I6。

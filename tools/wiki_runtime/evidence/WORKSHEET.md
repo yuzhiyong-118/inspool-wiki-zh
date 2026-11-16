@@ -96,7 +96,6 @@ python -X utf8 -B -m tools.wiki_runtime.evidence.integration_cli check-preparati
 外部写入超时或中断，先 `show`／`reconcile` 原 ID。已保存完整响应可恢复，dispatching／uncertain 不盲目重发或换 ID。`recover-inputs` 的 reindex 也是新增 POST，受控请求须重新提供有效接线。只读查看历史事实不要求今日依赖仍有效，也不重置预算。确定失败再按原 retryOf 关联；原采集、失败候选及修订次数均保留。
 
 历史验收见 K4 记录（未随公开仓库附带）；随后连接修订的当前操作见下节及整合修复记录（未随公开仓库附带）。
-历史验收见 K4 记录（证据未公开，无法由本仓库独立复核：docs/design/evidence/knowledge-preparation-k4/README.md）；随后连接修订的当前操作见下节及整合修复记录（证据未公开，无法由本仓库独立复核：docs/design/evidence/knowledge-preparation-integration-fix/README.md）。
 
 ## 7. K4 后连接修订：接收、续接与依据搬运
 

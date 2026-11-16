@@ -58,7 +58,6 @@ $learnConfig = '.learning-book-runtime/local/runtime.json'
 
 `release-19` 的真实推荐、自定义深入学习和 I4／I5 历史结果见真实验收报告（未随公开仓库附带），不覆盖本版修改。
 
-`release-19` 的真实推荐、自定义深入学习和 I4／I5 历史结果见真实验收报告（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-controlled-extension/run-46-release-19-real-custom/README.md），不覆盖本版修改。
 
 受管课程使用独立扩展路由和权威 journal，不删除 `question_content_protected`；普通原生正文／旧题修改仍拒绝。新增内容使用新块、新 question ID 和显式 `unreviewed` 状态，成功提交即保存，可以阅读和练习，但不冒充正式内容审查通过。
 
@@ -69,7 +68,6 @@ $learnConfig = '.learning-book-runtime/local/runtime.json'
 ```
 
 候选生成在正式 pages 枚举之外完成，随后短提交。生成失败或响应不完整保持 uncertain，按原 requestId 检查，不换 ID 重发。revision 冲突则通过 `/books/retry-extension` 显式关联原候选，以新提交请求复用候选字节，不重新生成。个人笔记走独立窄写入规则；深入学习子页、spine、父链接、主题映射和 Book 计数由同一提交恢复。扩展后的检查与 `/3` 交接见 [I4 基线](BASELINE.md)和[补丁说明](../../patches/deeptutor/controlled-extension/README.md)。当前证据与阻塞见本轮交接（未随公开仓库附带）。
-候选生成在正式 pages 枚举之外完成，随后短提交。生成失败或响应不完整保持 uncertain，按原 requestId 检查，不换 ID 重发。revision 冲突则通过 `/books/retry-extension` 显式关联原候选，以新提交请求复用候选字节，不重新生成。个人笔记走独立窄写入规则；深入学习子页、spine、父链接、主题映射和 Book 计数由同一提交恢复。扩展后的检查与 `/3` 交接见 [I4 基线](BASELINE.md)和[补丁说明](../../patches/deeptutor/controlled-extension/README.md)。当前证据与阻塞见本轮交接（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-controlled-extension/handoff.md）。
 
 学习前完成内容审查和 I4 基线；网页负责阅读、选择题、追问及位置恢复。聊天保留原文，并显示按 Unicode 字符实计、排除空白的原文字符数；这不是 token 数，也不把模型自称的字数当实测值。
 

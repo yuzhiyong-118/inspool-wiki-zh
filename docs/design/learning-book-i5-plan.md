@@ -37,7 +37,6 @@
 沿用 `_resolve_book_or_404`、请求 user/workspace 与 `resolved.learning`，不更改权限模型，不调用 resume/compile/生成、迁移／会话 adoption、save／score 重算。只输出当前读者的学习状态和诊断，不重复传全书内容。
 
 核心契约如下；I5-A 实施版额外返回逐项 `valueAcquired/coverage/diagnostics`、文件摘要／字节数及 `consistency=per_item_observation`，实际字节和构建身份见 验收（未随公开仓库附带）。下例只解释字段，不是实际用户记录：
-核心契约如下；I5-A 实施版额外返回逐项 `valueAcquired/coverage/diagnostics`、文件摘要／字节数及 `consistency=per_item_observation`，实际字节和构建身份见 验收（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i5/README.md）。下例只解释字段，不是实际用户记录：
 
 ```json
 {

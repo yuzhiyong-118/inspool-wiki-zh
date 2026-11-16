@@ -112,7 +112,6 @@ K1–K4 操作统一返回 result、findings、artifactRefs、nextAction，具�
 ## 7. 离线核对与放行边界
 
 使用合成样例（未随公开仓库附带）和可执行核对脚本（未随公开仓库附带）检验：旧包与新映射可对接、真实字节／定位／目标覆盖能对应、现有校验器的拒绝项与未覆盖项被如实记录。脚本不实现生产认可或语义门禁；任何传入的 user／reviewer 字符串都不能授权。
-使用合成样例（证据未公开，无法由本仓库独立复核：docs/design/evidence/knowledge-preparation-k0/fixture.json）和可执行核对脚本（未随本仓库发布：tools/tests/verify_knowledge_preparation_k0.py）检验：旧包与新映射可对接、真实字节／定位／目标覆盖能对应、现有校验器的拒绝项与未覆盖项被如实记录。脚本不实现生产认可或语义门禁；任何传入的 user／reviewer 字符串都不能授权。
 
 运行：
 

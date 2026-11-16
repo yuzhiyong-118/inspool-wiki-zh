@@ -1,7 +1,6 @@
 # I4 内容基线：采集、审查、复核
 
 状态：应用实现与本地／HTTP 契约验收通过；证据与未覆盖项（未随公开仓库附带）。没有自动编译／补题，也没有把新补丁安装到既有真实服务。产品仅用标准库，不 import DeepTutor、私有探针或测试夹具。
-状态：应用实现与本地／HTTP 契约验收通过；证据与未覆盖项（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i4/README.md）。没有自动编译／补题，也没有把新补丁安装到既有真实服务。产品仅用标准库，不 import DeepTutor、私有探针或测试夹具。
 
 ## 调用
 
@@ -62,7 +61,6 @@ state-dir/
 只下载同部署 `/files/outputs/` 下的 png/jpeg/gif/webp，必须是具名 Book workspace；General 原路由可能回退 partner，资源归属未知时不下载、标 partial。拒绝外站、越界、多重编码、query/fragment、主动内容及重定向。每轮读取实际字节，核对 MIME／位图签名、长度和 hash；最多 64 个资源、每份 8 MiB／合计 32 MiB。内容包是证据，不是离线播放器；Web 基础依赖以固定 renderer commit 标识。
 
 审查文件结构见 合成测试样例（未随公开仓库附带）。实际准备者必须核对固定快照与原文后填写，不能将样例中的 pass 当真实审查。至少包含 actor/角色、activity/snapshot/三个摘要、sourceFidelityChecked、来源身份/hash/位置/核对声明、每道 supported choice 的语义核对和来源证据、findings、unsupportedAcknowledged、decision。
-审查文件结构见 合成测试样例（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i4/examples/quality-review.json）。实际准备者必须核对固定快照与原文后填写，不能将样例中的 pass 当真实审查。至少包含 actor/角色、activity/snapshot/三个摘要、sourceFidelityChecked、来源身份/hash/位置/核对声明、每道 supported choice 的语义核对和来源证据、findings、unsupportedAcknowledged、decision。
 
 选择题只接受明确 choice、非空题干、至少两个非空选项及精确答案键、可唯一定位的 `(pageId,blockId,questionId)`；不模糊转换答案。其他题型保留为 unsupported。Generation failed、无效题／空内容／错误状态阻断。审查不能越过这些确定性门禁，来源忠实性也不能由 hash 或 READY 自动证明。
 

@@ -219,10 +219,8 @@ operation_id 只负责追踪，不是授权秘密。用户批准由可信交互�
 - 规则修改申请单独建操作，不与正在争议的内容候选一起偷渡应用。规则批准、验证器更新、旧页面迁移分别留下记录。
 - 当前任务固定规则版本；批准修订后重新建立规则快照和验证结果，不能沿用旧版本通过凭据。
 - 对外部内容和 agent 解释保留不信任边界，审查依据优先回到 raw 与本地来源页，不把讨论过程当成来源事实。
-- 0001-state-storage（未随公开仓库附带） 中 processed_into 时机的分歧是首个适合走规则审查的案例；先明确主规则与现有实践，不为了让旧 ADR 看似一致而偷偷改状态。
-- 0001-state-storage（未随本仓库发布：wiki/meta/adr/0001-state-storage.md） 中 processed_into 时机的分歧是首个适合走规则审查的案例；先明确主规则与现有实践，不为了让旧 ADR 看似一致而偷偷改状态。
-- 0003-hermes-integration（未随公开仓库附带） 描述调度与交互入口；Hermes、其他 CLI 或桌面 agent 将来都应调用同一执行器。调度系统不能自带另一套批准或写入规则。
-- 0003-hermes-integration（未随本仓库发布：wiki/meta/adr/0003-hermes-integration.md） 描述调度与交互入口；Hermes、其他 CLI 或桌面 agent 将来都应调用同一执行器。调度系统不能自带另一套批准或写入规则。
+- ADR-0001（raw 流程状态归属，见[知识层约定](wiki-layer-conventions.md)）中 processed_into 时机的分歧是首个适合走规则审查的案例；先明确主规则与现有实践，不为了让旧 ADR 看似一致而偷偷改状态。
+- ADR-0003（常驻自动化维护者，见[知识层约定](wiki-layer-conventions.md)）描述调度与交互入口；Hermes、其他 CLI 或桌面 agent 将来都应调用同一执行器。调度系统不能自带另一套批准或写入规则。
 - 本方案不新增知识分类层、不重组用户子目录、不替代现有 raw/source/knowledge 证据结构。
 
 ## 十、分阶段实施与验收

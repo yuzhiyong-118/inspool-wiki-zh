@@ -63,4 +63,3 @@ G0–G2 保留真实 ingest operation_type，复用 CandidateView 的原件／pa
 实际大仓库超过限额会拒绝，须由既有维护入口／后续 K4 处理正式内容基线，不把测试镜像的预览当真实库的 Executor 准入。输出附完整 snapshot／baseline_ref／candidateDigest，但不生成可信 manifest 或授权。业务纯预览的这些确定性报告不能作为正式 G3／用户 approve。
 
 实现与验收见 K3 证据（未随公开仓库附带）。K0–K2 的历史绑定文件不改；新增业务模型 API／网络请求为 0，宿主对话 token 未知，不操作原课程或账本。
-实现与验收见 K3 证据（证据未公开，无法由本仓库独立复核：docs/design/evidence/knowledge-preparation-k3/README.md）。K0–K2 的历史绑定文件不改；新增业务模型 API／网络请求为 0，宿主对话 token 未知，不操作原课程或账本。

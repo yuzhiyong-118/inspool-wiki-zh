@@ -57,4 +57,3 @@ result = reader.observe_records("实际activityId", clock_assumption=clock)
 即使全部门禁通过，也最多 `baseline_consistent/cooperative`，`submissionContent=unknown`；条件复核不证明当时实际显示的版本，ABA、提示影响、独立作答和掌握度仍未证明。当前未读取教学会话，assistance 始终 unknown。
 
 这里的 B 方法仍只观察进度，原阶段验收见 I5-B（未随公开仓库附带）。完整公开会话、全窗口限额／重试、可搬运包及 CLI 已在 I5-C～E 完成，入口为 [HANDOFF](HANDOFF.md)和 最终验收（未随公开仓库附带）；下一步 I6 做已安装服务的真实集成。
-这里的 B 方法仍只观察进度，原阶段验收见 I5-B（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i5/i5-b/README.md）。完整公开会话、全窗口限额／重试、可搬运包及 CLI 已在 I5-C～E 完成，入口为 [HANDOFF](HANDOFF.md)和 最终验收（证据未公开，无法由本仓库独立复核：docs/design/evidence/learning-book-i5/validated/README.md）；下一步 I6 做已安装服务的真实集成。
