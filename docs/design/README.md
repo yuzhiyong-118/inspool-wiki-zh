@@ -32,6 +32,7 @@ related_synthesis: []
 | 知识层页面、关系与图谱怎么写 | [Wiki 知识层约定](wiki-layer-conventions.md) |
 | 上游项目选型的依据是什么 | [上游来源清单](upstream-sources.md)、[关键发现报告](research/upstream-learning/report.md) |
 | 本次迁移做了什么、哪些没公开 | [迁移摘要](migration-summary.md)、[迁移方案](public-repo-content-backfill-plan.md) |
+| 历轮审查发现了什么问题、怎么修的 | [审查发现与修复机制汇总](evidence-findings.md) |
 | 八个迁移批次各做了什么、怎么复核 | [批次交接说明](migration-batches.md) |
 
 ## 当前设计
@@ -42,6 +43,7 @@ related_synthesis: []
 
 - [维护方案：门禁、反馈循环与多 Agent 维护](maintenance-plan.md) — 角色权限、候选与正式库分离、失败处理与恢复、证据链。
 - [Wiki 知识层约定](wiki-layer-conventions.md) — 页面规范、关系字段、工作流与状态机、入口职责分层，以及三条历史 ADR 决策。
+- [审查发现与修复机制汇总](evidence-findings.md) — 历轮审查中只存在于验收证据目录的问题、原因、修复机制与保留的失败教训。
 - [Token 成本治理设计与任务](knowledge-token-efficiency-plan.md) — 固定管线、用量归因、上下文与缓存、对照验收。
 
 ### 知识准备、准入与入库

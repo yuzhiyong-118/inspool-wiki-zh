@@ -18,7 +18,7 @@ related_synthesis: []
 
 **实现和临时库验收已完成，独立复核无新实质阻断。** 101 个不同检查有最终通过依据，含 18 个新增检查；按源代码修订与夹具修正分次补验，不声称一次全部通过。先读验收摘要（证据未公开，无法由本仓库独立复核：docs/design/evidence/knowledge-candidate-admission/README.md）、清单（证据未公开，无法由本仓库独立复核：docs/design/evidence/knowledge-candidate-admission/acceptance.json）和问题关闭（证据未公开，无法由本仓库独立复核：docs/design/evidence/knowledge-candidate-admission/review.md）。当前无活动 Goal、后台测试、真实 API 或正式知识应用；没有提交／推送，不再等待旧工具 session。
 
-普通原文与标准采集薄 raw 均通过专用准入和真实临时库事务；关键 WAL 点实际进程退出、撤销后离线恢复、终态重放、用户冲突保留，以及 owner CLI 在咨询期间 admit 的真实跨进程交错已验证。咨询回包覆盖授权的并发 P2 已修复关闭。原正式内容 43 文件未变；真实语义／用户身份认证不由合成审阅测试证明。
+普通原文与标准采集薄 raw 均通过专用准入和真实临时库事务；关键 WAL 点实际进程退出、撤销后离线恢复、终态重放、用户冲突保留，以及 owner CLI 在咨询期间 admit 的真实跨进程交错已验证。**咨询回包覆盖授权的并发 P2 已修复关闭**，机制与保留的失败教训见[审查发现与修复机制汇总](evidence-findings.md)第一节。原始复核记录未随本仓库发布（证据未公开，无法由本仓库独立复核：docs/design/evidence/knowledge-candidate-admission/review.md）。原正式内容 43 文件未变；真实语义／用户身份认证不由合成审阅测试证明。
 
 新增 `runtime/knowledge_ingest.py`、`host/knowledge_ingest.py` 与 `test_knowledge_ingest_admission.py`。改动 Executor 的准入类型分支、显式 knowledge_content 视图和 WAL 范围、步骤版本校验；Runtime 抽出共用 _submission_context，新增领域表仍在同一 RuntimeStore；Host 增加 admit 方法和 owner CLI，原 apply／revoke／recover 分派到专用路径，inspect 分列内容意见和实际执行状态。
 
