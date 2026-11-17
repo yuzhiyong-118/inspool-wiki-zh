@@ -33,7 +33,7 @@ related_synthesis: []
 | 上游项目选型的依据是什么 | [上游来源清单](upstream-sources.md)、[关键发现报告](research/upstream-learning/report.md) |
 | 本次迁移做了什么、哪些没公开 | [迁移摘要](migration-summary.md)、[迁移方案](public-repo-content-backfill-plan.md) |
 | 历轮审查发现了什么问题、怎么修的 | [审查发现与修复机制汇总](evidence-findings.md) |
-| 十二个迁移批次各做了什么、怎么复核 | [批次交接说明](migration-batches.md) |
+| 本次迁移现在什么状态、要决定什么 | [交接说明](migration-batches.md) |
 
 ## 当前设计
 
@@ -134,5 +134,5 @@ related_synthesis: []
 - [上游补丁](../../patches/deeptutor/README.md)：适配特定上游版本的补丁，不是已部署服务。
 - [公开发布边界](../PUBLICATION.md)、[迁移说明](../MIGRATION.md)、[验证记录](../VALIDATION.md)。
 - [迁移摘要](migration-summary.md)：本次迁移的主题、处理类别与未公开范围。
-- [批次交接说明](migration-batches.md)：十二个批次各做了什么、合并规则、复核路径与需要重点看的地方。
+- [交接说明](migration-batches.md)：本次迁移的当前状态、复核路径与需要主 Agent 拍板的事项。
 - [迁移方案](public-repo-content-backfill-plan.md)：单一设计正本的执行方案与阶段划分。

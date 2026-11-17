@@ -33,6 +33,7 @@ python -B -m unittest discover -s tools/tests
 | 门禁与权限边界、宿主接入、实际 Codex 边界 | [入口矩阵](tools/wiki_runtime/ENTRYPOINTS.md)、[宿主接入](tools/wiki_runtime/host/HOST-INTEGRATION.md)、[Codex 说明](tools/wiki_runtime/host/CODEX.md) |
 | 学习资料与出题生产怎么用 | [学习集成](tools/learning_book/README.md)、[题目生产手册](tools/learning_book/QUESTION_PRODUCTION.md) |
 | 全部设计文档怎么找 | [设计入口](docs/design/README.md) |
+| 这次迁移现在什么状态、要决定什么 | [交接说明](docs/design/migration-batches.md) |
 | 这次迁移做了什么、哪些没公开 | [设计迁移摘要](docs/design/migration-summary.md) |
 | 公开了什么、哪些内容留在本地 | [发布边界](docs/PUBLICATION.md) |
 | 这个仓库怎么从个人工作区迁出来的 | [迁移说明](docs/MIGRATION.md) |

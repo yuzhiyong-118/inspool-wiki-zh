@@ -60,7 +60,7 @@ python -B tools/check_public_release.py
 
 ## 同类排查后的额外核验（批次 J）
 
-复审追问是否还有同类问题后追加的四项核验，方法与结果见[批次交接说明](design/migration-batches.md)第三节：
+复审追问是否还有同类问题后追加的四项核验，方法与结果见[交接说明](design/migration-batches.md)第五节：
 
 - **源侧逐行对照**：私有源文件 13,434 份逐行建索引，与公开侧比对「逐字相同且带个人语义」的候选，人工判定后确认的问题已全部抽象。
 - **实例标识普查**：私有证据与运行产物 2,681 份中抽出 2,960 个标识符形态取值逐个回查，公开 Markdown 中已无实例运行标签与实例目录名。
@@ -85,7 +85,7 @@ python -B -m unittest tools.tests.test_instance_markers
 
 ## 收尾三项的额外核验（批次 K）
 
-复审留下三项后追加的核验，方法与结果见[批次交接说明](design/migration-batches.md)第三节：
+复审留下三项后追加的核验，方法与结果见[交接说明](design/migration-batches.md)第五节：
 
 - **受控扩展缺陷的演进关系**：按三轮独立复审记录重建「发现 → 修复 → 后续复核」，标出关闭版本与仍未关闭项。原始记录：`release-04` 不通过（6 项阻断）、`release-12` 不通过（4 项新阻断）、`release-14` 通过。`release-16`～`release-21` 属实现与部署，`release-21` 未做新的独立复审。
 - **提取类覆盖实测**：以已发布的 159 份公开 Markdown 为语料，对 162 份提取类来源做两轮独立判据测量——先测技术标识符落点，再对含设计判断的句子做语义级比对。定位到两处真实遗漏并已补入：上游研究笔记约 70 条源码级机制结论（新增[上游源码级机制结论提取](design/research/upstream-learning/source-mechanism-findings.md)）、I2 探针的三项核验口径教训（补入[审查发现与修复机制汇总](design/evidence-findings.md)第三节）。**该核对仍不是全量语义证明**——逐字比对识别不了改写式迁移，判断依赖人工阅读。
