@@ -100,6 +100,7 @@ related_synthesis: []
 
 - [设计入口](README.md)：按问题查找全部设计文档。
 - [迁移方案](public-repo-content-backfill-plan.md)：执行方案、阶段划分与完成标准。
+- [批次交接说明](migration-batches.md)：八个批次各做了什么、复核路径与需要重点看的地方。
 - [发布边界](../PUBLICATION.md)：哪些内容可公开、哪些留在本地。
 - [迁移说明](../MIGRATION.md)：仓库拆分与本次迁移的关系。
 - [验证记录](../VALIDATION.md)：已执行与未执行的验证范围。
