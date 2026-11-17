@@ -23,7 +23,7 @@ related_synthesis: []
 | 迁入内容 | 源侧 2,741 份候选全部有明确去向，未分类 0、阻塞 0；83 份设计文档从设计入口 100% 可达 |
 | 公开文件 | 461 份，逐批暂存树门禁 0 项问题 |
 | 批次 | 12 个，每个独立提交 + 附注标签 |
-| 提交 | 本地领先远端 **13 个提交**；远端仍是拆分框架时的 `f2cea87` |
+| 提交 | 用 `git rev-list --count origin/main..HEAD` 查询相对本地远端跟踪引用的领先提交数；该引用不代表实时远端状态 |
 | 验证 | 门禁 0 项问题 · health exit 0 · 相关测试 50 项通过 · 私人标记逐提交扫描 0 命中 · 12 个标签逐一检出后门禁均 exit 0 |
 | 私有 wiki 层 | 两处工作区 31 份文件逐字节一致；`raw/` 层未被触及 |
 
@@ -37,7 +37,7 @@ related_synthesis: []
 
 ### A. 需要你决定（3 条）
 
-1. **是否推送。** 本地 13 个提交、远端仍在 `f2cea87`。授权口径见 v3 方案 §9 S4：发布授权且阻断关闭后才推送。决定推送前请重跑 `python -B tools/check_public_release.py --staged` 与 `python -B tools/health.py --json`，并核对 `git rev-parse HEAD` 与远端一致。
+1. **是否推送。** 用 `git rev-list --count origin/main..HEAD` 查询本地待发布提交数；发布前另行核对实时远端状态。授权口径见 v3 方案 §9 S4：取得用户发布授权且阻断关闭后才推送。发布前请重跑 `python -B tools/check_public_release.py --staged` 与 `python -B tools/health.py --json`；推送成功后，再核对远端 HEAD 与实际发布的本地提交一致。
 2. **误覆盖的更正方向（批次 K）。** 第五节记载的「私有 `wiki/log.md` 被覆盖、无 Git 历史可回溯」经单独核查后**结论方向相反**：两份都未受损，私有工作区那份较新、公开工作区那份较旧，历史可回溯。已按「公开副本追上私有副本」同步 3 份文件，未做回滚。请确认这个方向对；若你认为应当以另一份为准，或需要另存一份带时间戳的快照，请说明。
 3. **`%APPDATA%\lattice\providers.json` 是否另行处理。** `docs/design/deepseek-harness-review-handoff.md` 保留了这一本机配置位置与「用户明确授权复用既有连接」的表述。路径不含身份信息，属本机环境指针；经作者确认**保持现状不抽象**，交由主 Agent 判断是否需要另行处理。
 

@@ -82,7 +82,7 @@ related_synthesis: []
 
 open-notebook-mcp 适配器落后于后端至少一轮 API 演进，具体表现为（均为 `src/open_notebook_mcp/server.py`）：
 
-- **字段关联名不一致**：`create_source` 只发 `notebook_id`（单数），而后端只读 `notebooks`（复数）（ONMCPL-004/005）；
+- **字段名差异的历史误判已纠正**：适配器发送 `notebook_id`（单数），后端推荐 `notebooks`（复数），但 `SourceCreate.validate_notebook_fields` 显式实现了兼容转换。首轮据此判断关联失效（ONMCPL-004/005），后续复核已撤回该判断（ONMCP-015）；字段名差异本身不构成接口阻断。
 - **必填性反转**：`execute_chat` 的 `context` 在适配器里可选、在后端是必填；`get_chat_context` 的 `context_config` 同样反转（ONMCPL-009/010）；
 - **请求体格式与端点声明不符**：`create_source` 发 JSON 体到表单端点（ONMCPL-004）；
 - **响应类型假设错误**：`ask_question` 打到 `POST /api/search/ask`，该端点返回 SSE 流，而适配器的 `make_request` 无条件 `r.json()`（ONMCPL-007/008）。
