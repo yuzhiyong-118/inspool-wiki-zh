@@ -67,6 +67,7 @@ related_synthesis: []
 | --- | --- | --- |
 | [报告](report.md) | 五条处理链的关键发现、八维度机制对照、对首轮评审的更正、token 成本能省／会多／不能算、未解决项、可复用入口、选型结论 | 研究正文 |
 | [上游设计动机与架构启发](upstream-design-rationale.md) | 六个项目各自在优化什么、最值得吸收的八项取舍、对当前方案的实际影响 | 分析正文 |
+| [上游源码级机制结论提取](source-mechanism-findings.md) | 支撑选型结论的源码事实、复用边界的硬约束、接口与适配器的版本偏斜、研究过程中的更正 | 分析正文 |
 | [架构方案](architecture-proposal.md) | 学习应用与知识库的整体架构方案 | 设计正文 |
 | [验收记录](acceptance-review.md) | 研究交付的验收过程与逐项核对 | 评审记录 |
 | [返修复审记录](acceptance-review-rework.md) | 验收发现的问题与返修后的复核 | 评审记录 |

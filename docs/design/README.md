@@ -33,7 +33,7 @@ related_synthesis: []
 | 上游项目选型的依据是什么 | [上游来源清单](upstream-sources.md)、[关键发现报告](research/upstream-learning/report.md) |
 | 本次迁移做了什么、哪些没公开 | [迁移摘要](migration-summary.md)、[迁移方案](public-repo-content-backfill-plan.md) |
 | 历轮审查发现了什么问题、怎么修的 | [审查发现与修复机制汇总](evidence-findings.md) |
-| 八个迁移批次各做了什么、怎么复核 | [批次交接说明](migration-batches.md) |
+| 十二个迁移批次各做了什么、怎么复核 | [批次交接说明](migration-batches.md) |
 
 ## 当前设计
 
@@ -86,6 +86,7 @@ related_synthesis: []
 - [研究方法、证据口径与未公开范围](research/upstream-learning/README.md) — 证据定位的三种形态、关键修订与校验方式。
 - [上游来源清单](upstream-sources.md) — 各仓库的固定提交、许可与审查限制。
 - [源码研究关键发现报告](research/upstream-learning/report.md) — 五条处理链、机制对照、token 成本与选型结论。
+- [上游源码级机制结论提取](research/upstream-learning/source-mechanism-findings.md) — 支撑选型结论的源码事实、复用边界的硬约束、接口偏斜与更正记录。
 - [从上游 README 与设计原则重新理解架构取舍](research/upstream-learning/upstream-design-rationale.md) — 六项目各自在优化什么、最值得吸收的八项取舍。
 - [学习应用与知识库整体架构方案](research/upstream-learning/architecture-proposal.md)
 - [研究验收记录](research/upstream-learning/acceptance-review.md) 与 [返修复审记录](research/upstream-learning/acceptance-review-rework.md)
@@ -133,5 +134,5 @@ related_synthesis: []
 - [上游补丁](../../patches/deeptutor/README.md)：适配特定上游版本的补丁，不是已部署服务。
 - [公开发布边界](../PUBLICATION.md)、[迁移说明](../MIGRATION.md)、[验证记录](../VALIDATION.md)。
 - [迁移摘要](migration-summary.md)：本次迁移的主题、处理类别与未公开范围。
-- [批次交接说明](migration-batches.md)：八个批次各做了什么、合并规则、复核路径与需要重点看的地方。
+- [批次交接说明](migration-batches.md)：十二个批次各做了什么、合并规则、复核路径与需要重点看的地方。
 - [迁移方案](public-repo-content-backfill-plan.md)：单一设计正本的执行方案与阶段划分。
